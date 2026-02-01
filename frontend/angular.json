@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "citatio-app": {
+    "citatio-front": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -61,10 +61,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "citatio-app:build:production"
+              "buildTarget": "citatio-front:build:production"
             },
             "development": {
-              "buildTarget": "citatio-app:build:development"
+              "buildTarget": "citatio-front:build:development"
             }
           },
           "defaultConfiguration": "development"

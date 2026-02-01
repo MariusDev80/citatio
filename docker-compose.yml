@@ -1,0 +1,32 @@
+services:
+  database:
+    image: postgres:15-alpine
+    container_name: citatio-db
+    restart: always
+    environment:
+      POSTGRES_DB: citatio_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+
+  backend:
+    image: ghcr.io/${GITHUB_REPOSITORY}/backend:latest
+    container_name: citatio-back
+    depends_on:
+      - database
+    environment:
+      DB_HOST: database
+      DB_NAME: citatio_db
+      DB_USER: user
+      DB_PASSWORD: password
+    ports:
+      - "8080:8080"
+
+  frontend:
+    image: ghcr.io/${GITHUB_REPOSITORY}/frontend:latest
+    container_name: citatio-front
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
