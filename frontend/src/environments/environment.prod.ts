@@ -1,0 +1,1 @@
+backendUrl: "https://citatio-geo.com/api/"

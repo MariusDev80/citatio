@@ -41,6 +41,16 @@ jobs:
           push: true
           # On utilise la nouvelle variable env.REPO_LC
           tags: ghcr.io/${{ env.REPO_LC }}/backend:latest
+      
+      # On envoie les fichiers de config sur le VPS
+      - name: Copy config files via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "docker-compose.yml,Caddyfile" # On envoie ces deux fichiers
+          target: "/opt/citatio"
 
   deploy:
     needs: build-and-push
@@ -54,9 +64,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd /opt/citatio
-            # On met à jour le fichier compose si nécessaire
             docker compose pull
             docker compose up -d
             docker image prune -f
             docker ps
-            

@@ -11,7 +11,7 @@ services:
       - ./data/db:/var/lib/postgresql/data
 
   backend:
-    image: ghcr.io/MariusDev80/citatio/backend:latest
+    image: ghcr.io/mariusdev80/citatio/backend:latest
     container_name: citatio-back
     depends_on:
       - database
@@ -20,13 +20,27 @@ services:
       DB_NAME: citatio_db
       DB_USER: user
       DB_PASSWORD: password
-    ports:
-      - "8080:8080"
+    # On n'ouvre plus de "ports", on "expose" uniquement en interne pour Caddy
+    expose:
+      - "8080"
 
   frontend:
-    image: ghcr.io/MariusDev80/citatio/frontend:latest
+    image: ghcr.io/mariusdev80/citatio/frontend:latest
     container_name: citatio-front
+    expose:
+      - "80"
+
+  gateway:
+    image: caddy:latest
+    container_name: citatio-gateway
+    restart: always
     ports:
-      - "80:80"
+      - "80:80"     # HTTP (pour redirection automatique)
+      - "443:443"   # HTTPS
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./data/caddy_data:/data
+      - ./data/caddy_config:/config
     depends_on:
+      - frontend
       - backend
