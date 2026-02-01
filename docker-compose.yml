@@ -11,7 +11,7 @@ services:
       - ./data/db:/var/lib/postgresql/data
 
   backend:
-    image: ghcr.io/${GITHUB_REPOSITORY}/backend:latest
+    image: ghcr.io/MariusDev80/citatio/backend:latest
     container_name: citatio-back
     depends_on:
       - database
@@ -24,7 +24,7 @@ services:
       - "8080:8080"
 
   frontend:
-    image: ghcr.io/${GITHUB_REPOSITORY}/frontend:latest
+    image: ghcr.io/MariusDev80/citatio/frontend:latest
     container_name: citatio-front
     ports:
       - "80:80"
