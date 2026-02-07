@@ -1,0 +1,59 @@
+<div class="contact-container">
+  <h1>Nous contacter</h1>
+
+  <div class="contact-grid">
+    <p-card class="contact-info">
+      <h3>Coordonnées</h3>
+      <div class="info-item">
+        <i class="pi pi-envelope"></i>
+        <p>Email : <a href="mailto:info@citatio.com">info&#64;citatio.com</a></p>
+      </div>
+      <div class="info-item">
+        <i class="pi pi-phone"></i>
+        <p>Tél : <a href="tel:+33123456789">+33 1 23 45 67 89</a></p>
+      </div>
+      <div class="info-item">
+        <i class="pi pi-map-marker"></i>
+        <p>123 Rue de la République, 75000 Paris</p>
+      </div>
+    </p-card>
+
+    <p-card class="contact-form-card">
+      <h3>Formulaire de Contact</h3>
+
+      @if (submitSuccess()) {
+        <div class="success-msg">
+          <i class="pi pi-check-circle"></i> Votre message a été envoyé avec succès !
+        </div>
+      }
+
+      <form [formGroup]="contactForm" (ngSubmit)="submitForm()">
+        <div class="field">
+          <label for="name">Nom</label>
+          <input pInputText id="name" formControlName="name" placeholder="Votre nom" />
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input pInputText id="email" type="email" formControlName="email" placeholder="Votre email" />
+        </div>
+
+        <div class="field">
+          <label for="subject">Sujet</label>
+          <input pInputText id="subject" formControlName="subject" placeholder="Sujet" />
+        </div>
+
+        <div class="field">
+          <label for="message">Message</label>
+          <textarea pTextarea id="message" formControlName="message" rows="5" placeholder="Votre message"></textarea>
+        </div>
+
+        <p-button
+          type="submit"
+          label="Envoyer"
+          icon="pi pi-send"
+          [disabled]="contactForm.invalid && submitted()" />
+      </form>
+    </p-card>
+  </div>
+</div>

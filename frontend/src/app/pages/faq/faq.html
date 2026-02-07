@@ -1,0 +1,14 @@
+<div class="faq-container">
+  <h1>Questions Fréquemment Posées</h1>
+
+  <p-accordion [multiple]="true" [value]="['0']">
+    @for (item of faqItems(); track item.question; let i = $index) {
+      <p-accordion-panel [value]="i.toString()">
+        <p-accordion-header>{{ item.question }}</p-accordion-header>
+        <p-accordion-content>
+          <p>{{ item.answer }}</p>
+        </p-accordion-content>
+      </p-accordion-panel>
+    }
+  </p-accordion>
+</div>

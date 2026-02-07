@@ -11,3 +11,12 @@ frontend/.angular/
 backend/target/
 backend/.mvn/
 backend/mvnw.cmd
+
+# Logs
+logs/
+*.log
+
+# Local
+data/
+docker-compose.local.yml
+Caddyfile.local
