@@ -1,25 +1,33 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { MenubarModule } from 'primeng/menubar';
-import { MenuItem } from 'primeng/api';
+import { NgOptimizedImage } from '@angular/common';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+
+interface NavItem {
+  label: string;
+  path: string;
+  exact?: boolean;
+}
 
 /**
- * NavbarComponent utilise le composant `p-menubar` de PrimeNG qui gère nativement
- * le responsive (burger menu), les sous-menus, et l'accessibilité ARIA.
- * Les items de navigation sont définis via un signal pour rester cohérent
- * avec l'architecture réactive Angular 21.
+ * NavbarComponent – navigation principale de l'application.
+ *
+ * On construit le template manuellement plutôt que d'utiliser [model]
+ * du p-menubar afin de bénéficier de `routerLinkActive` natif Angular
+ * pour l'indicateur de page active (trait sous le lien).
  */
 @Component({
   selector: 'app-navbar',
-  imports: [MenubarModule],
+  imports: [NgOptimizedImage, RouterLink, RouterLinkActive],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavbarComponent {
-  protected readonly menuItems = signal<MenuItem[]>([
-    { label: 'Accueil', icon: 'pi pi-home', routerLink: '/' },
-    { label: 'Qui sommes nous', icon: 'pi pi-users', routerLink: '/about' },
-    { label: 'FAQ', icon: 'pi pi-question-circle', routerLink: '/faq' },
-    { label: 'Contact', icon: 'pi pi-envelope', routerLink: '/contact' },
+  protected readonly navItems = signal<NavItem[]>([
+    { label: 'Accueil', path: '/', exact: true },
+    { label: 'Services', path: '/services' },
+    { label: 'Qui sommes nous', path: '/about' },
+    { label: 'FAQ', path: '/faq' },
+    { label: 'Contact', path: '/contact' },
   ]);
 }

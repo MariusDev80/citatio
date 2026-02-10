@@ -1,5 +1,19 @@
-<p-menubar [model]="menuItems()">
-  <ng-template #start>
-    <span class="brand">Citatio</span>
-  </ng-template>
-</p-menubar>
+<nav class="navbar" role="navigation" aria-label="Navigation principale">
+  <a routerLink="/" class="brand-link" aria-label="Accueil Citatio">
+    <img ngSrc="citatio_logo.png" alt="Logo Citatio" width="150" height="50" priority />
+  </a>
+
+  <ul class="nav-items">
+    @for (item of navItems(); track item.path) {
+      <li class="nav-item">
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+          class="nav-link">
+          {{ item.label }}
+        </a>
+      </li>
+    }
+  </ul>
+</nav>

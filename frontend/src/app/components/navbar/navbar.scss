@@ -1,6 +1,91 @@
-.brand {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--p-primary-color);
-  margin-right: 1rem;
+:host {
+  display: block;
+}
+
+.navbar {
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  background: var(--p-surface-0);
+  border-bottom: 1px solid var(--p-surface-200);
+  padding: 0 2rem;
+  height: 64px;
+}
+
+.brand-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+
+  img {
+    height: 42px;
+    width: auto;
+    object-fit: contain;
+  }
+}
+
+// Centrage absolu : les items sont centrés par rapport à toute la largeur
+// de la navbar, indépendamment de la place prise par le logo.
+.nav-items {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0.25rem;
+  pointer-events: none;
+}
+
+.nav-item {
+  display: flex;
+  align-items: stretch;
+  pointer-events: auto;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0 1.25rem;
+  text-decoration: none;
+  color: var(--p-text-color);
+  font-weight: 500;
+  font-size: 0.95rem;
+  position: relative;
+  transition: color 0.2s ease;
+
+  // Underline indicator – hidden by default
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 25%;
+    width: 50%;
+    height: 3px;
+    border-radius: 3px 3px 0 0;
+    background: var(--p-primary-color);
+    transform: scaleX(0);
+    transition: transform 0.25s ease;
+  }
+
+  &:hover {
+    color: var(--p-primary-color);
+  }
+
+  // Active state – applied by routerLinkActive directive
+  &.active {
+    color: var(--p-primary-color);
+
+    &::after {
+      transform: scaleX(1);
+    }
+  }
 }

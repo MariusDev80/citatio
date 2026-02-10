@@ -1,16 +1,19 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { providePrimeNG } from 'primeng/config';
-import Aura from '@primeuix/themes/aura';
+import CitatioPreset from './theme/citatio-preset';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
+    provideRouter(routes, withInMemoryScrolling({ scrollPositionRestoration: 'top' })),
     providePrimeNG({
       theme: {
-        preset: Aura,
+        preset: CitatioPreset,
+        options: {
+          darkModeSelector: '.app-dark',
+        },
       },
     }),
   ],
