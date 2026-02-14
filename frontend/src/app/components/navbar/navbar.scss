@@ -1,15 +1,25 @@
+// ──────────────────────────────────────────────
+// Breakpoint mobile : en-dessous de cette valeur
+// le menu bascule en mode "hamburger".
+// ──────────────────────────────────────────────
+$mobile-breakpoint: 768px;
+
 :host {
   display: block;
+  position: relative; // ancrage pour le dropdown mobile
 }
 
+// ────── Barre principale ──────
 .navbar {
   display: flex;
-  align-items: stretch;
+  align-items: center;
+  justify-content: space-between;
   position: relative;
   background: var(--p-surface-0);
   border-bottom: 1px solid var(--p-surface-200);
   padding: 0 2rem;
   height: 64px;
+  z-index: 100;
 }
 
 .brand-link {
@@ -27,9 +37,23 @@
   }
 }
 
-// Centrage absolu : les items sont centrés par rapport à toute la largeur
-// de la navbar, indépendamment de la place prise par le logo.
+// ────── Bouton hamburger ──────
+// Caché sur desktop, visible uniquement sous le breakpoint.
+.menu-toggle {
+  display: none;
+  position: relative;
+  z-index: 1;
+
+  @media (max-width: $mobile-breakpoint - 1) {
+    display: flex;
+  }
+}
+
+// ────── Liste de navigation ──────
+// Desktop : centrée en position absolue dans la barre.
+// Mobile  : dropdown vertical sous la navbar.
 .nav-items {
+  // ----- Desktop (défaut) -----
   position: absolute;
   left: 0;
   right: 0;
@@ -43,12 +67,50 @@
   padding: 0;
   gap: 0.25rem;
   pointer-events: none;
+
+  // ----- Mobile -----
+  @media (max-width: $mobile-breakpoint - 1) {
+    // Repositionner en dropdown absolu sous la navbar.
+    position: absolute;
+    top: 64px; // hauteur de la navbar
+    left: 0;
+    right: 0;
+    bottom: auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: var(--p-surface-0);
+    border-bottom: 1px solid var(--p-surface-200);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
+    pointer-events: auto;
+
+    // ── Animation collapse / expand ──
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition:
+      max-height 0.35s ease,
+      opacity 0.25s ease;
+
+    &.open {
+      max-height: 500px; // assez grand pour contenir tous les items
+      opacity: 1;
+    }
+  }
 }
 
 .nav-item {
   display: flex;
   align-items: stretch;
   pointer-events: auto;
+
+  @media (max-width: $mobile-breakpoint - 1) {
+    border-bottom: 1px solid var(--p-surface-100);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
 }
 
 .nav-link {
@@ -62,7 +124,7 @@
   position: relative;
   transition: color 0.2s ease;
 
-  // Underline indicator – hidden by default
+  // Underline indicator – hidden by default (desktop only)
   &::after {
     content: '';
     position: absolute;
@@ -86,6 +148,27 @@
 
     &::after {
       transform: scaleX(1);
+    }
+  }
+
+  // ── Ajustements mobile ──
+  @media (max-width: $mobile-breakpoint - 1) {
+    padding: 1rem 1.5rem;
+    width: 100%;
+    font-size: 1rem;
+
+    // Pas d'underline indicator sur mobile : on utilise
+    // un background subtil à la place.
+    &::after {
+      display: none;
+    }
+
+    &.active {
+      background: var(--p-primary-50, rgba(0 0 0 / 4%));
+    }
+
+    &:hover {
+      background: var(--p-surface-50);
     }
   }
 }

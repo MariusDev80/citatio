@@ -1,9 +1,25 @@
 <nav class="navbar" role="navigation" aria-label="Navigation principale">
   <a routerLink="/" class="brand-link" aria-label="Accueil Citatio">
-    <img ngSrc="citatio_logo.png" alt="Logo Citatio" width="150" height="50" priority />
+    <img ngSrc="logo/LOGO GEOIA (3).png" alt="Logo Citatio" width="150" height="50" priority />
   </a>
 
-  <ul class="nav-items">
+  <!-- Bouton hamburger visible uniquement sur mobile -->
+  <p-button
+    class="menu-toggle"
+    [icon]="menuOpen() ? 'pi pi-times' : 'pi pi-bars'"
+    [rounded]="true"
+    [text]="true"
+    [attr.aria-expanded]="menuOpen()"
+    aria-controls="navbar-menu"
+    aria-label="Ouvrir le menu de navigation"
+    (onClick)="toggleMenu()" />
+
+  <!-- Liste de navigation : inline sur desktop, dropdown sur mobile -->
+  <ul
+    id="navbar-menu"
+    class="nav-items"
+    [class.open]="menuOpen()"
+    role="list">
     @for (item of navItems(); track item.path) {
       <li class="nav-item">
         <a
