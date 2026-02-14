@@ -11,7 +11,7 @@
 
   h3 {
     color: var(--p-primary-color, #667eea);
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
   }
 }
 
@@ -28,14 +28,18 @@
 
 .info-item {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 
   i {
     color: var(--p-primary-color, #667eea);
     font-size: 1.3rem;
-    margin-top: 0.15rem;
+    flex-shrink: 0;
+  }
+
+  p {
+    margin: 0;
   }
 
   a {
@@ -72,4 +76,9 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+textarea {
+  min-height: 150px;
+  max-height: 300px;
 }
