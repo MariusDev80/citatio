@@ -15,7 +15,7 @@ export const appConfig: ApplicationConfig = {
       theme: {
         preset: CitatioPreset,
         options: {
-          darkModeSelector: '.app-dark',
+          darkModeSelector: '.dark',
         },
       },
     }),

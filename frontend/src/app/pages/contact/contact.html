@@ -1,51 +1,55 @@
-<div class="contact-container">
-  <h1>Nous contacter</h1>
+<div class="pt-32 pb-16 max-w-5xl mx-auto px-6">
+  <h1 class="ct-page-title mb-12">Nous contacter</h1>
 
-  <div class="contact-grid">
-    <p-card class="contact-info">
-      <h3>Coordonnées</h3>
-      <div class="info-item">
-        <i class="pi pi-envelope centered"></i>
-        <p>Email : <a href="mailto:contact@citatio-geo.com">contact&#64;citatio-geo.com</a></p>
-      </div>
-      <div class="info-item">
-        <i class="pi pi-phone"></i>
-        <p>Tél : <a href="tel:+33767478372">+33 7 67 47 83 72</a></p>
-      </div>
-      <div class="info-item">
-        <i class="pi pi-map-marker"></i>
-        <p>1 rue de l'Aven, 44240 La Chapelle-sur-Erdre</p>
-      </div>
-    </p-card>
+  <div class="grid grid-cols-1 md:grid-cols-5 gap-8 items-start">
 
-    <p-card class="contact-form-card">
-      <h3>Formulaire de Contact</h3>
+    <!-- Coordonnées -->
+    <div class="md:col-span-2 ct-card">
+      <h3 class="text-xl font-bold ct-text-accent mb-6">Coordonnées</h3>
+
+      <div class="flex items-center gap-3 mb-6">
+        <i class="pi pi-envelope ct-text-accent text-lg shrink-0"></i>
+        <p class="ct-text-secondary">Email : <a href="mailto:contact@citatio-geo.com" class="ct-text-accent hover:underline">contact&#64;citatio-geo.com</a></p>
+      </div>
+      <div class="flex items-center gap-3 mb-6">
+        <i class="pi pi-phone ct-text-accent text-lg shrink-0"></i>
+        <p class="ct-text-secondary">Tél : <a href="tel:+33767478372" class="ct-text-accent hover:underline">+33 7 67 47 83 72</a></p>
+      </div>
+      <div class="flex items-center gap-3">
+        <i class="pi pi-map-marker ct-text-accent text-lg shrink-0"></i>
+        <p class="ct-text-secondary">1 rue de l'Aven, 44240 La Chapelle-sur-Erdre</p>
+      </div>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="md:col-span-3 ct-card">
+      <h3 class="text-xl font-bold ct-text-accent mb-6">Formulaire de Contact</h3>
 
       @if (submitSuccess()) {
-        <div class="success-msg">
+        <div class="flex items-center gap-2 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 p-4 rounded-xl mb-6">
           <i class="pi pi-check-circle"></i> Votre message a été envoyé avec succès !
         </div>
       }
 
-      <form [formGroup]="contactForm" (ngSubmit)="submitForm()">
-        <div class="field">
-          <label for="name">Nom</label>
-          <input pInputText id="name" formControlName="name" placeholder="Votre nom" />
+      <form [formGroup]="contactForm" (ngSubmit)="submitForm()" class="space-y-5">
+        <div class="flex flex-col gap-2">
+          <label for="name" class="font-semibold ct-text-secondary">Nom</label>
+          <input pInputText id="name" formControlName="name" placeholder="Votre nom" class="w-full" />
         </div>
 
-        <div class="field">
-          <label for="email">Email</label>
-          <input pInputText id="email" type="email" formControlName="email" placeholder="Votre email" />
+        <div class="flex flex-col gap-2">
+          <label for="email" class="font-semibold ct-text-secondary">Email</label>
+          <input pInputText id="email" type="email" formControlName="email" placeholder="Votre email" class="w-full" />
         </div>
 
-        <div class="field">
-          <label for="subject">Sujet</label>
-          <input pInputText id="subject" formControlName="subject" placeholder="Sujet" />
+        <div class="flex flex-col gap-2">
+          <label for="subject" class="font-semibold ct-text-secondary">Sujet</label>
+          <input pInputText id="subject" formControlName="subject" placeholder="Sujet" class="w-full" />
         </div>
 
-        <div class="field">
-          <label for="message">Message</label>
-          <textarea pTextarea id="message" formControlName="message" rows="5" placeholder="Votre message"></textarea>
+        <div class="flex flex-col gap-2">
+          <label for="message" class="font-semibold ct-text-secondary">Message</label>
+          <textarea pTextarea id="message" formControlName="message" rows="5" placeholder="Votre message" class="w-full"></textarea>
         </div>
 
         <p-button
@@ -54,6 +58,6 @@
           icon="pi pi-send"
           [disabled]="contactForm.invalid && submitted()" />
       </form>
-    </p-card>
+    </div>
   </div>
 </div>

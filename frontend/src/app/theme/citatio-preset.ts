@@ -2,18 +2,14 @@ import { definePreset } from '@primeuix/themes';
 import Aura from '@primeuix/themes/aura';
 
 /**
- * Custom PrimeNG preset for Citatio.
+ * Citatio PrimeNG preset — Aura base with a blue/slate palette
+ * inspired by the landing page design.
  *
- * Built on top of Aura using `definePreset` — the recommended approach
- * from PrimeNG's theming documentation. Primitive token references like
- * `{blue.500}` resolve to the built-in color palette at runtime, which
- * ensures consistency and dark/light mode support out of the box.
- *
- * Palette: blue / sky (light blue) primary — slate (black-ish) surfaces.
+ * Dark mode is driven by the `.dark` class on `<html>`, shared
+ * with Tailwind CSS so both systems react to the same toggle.
  */
 const CitatioPreset = definePreset(Aura, {
   semantic: {
-    // Map the primary color ramp to the built-in blue palette
     primary: {
       50: '{blue.50}',
       100: '{blue.100}',
@@ -27,7 +23,6 @@ const CitatioPreset = definePreset(Aura, {
       900: '{blue.900}',
       950: '{blue.950}',
     },
-
     colorScheme: {
       light: {
         primary: {
@@ -42,7 +37,6 @@ const CitatioPreset = definePreset(Aura, {
           color: '{blue.700}',
           focusColor: '{blue.800}',
         },
-        // Slate surfaces give a subtle cool-gray / black tone in light mode
         surface: {
           0: '#ffffff',
           50: '{slate.50}',
@@ -60,18 +54,17 @@ const CitatioPreset = definePreset(Aura, {
       },
       dark: {
         primary: {
-          color: '{sky.400}',
+          color: '{blue.400}',
           inverseColor: '{slate.950}',
-          hoverColor: '{sky.300}',
-          activeColor: '{sky.200}',
+          hoverColor: '{blue.300}',
+          activeColor: '{blue.200}',
         },
         highlight: {
-          background: 'rgba(56, 189, 248, 0.16)',
-          focusBackground: 'rgba(56, 189, 248, 0.24)',
+          background: 'rgba(96, 165, 250, 0.16)',
+          focusBackground: 'rgba(96, 165, 250, 0.24)',
           color: 'rgba(255, 255, 255, 0.87)',
           focusColor: 'rgba(255, 255, 255, 0.87)',
         },
-        // Dark slate surfaces for a deep black/dark-blue feel
         surface: {
           0: '#ffffff',
           50: '{slate.50}',

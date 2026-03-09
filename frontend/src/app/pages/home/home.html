@@ -1,104 +1,166 @@
-<section class="hero">
-  <h1>Rendez votre entreprise visible sur l'IA</h1>
-  <p>
-    Vos clients utilisent ChatGPT, Gemini et Google AI pour trouver des solutions.
-    Êtes-vous dans leurs réponses ?
-  </p>
-  <p-button label="Découvrir le GEO" icon="pi pi-arrow-right" routerLink="/services" />
-</section>
+<!-- ═══ Hero Section ═══ -->
+<section class="relative pt-40 pb-40 overflow-hidden min-h-[95vh] flex items-center justify-center transition-colors duration-500">
 
-<section class="about-geo">
-  <div class="about-geo-content">
-    <h2>Le SEO ne suffit plus.</h2>
-    <p class="lead">
-      De plus en plus de vos prospects utilisent les moteurs génératifs — ChatGPT,
-      Gemini, Perplexity — pour chercher des prestataires, comparer des offres et
-      prendre des décisions. Si votre entreprise n'apparaît pas dans ces réponses,
-      <strong>vous êtes invisible sur un canal qui explose</strong>.
+  <app-radar-animation />
+
+  <!-- Contenu Hero -->
+  <div class="max-w-7xl mx-auto px-6 relative z-30 flex flex-col items-center text-center">
+
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50/90 dark:bg-blue-900/20 backdrop-blur-md border border-blue-100 dark:border-blue-800 text-blue-700 dark:text-blue-400 text-xs font-bold mb-10 animate-bounce shadow-sm cursor-default">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      L'ÈRE DU SEO EST RÉVOLUE
+    </div>
+
+    <div class="relative">
+      <h1 class="text-6xl md:text-8xl font-black text-slate-900 dark:text-white leading-[1] tracking-tight mb-8">
+        Rendez votre entreprise <br />
+        <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-400 dark:from-blue-400 dark:via-indigo-400 dark:to-blue-300">
+          visible sur l'IA
+        </span>
+      </h1>
+      <div class="absolute -top-12 -right-16 text-blue-400/40 dark:text-blue-400/20 animate-pulse hidden lg:block" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+      </div>
+    </div>
+
+    <p class="max-w-2xl mx-auto text-xl ct-text-muted leading-relaxed mb-12">
+      Vos clients utilisent ChatGPT, Gemini et Google AI pour trouver des solutions.
+      <span class="font-bold text-slate-800 dark:text-slate-200">Êtes-vous cité dans leurs réponses ?</span>
     </p>
 
-    <div class="geo-cards">
-      <div class="geo-card">
-        <div class="geo-card-icon">
-          <i class="pi pi-search"></i>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-5">
+      <a routerLink="/services" class="cta-primary group relative bg-blue-600 text-white px-10 py-5 rounded-2xl font-bold text-lg hover:bg-blue-700 dark:hover:bg-blue-500 transition-all shadow-2xl shadow-blue-200/50 dark:shadow-blue-900/40 overflow-hidden">
+        <span class="relative z-10 flex items-center gap-2">
+          Découvrir le GEO
+          <i class="pi pi-chevron-right text-sm"></i>
+        </span>
+        <div class="shine-effect"></div>
+      </a>
+      <a routerLink="/contact" class="px-10 py-5 rounded-2xl font-bold text-lg text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 hover:shadow-md transition-all flex items-center gap-2 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm">
+        <i class="pi pi-calendar text-lg"></i>
+        Voir l'audit gratuit
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Problem Section ═══ -->
+<section class="py-24 relative z-30">
+  <div class="ct-section">
+    <div class="grid md:grid-cols-2 gap-16 items-center">
+      <div>
+        <h2 class="text-4xl font-black ct-text-heading mb-6 leading-tight">
+          Le SEO classique <br>ne suffit plus.
+        </h2>
+        <div class="space-y-6 text-lg ct-text-muted">
+          <p>
+            De plus en plus de vos prospects utilisent les moteurs génératifs — ChatGPT, Gemini, Perplexity — pour chercher des prestataires et prendre des décisions.
+          </p>
+          <p class="p-6 bg-slate-50 dark:bg-slate-900 rounded-2xl border-l-4 border-blue-600 italic transition-colors">
+            "Si votre entreprise n'apparaît pas dans ces réponses, <span class="ct-text-heading font-bold">vous êtes invisible</span> sur un canal qui explose."
+          </p>
         </div>
-        <h3>Le problème</h3>
-        <p>
-          Le référencement classique (SEO) optimise votre site pour Google.
-          Mais les réponses des IA ne fonctionnent pas comme une page de résultats :
-          elles synthétisent, recommandent et citent. Votre stratégie SEO actuelle
-          ne vous rend pas visible dans ces nouveaux formats.
-        </p>
       </div>
 
-      <div class="geo-card">
-        <div class="geo-card-icon">
-          <i class="pi pi-sparkles"></i>
+      <div class="grid grid-cols-1 gap-6">
+        <div class="ct-feature-row">
+          <div class="ct-icon-box ct-text-accent">
+            <i class="pi pi-search text-xl"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold ct-text-heading mb-1">Le SEO sature</h3>
+            <p class="ct-text-muted">Optimiser pour Google est devenu une guerre de position coûteuse et lente.</p>
+          </div>
         </div>
-        <h3>La solution : le GEO</h3>
-        <p>
-          Le <strong>GEO</strong> (Generative Engine Optimization) est la discipline
-          qui optimise votre présence pour les moteurs génératifs. Plus proche des
-          relations publiques que du code, le GEO s'assure que les LLM vous
-          connaissent, vous comprennent et vous recommandent.
-        </p>
-      </div>
 
-      <div class="geo-card">
-        <div class="geo-card-icon">
-          <i class="pi pi-sync"></i>
+        <div class="ct-feature-row">
+          <div class="ct-icon-box text-indigo-600 dark:text-indigo-400">
+            <i class="pi pi-sparkles text-xl"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold ct-text-heading mb-1">La solution : le GEO</h3>
+            <p class="ct-text-muted">Optimisez votre présence pour les moteurs de recherche génératifs (LLM).</p>
+          </div>
         </div>
-        <h3>Complémentaire au SEO</h3>
-        <p>
-          Nous ne remplaçons pas votre agence SEO — nous ajoutons la couche IA
-          que personne ne traite encore. Gardez votre référencement Google,
-          et gagnez en plus la visibilité sur les plateformes IA.
-        </p>
+
+        <div class="ct-feature-row">
+          <div class="ct-icon-box text-blue-400">
+            <i class="pi pi-sync text-xl"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold ct-text-heading mb-1">Complémentaire</h3>
+            <p class="ct-text-muted">Nous ne remplaçons pas votre SEO, nous ajoutons la couche IA cruciale.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="services">
-  <h2>Ce que nous faisons pour vous</h2>
-  <div class="services-grid">
-    <p-card>
-      <ng-template #header>
-        <div class="card-icon"><i class="pi pi-eye"></i></div>
-      </ng-template>
-      <h3>Audit de visibilité IA</h3>
-      <p>
-        Nous analysons comment les IA perçoivent votre marque aujourd'hui
-        et identifions les opportunités pour apparaître dans leurs réponses.
-      </p>
-    </p-card>
+<!-- ═══ Services Section ═══ -->
+<section class="py-24 bg-slate-50 dark:bg-slate-900/50 transition-colors duration-500">
+  <div class="ct-section text-center mb-16">
+    <h2 class="text-4xl font-black ct-text-heading mb-4">Ce que nous faisons pour vous</h2>
+    <p class="ct-text-muted max-w-xl mx-auto">Une approche scientifique pour dominer les résultats générés par l'Intelligence Artificielle.</p>
+  </div>
 
-    <p-card>
-      <ng-template #header>
-        <div class="card-icon"><i class="pi pi-chart-line"></i></div>
-      </ng-template>
-      <h3>Stratégie GEO sur mesure</h3>
-      <p>
-        Nous élaborons un plan d'action pour positionner votre entreprise
-        dans les réponses de ChatGPT, Gemini, Perplexity et Google AI Overviews.
-      </p>
-    </p-card>
+  <div class="ct-section grid grid-cols-1 md:grid-cols-3 gap-8">
+    <!-- Audit — carte principale -->
+    <div class="md:col-span-2 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-10 text-white relative overflow-hidden group shadow-2xl shadow-blue-200/50 dark:shadow-blue-900/20 transition-all hover:scale-[1.01]">
+      <div class="relative z-10 flex flex-col h-full justify-between">
+        <div>
+          <i class="pi pi-eye mb-6 opacity-80" style="font-size: 2.75rem"></i>
+          <h3 class="text-3xl font-black mb-4 tracking-tight">Audit de visibilité IA</h3>
+          <p class="text-blue-100 text-lg max-w-md leading-relaxed">
+            Nous analysons comment les IA perçoivent votre marque aujourd'hui et identifions les opportunités pour apparaître dans leurs recommandations.
+          </p>
+        </div>
+        <a routerLink="/contact" class="mt-8 self-start px-6 py-3 bg-white text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-colors shadow-lg">
+          Lancer mon audit
+        </a>
+      </div>
+      <div class="absolute top-[-20%] right-[-10%] w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-1000"></div>
+    </div>
 
-    <p-card>
-      <ng-template #header>
-        <div class="card-icon"><i class="pi pi-megaphone"></i></div>
-      </ng-template>
-      <h3>Déploiement &amp; Suivi</h3>
-      <p>
-        Nous mettons en œuvre la stratégie, produisons les contenus optimisés
-        et mesurons régulièrement votre progression sur les moteurs génératifs.
-      </p>
-    </p-card>
+    <!-- Stratégie GEO -->
+    <div class="bg-white dark:bg-slate-800 rounded-3xl p-10 border border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-black/20 hover:border-blue-300 dark:hover:border-blue-500 transition-all flex flex-col justify-between hover:scale-[1.01]">
+      <div>
+        <i class="pi pi-chart-line mb-6 ct-text-accent" style="font-size: 2.75rem"></i>
+        <h3 class="text-2xl font-black mb-4 ct-text-heading">Stratégie GEO</h3>
+        <p class="ct-text-body">
+          Un plan d'action précis pour positionner votre entreprise dans ChatGPT, Gemini et Perplexity.
+        </p>
+      </div>
+    </div>
+
+    <!-- Déploiement & Suivi — full width -->
+    <div class="md:col-span-3 bg-white dark:bg-slate-800 rounded-3xl p-10 border border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-black/20 hover:border-indigo-300 dark:hover:border-indigo-500 transition-all flex flex-col md:flex-row items-center gap-10 hover:scale-[1.01]">
+      <div class="w-20 h-20 md:w-32 md:h-32 shrink-0 rounded-3xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 transition-colors">
+        <i class="pi pi-megaphone" style="font-size: 3.5rem"></i>
+      </div>
+      <div class="flex-1 text-center md:text-left">
+        <h3 class="text-2xl font-black mb-4 ct-text-heading">Déploiement &amp; Suivi</h3>
+        <p class="ct-text-body text-lg">
+          Nous mettons en œuvre la stratégie, produisons les contenus optimisés et mesurons votre progression.
+        </p>
+      </div>
+      <a routerLink="/services" class="px-8 py-4 bg-slate-900 dark:bg-slate-700 text-white rounded-2xl font-bold hover:bg-slate-800 dark:hover:bg-slate-600 transition-all shadow-lg active:scale-95">
+        En savoir plus
+      </a>
+    </div>
   </div>
 </section>
 
-<section class="cta">
-  <h2>Prêt à devenir visible sur l'IA ?</h2>
-  <p>Échangeons 10 minutes pour évaluer votre visibilité actuelle sur les moteurs génératifs.</p>
-  <p-button label="Prendre rendez-vous" icon="pi pi-calendar" routerLink="/contact" />
+<!-- ═══ CTA Section ═══ -->
+<section class="py-24 px-6">
+  <div class="max-w-5xl mx-auto bg-slate-900 border border-slate-800 rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden shadow-2xl">
+    <div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_120%,#3b82f6,transparent)] opacity-30"></div>
+    <div class="relative z-10">
+      <h2 class="text-3xl md:text-5xl font-black text-white mb-6">Prêt à devenir visible sur l'IA ?</h2>
+      <a routerLink="/contact" class="bg-white dark:bg-blue-600 text-slate-900 dark:text-white px-10 py-5 rounded-2xl font-black text-xl hover:scale-105 active:scale-95 transition-all shadow-2xl inline-flex items-center gap-3">
+        <i class="pi pi-calendar text-xl"></i>
+        Prendre rendez-vous
+      </a>
+    </div>
+  </div>
 </section>

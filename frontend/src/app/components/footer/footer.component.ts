@@ -9,7 +9,7 @@ import { RouterLink } from '@angular/router';
   selector: 'app-footer',
   imports: [RouterLink],
   templateUrl: './footer.html',
-  styleUrl: './footer.scss',
+  styleUrl: './footer.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FooterComponent {}
