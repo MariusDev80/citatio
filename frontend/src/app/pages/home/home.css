@@ -1,0 +1,12 @@
+/* CTA shine effect */
+.cta-primary:hover .shine-effect {
+  transform: translateX(100%);
+}
+
+.shine-effect {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.8s ease;
+}

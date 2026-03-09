@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
+import { RadarAnimationComponent } from '../../components/radar-animation/radar-animation.component';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, ButtonModule, CardModule],
+  imports: [RouterLink, RadarAnimationComponent],
   templateUrl: './home.html',
-  styleUrl: './home.scss',
+  styleUrl: './home.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {}

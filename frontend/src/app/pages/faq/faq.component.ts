@@ -14,7 +14,7 @@ interface FaqItem {
   selector: 'app-faq',
   imports: [AccordionModule],
   templateUrl: './faq.html',
-  styleUrl: './faq.scss',
+  styleUrl: './faq.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FaqComponent {

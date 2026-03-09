@@ -3,18 +3,12 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
-import { CardModule } from 'primeng/card';
 
-/**
- * ContactComponent utilise les Reactive Forms (recommandés par Angular).
- * inject(FormBuilder) est utilisé au lieu du constructeur pour respecter
- * les best practices Angular 21.
- */
 @Component({
   selector: 'app-contact',
-  imports: [ReactiveFormsModule, ButtonModule, InputTextModule, TextareaModule, CardModule],
+  imports: [ReactiveFormsModule, ButtonModule, InputTextModule, TextareaModule],
   templateUrl: './contact.html',
-  styleUrl: './contact.scss',
+  styleUrl: './contact.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContactComponent {

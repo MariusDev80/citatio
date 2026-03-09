@@ -12,7 +12,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 @Component({
   selector: 'app-legal',
   templateUrl: './legal.html',
-  styleUrl: './legal.scss',
+  styleUrl: './legal.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LegalComponent {}
