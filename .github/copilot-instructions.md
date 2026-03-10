@@ -106,7 +106,6 @@ Use Tailwind CSS v4 utility classes directly in templates for all layout, spacin
 Always provide `dark:` variants for colors and backgrounds to support dark mode.
 Keep component `.css` files minimal — only use them for `:host` display, animations, or styles that cannot be expressed with Tailwind utilities.
 Do NOT use SCSS — this project uses plain CSS exclusively.
-Do NOT use PrimeFlex — it is NOT installed. Use Tailwind equivalents (`flex`, `grid`, `gap-*`, `p-*`, etc.).
 Do NOT use `ngClass` or `ngStyle` — use `[class.name]` property bindings (e.g. `[class.ct-navbar--scrolled]="isScrolled()"`) or static `class` attributes with Tailwind utilities.
 Global base styles (targeting HTML elements like `html`, `body`, `::selection`) MUST be placed inside `@layer base` in `styles.css`.
 Reusable custom component classes MUST use the `ct-` prefix and be placed inside `@layer components` in `styles.css`. Use `@apply` with Tailwind utilities inside these classes for maintainability (e.g. `.ct-card`, `.ct-text-accent`, `.ct-page-title`, `.ct-icon-box`).

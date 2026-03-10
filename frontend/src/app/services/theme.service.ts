@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 
 /**
  * ThemeService — manages the dark / light mode toggle.
@@ -12,6 +13,7 @@ import { Injectable, signal } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   private static readonly STORAGE_KEY = 'citatio-dark-mode';
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   readonly isDark = signal(this.loadInitialPreference());
 
@@ -23,10 +25,15 @@ export class ThemeService {
     const next = !this.isDark();
     this.isDark.set(next);
     this.applyClass(next);
-    localStorage.setItem(ThemeService.STORAGE_KEY, JSON.stringify(next));
+    if (this.isBrowser) {
+      localStorage.setItem(ThemeService.STORAGE_KEY, JSON.stringify(next));
+    }
   }
 
   private loadInitialPreference(): boolean {
+    if (!this.isBrowser) {
+      return false;
+    }
     const stored = localStorage.getItem(ThemeService.STORAGE_KEY);
     if (stored !== null) {
       try {
@@ -39,6 +46,8 @@ export class ThemeService {
   }
 
   private applyClass(dark: boolean): void {
-    document.documentElement.classList.toggle('dark', dark);
+    if (this.isBrowser) {
+      document.documentElement.classList.toggle('dark', dark);
+    }
   }
 }

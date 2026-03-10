@@ -7,12 +7,13 @@
 
     <h3 class="ct-legal-subtitle">Éditeur du site</h3>
     <p class="ct-legal-text">
-      Le site <strong class="ct-text-heading">Citatio</strong> est édité par la société Citatio,
+      Le site <strong class="ct-text-heading">{{ company.url }}</strong> est édité par la société {{ company.legalName }},
       [forme juridique], au capital de [montant] €,
       immatriculée au RCS de [ville] sous le numéro [numéro SIRET].
     </p>
-    <p class="ct-legal-text">Siège social : [adresse complète]</p>
+    <p class="ct-legal-text">Siège social : {{ company.address.street }}, {{ company.address.postalCode }} {{ company.address.city }}</p>
     <p class="ct-legal-text">Directeur de la publication : [nom du directeur]</p>
+    <p class="ct-legal-text">Contact : <a [href]="'mailto:' + company.email" class="ct-text-accent hover:underline">{{ company.email }}</a> — <a [href]="'tel:' + company.phoneRaw" class="ct-text-accent hover:underline">{{ company.phoneDisplay }}</a></p>
 
     <h3 class="ct-legal-subtitle">Hébergeur</h3>
     <p class="ct-legal-text">
@@ -56,7 +57,7 @@
     <p class="ct-legal-text">
       Conformément au RGPD, vous disposez d'un droit d'accès, de rectification,
       de suppression et de portabilité de vos données. Vous pouvez exercer ces
-      droits en nous contactant à l'adresse : <strong class="ct-text-heading">[email de contact]</strong>.
+      droits en nous contactant à l'adresse : <a [href]="'mailto:' + company.email" class="ct-text-accent hover:underline font-semibold">{{ company.email }}</a>.
     </p>
 
     <h3 class="ct-legal-subtitle">Cookies</h3>
@@ -74,7 +75,7 @@
     <h3 class="ct-legal-subtitle">Objet</h3>
     <p class="ct-legal-text">
       Les présentes CGU ont pour objet de définir les conditions d'accès
-      et d'utilisation du site Citatio.
+      et d'utilisation du site {{ company.legalName }}.
     </p>
 
     <h3 class="ct-legal-subtitle">Accès au site</h3>
@@ -85,15 +86,15 @@
 
     <h3 class="ct-legal-subtitle">Responsabilité</h3>
     <p class="ct-legal-text">
-      Citatio met tout en œuvre pour assurer l'exactitude des informations
-      publiées sur le site. Toutefois, Citatio ne saurait être tenue responsable
+      {{ company.legalName }} met tout en œuvre pour assurer l'exactitude des informations
+      publiées sur le site. Toutefois, {{ company.legalName }} ne saurait être tenue responsable
       des erreurs, omissions ou résultats obtenus suite à l'utilisation
       de ces informations.
     </p>
 
     <h3 class="ct-legal-subtitle">Modification des CGU</h3>
     <p class="ct-legal-text">
-      Citatio se réserve le droit de modifier les présentes CGU à tout moment.
+      {{ company.legalName }} se réserve le droit de modifier les présentes CGU à tout moment.
       L'utilisateur est invité à les consulter régulièrement.
     </p>
 

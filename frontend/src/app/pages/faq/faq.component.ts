@@ -1,15 +1,13 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { AccordionModule } from 'primeng/accordion';
+import { JsonLdService } from '../../services/json-ld.service';
+import { COMPANY } from '../../config/company.config';
 
 interface FaqItem {
   question: string;
   answer: string;
 }
 
-/**
- * FaqComponent utilise `p-accordion` de PrimeNG pour un rendu accessible
- * et natif des FAQ. Le signal `faqItems` fournit les données de manière réactive.
- */
 @Component({
   selector: 'app-faq',
   imports: [AccordionModule],
@@ -18,6 +16,8 @@ interface FaqItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FaqComponent {
+  private readonly jsonLd = inject(JsonLdService);
+  private readonly destroyRef = inject(DestroyRef);
   protected readonly faqItems = signal<FaqItem[]>([
     {
       question: 'Qu\'est-ce que le GEO (Generative Engine Optimization) ?',
@@ -52,4 +52,33 @@ export class FaqComponent {
       answer: 'Nous proposons un premier échange gratuit de 10 minutes pour évaluer votre visibilité actuelle sur les moteurs génératifs. Pas de vente, pas d\'engagement : juste un diagnostic rapide pour savoir si le GEO est pertinent pour votre activité.',
     },
   ]);
+
+  constructor() {
+    this.jsonLd.setSchema('faq', {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: this.faqItems().map(item => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer,
+        },
+      })),
+    });
+
+    this.jsonLd.setSchema('breadcrumb-faq', {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Accueil', item: COMPANY.url + '/' },
+        { '@type': 'ListItem', position: 2, name: 'FAQ', item: COMPANY.url + '/faq' },
+      ],
+    });
+
+    this.destroyRef.onDestroy(() => {
+      this.jsonLd.removeSchema('faq');
+      this.jsonLd.removeSchema('breadcrumb-faq');
+    });
+  }
 }
