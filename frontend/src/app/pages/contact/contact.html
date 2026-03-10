@@ -9,15 +9,15 @@
 
       <div class="flex items-center gap-3 mb-6">
         <i class="pi pi-envelope ct-text-accent text-lg shrink-0"></i>
-        <p class="ct-text-secondary">Email : <a href="mailto:contact@citatio-geo.com" class="ct-text-accent hover:underline">contact&#64;citatio-geo.com</a></p>
+        <p class="ct-text-secondary">Email : <a [href]="'mailto:' + company.email" class="ct-text-accent hover:underline">{{ company.email }}</a></p>
       </div>
       <div class="flex items-center gap-3 mb-6">
         <i class="pi pi-phone ct-text-accent text-lg shrink-0"></i>
-        <p class="ct-text-secondary">Tél : <a href="tel:+33767478372" class="ct-text-accent hover:underline">+33 7 67 47 83 72</a></p>
+        <p class="ct-text-secondary">Tél : <a [href]="'tel:' + company.phoneRaw" class="ct-text-accent hover:underline">{{ company.phoneDisplay }}</a></p>
       </div>
       <div class="flex items-center gap-3">
         <i class="pi pi-map-marker ct-text-accent text-lg shrink-0"></i>
-        <p class="ct-text-secondary">1 rue de l'Aven, 44240 La Chapelle-sur-Erdre</p>
+        <p class="ct-text-secondary">{{ company.address.street }}, {{ company.address.postalCode }} {{ company.address.city }}</p>
       </div>
     </div>
 

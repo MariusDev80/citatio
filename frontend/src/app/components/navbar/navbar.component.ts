@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, PLATFORM_ID, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { animationFrameScheduler, filter, fromEvent, throttleTime } from 'rxjs';
@@ -22,6 +23,7 @@ interface NavItem {
 })
 export class NavbarComponent {
   private readonly router = inject(Router);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   protected readonly theme = inject(ThemeService);
 
   protected readonly menuOpen = signal(false);
@@ -41,12 +43,14 @@ export class NavbarComponent {
       .pipe(filter((e) => e instanceof NavigationEnd))
       .subscribe(() => this.menuOpen.set(false));
 
-    fromEvent(window, 'scroll')
-      .pipe(
-        throttleTime(0, animationFrameScheduler),
-        takeUntilDestroyed(),
-      )
-      .subscribe(() => this.isScrolled.set(window.scrollY > 50));
+    if (this.isBrowser) {
+      fromEvent(window, 'scroll')
+        .pipe(
+          throttleTime(0, animationFrameScheduler),
+          takeUntilDestroyed(),
+        )
+        .subscribe(() => this.isScrolled.set(window.scrollY > 50));
+    }
   }
 
   toggleMenu(): void {
@@ -54,7 +58,7 @@ export class NavbarComponent {
   }
 
   protected onResize(): void {
-    if (window.innerWidth >= NavbarComponent.MOBILE_BREAKPOINT) {
+    if (this.isBrowser && window.innerWidth >= NavbarComponent.MOBILE_BREAKPOINT) {
       this.menuOpen.set(false);
     }
   }
