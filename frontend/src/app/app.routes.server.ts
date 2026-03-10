@@ -8,5 +8,7 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'faq', renderMode: RenderMode.Prerender },
   { path: 'contact', renderMode: RenderMode.Prerender },
   { path: 'legal', renderMode: RenderMode.Prerender },
-  { path: '**', renderMode: RenderMode.Prerender },
+  // La route 404 est rendue côté client : le serveur statique sert index.html
+  // (fallback SPA) et Angular prend le relais pour afficher NotFoundComponent.
+  { path: '**', renderMode: RenderMode.Client },
 ];

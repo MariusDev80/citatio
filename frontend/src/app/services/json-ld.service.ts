@@ -39,5 +39,9 @@ export class JsonLdService {
       existing.remove();
       this.scripts.delete(key);
     }
+    // Supprime aussi les scripts injectés côté serveur (SSR/prerender)
+    // qui ne sont pas dans la Map mais présents dans le DOM après hydratation.
+    this.document.querySelectorAll(`script[data-jsonld="${key}"]`)
+      .forEach(el => el.remove());
   }
 }

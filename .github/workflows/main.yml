@@ -2,10 +2,88 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ develop, master ]
+  pull_request:
+    branches: [ develop, master ]
 
 jobs:
+  # ─────────────────────────────────────────────
+  # Job 1 : Tests unitaires (Vitest)
+  # Tourne sur TOUT push/PR — jamais dans Docker
+  # ─────────────────────────────────────────────
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm test -- --run --reporter=verbose
+
+  # ─────────────────────────────────────────────
+  # Job 2 : Tests de non-régression (Playwright)
+  # Tourne sur TOUT push/PR — jamais dans Docker
+  # ─────────────────────────────────────────────
+  e2e:
+    name: E2E Tests (Playwright)
+    runs-on: ubuntu-latest
+    needs: test
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build app (prerender)
+        run: npm run build
+
+      - name: Run E2E tests
+        run: npx playwright test
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7
+
+  # ─────────────────────────────────────────────
+  # Job 3 : Build & Push Docker (develop only)
+  # Ne se déclenche que si les tests passent
+  # ─────────────────────────────────────────────
   build-and-push:
+    name: Build & Push Docker images
+    needs: [ test, e2e ]
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -14,10 +92,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # --- ÉTAPE AJOUTÉE : Conversion du nom en minuscules ---
       - name: Lowercase repo name
-        run: |
-          echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
+        run: echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -31,7 +107,6 @@ jobs:
         with:
           context: ./frontend
           push: true
-          # On utilise la nouvelle variable env.REPO_LC
           tags: ghcr.io/${{ env.REPO_LC }}/frontend:latest
 
       - name: Build & Push Back
@@ -39,11 +114,15 @@ jobs:
         with:
           context: ./backend
           push: true
-          # On utilise la nouvelle variable env.REPO_LC
           tags: ghcr.io/${{ env.REPO_LC }}/backend:latest
 
+  # ─────────────────────────────────────────────
+  # Job 4 : Déploiement VPS (develop only)
+  # ─────────────────────────────────────────────
   deploy:
+    name: Deploy to VPS
     needs: build-and-push
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: SSH Deploy
