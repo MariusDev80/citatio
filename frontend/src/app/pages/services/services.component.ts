@@ -10,6 +10,7 @@ import { COMPANY } from '../../config/company.config';
 })
 export class ServicesComponent {
   private readonly jsonLd = inject(JsonLdService);
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor() {
     const provider = { '@type': 'Organization', name: COMPANY.name };
@@ -97,7 +98,7 @@ export class ServicesComponent {
       ],
     });
 
-    inject(DestroyRef).onDestroy(() => {
+    this.destroyRef.onDestroy(() => {
       this.jsonLd.removeSchema('services');
       this.jsonLd.removeSchema('breadcrumb-services');
     });

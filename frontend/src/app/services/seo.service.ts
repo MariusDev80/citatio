@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
-import { inject, Injectable } from '@angular/core';
+import { DestroyRef, inject, Injectable } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Meta, Title } from '@angular/platform-browser';
 import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter, map } from 'rxjs';
@@ -26,6 +27,7 @@ export class SeoService {
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly document = inject(DOCUMENT);
+  private readonly destroyRef = inject(DestroyRef);
 
   init(): void {
     this.router.events
@@ -36,6 +38,7 @@ export class SeoService {
           seo: route.snapshot.data['seo'] as SeoData | undefined,
           path: route.snapshot.url.map(s => s.path).join('/'),
         })),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(({ seo, path }) => this.updateMeta(seo, path));
   }

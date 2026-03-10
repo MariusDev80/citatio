@@ -17,6 +17,7 @@ interface FaqItem {
 })
 export class FaqComponent {
   private readonly jsonLd = inject(JsonLdService);
+  private readonly destroyRef = inject(DestroyRef);
   protected readonly faqItems = signal<FaqItem[]>([
     {
       question: 'Qu\'est-ce que le GEO (Generative Engine Optimization) ?',
@@ -75,7 +76,7 @@ export class FaqComponent {
       ],
     });
 
-    inject(DestroyRef).onDestroy(() => {
+    this.destroyRef.onDestroy(() => {
       this.jsonLd.removeSchema('faq');
       this.jsonLd.removeSchema('breadcrumb-faq');
     });

@@ -42,7 +42,7 @@ export class App {
         postalCode: COMPANY.address.postalCode,
         addressCountry: COMPANY.address.country,
       },
-      sameAs: [...COMPANY.sameAs],
+      ...(COMPANY.sameAs.length > 0 && { sameAs: [...COMPANY.sameAs] }),
     });
 
     this.jsonLd.setSchema('website', {

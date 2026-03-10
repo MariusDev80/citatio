@@ -10,6 +10,7 @@ import { COMPANY } from '../../config/company.config';
 })
 export class AboutComponent {
   private readonly jsonLd = inject(JsonLdService);
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor() {
     this.jsonLd.setSchema('breadcrumb-about', {
@@ -21,7 +22,7 @@ export class AboutComponent {
       ],
     });
 
-    inject(DestroyRef).onDestroy(() => {
+    this.destroyRef.onDestroy(() => {
       this.jsonLd.removeSchema('breadcrumb-about');
     });
   }

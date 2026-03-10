@@ -4,7 +4,6 @@ import { SeoData } from './services/seo.service';
 export const routes: Routes = [
   {
     path: '',
-    title: 'Citatio GEO — Rendez votre entreprise visible sur l\'IA',
     data: {
       seo: {
         title: 'Citatio GEO — Rendez votre entreprise visible sur l\'IA',
@@ -16,7 +15,6 @@ export const routes: Routes = [
   },
   {
     path: 'about',
-    title: 'À propos — Citatio GEO',
     data: {
       seo: {
         title: 'À propos — Citatio GEO',
@@ -28,7 +26,6 @@ export const routes: Routes = [
   },
   {
     path: 'services',
-    title: 'Nos services — Citatio GEO',
     data: {
       seo: {
         title: 'Nos services — Citatio GEO',
@@ -40,7 +37,6 @@ export const routes: Routes = [
   },
   {
     path: 'faq',
-    title: 'FAQ — Citatio GEO',
     data: {
       seo: {
         title: 'FAQ — Citatio GEO',
@@ -52,7 +48,6 @@ export const routes: Routes = [
   },
   {
     path: 'contact',
-    title: 'Contact — Citatio GEO',
     data: {
       seo: {
         title: 'Contact — Citatio GEO',
@@ -64,7 +59,6 @@ export const routes: Routes = [
   },
   {
     path: 'legal',
-    title: 'Mentions légales — Citatio GEO',
     data: {
       seo: {
         title: 'Mentions légales — Citatio GEO',
@@ -76,7 +70,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    title: 'Page introuvable — Citatio GEO',
     data: {
       seo: {
         title: 'Page introuvable — Citatio GEO',
