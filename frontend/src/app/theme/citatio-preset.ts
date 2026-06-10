@@ -82,6 +82,30 @@ const CitatioPreset = definePreset(Aura, {
       },
     },
   },
+  components: {
+    // Le bouton rempli (primary) en mode sombre doit matcher les boutons
+    // Tailwind de l'app (bg-blue-600, hover blue-500, texte blanc) — la couleur
+    // primaire sémantique reste en blue.400 pour le texte d'accent (contraste).
+    button: {
+      colorScheme: {
+        dark: {
+          root: {
+            primary: {
+              background: '{blue.600}',
+              hoverBackground: '{blue.500}',
+              activeBackground: '{blue.700}',
+              borderColor: '{blue.600}',
+              hoverBorderColor: '{blue.500}',
+              activeBorderColor: '{blue.700}',
+              color: '#ffffff',
+              hoverColor: '#ffffff',
+              activeColor: '#ffffff',
+            },
+          },
+        },
+      },
+    },
+  },
 });
 
 export default CitatioPreset;
