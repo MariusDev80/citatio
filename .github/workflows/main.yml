@@ -131,9 +131,15 @@ jobs:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # Tout échec d'une commande fait échouer le job (fini les déploiements "verts" qui ne déploient rien)
+          script_stop: true
           script: |
             cd /opt/citatio
+            # Authentification au registre privé GHCR depuis le pipeline,
+            # pour ne plus dépendre d'un login manuel sur le VPS qui expire silencieusement.
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u MariusDev80 --password-stdin
             docker compose pull
             docker compose up -d
+            docker logout ghcr.io
             docker image prune -f
             docker ps
