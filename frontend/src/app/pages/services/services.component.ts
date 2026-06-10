@@ -18,16 +18,16 @@ export class ServicesComponent {
     this.jsonLd.setSchema('services', {
       '@context': 'https://schema.org',
       '@type': 'ItemList',
-      name: `Services ${COMPANY.name}`,
+      name: `Offres ${COMPANY.name}`,
       itemListElement: [
         {
           '@type': 'ListItem',
           position: 1,
           item: {
             '@type': 'Service',
-            name: 'Audit de visibilité IA',
+            name: 'Vitrine Essentiel',
             description:
-              'Mesure de votre présence actuelle sur les moteurs génératifs (ChatGPT, Gemini, Perplexity) avec un rapport détaillé.',
+              'Création d\'un site vitrine responsive (3 à 5 pages) avec design sur mesure, formulaire de contact et base SEO technique.',
             provider,
           },
         },
@@ -36,9 +36,9 @@ export class ServicesComponent {
           position: 2,
           item: {
             '@type': 'Service',
-            name: 'Stratégie GEO sur mesure',
+            name: 'Vitrine + SEO',
             description:
-              'Plan d\'action adapté à votre secteur : optimisation de contenus pour les LLM, construction d\'autorité thématique.',
+              'Site vitrine optimisé pour Google : SEO on-page, recherche de mots-clés, données structurées (schema.org) et recommandations de contenu.',
             provider,
           },
         },
@@ -47,9 +47,9 @@ export class ServicesComponent {
           position: 3,
           item: {
             '@type': 'Service',
-            name: 'Production de contenus optimisés IA',
+            name: 'Vitrine + GEO/SEO',
             description:
-              'Création et restructuration de contenus pour qu\'ils soient compris, synthétisés et cités par les moteurs génératifs.',
+              'Site vitrine visible sur Google et sur les IA : optimisation GEO (ChatGPT, Gemini, Google AI Overview) et contenu pensé pour la citation par les IA.',
             provider,
           },
         },
@@ -58,9 +58,9 @@ export class ServicesComponent {
           position: 4,
           item: {
             '@type': 'Service',
-            name: 'Complémentarité SEO + GEO',
+            name: 'Hébergement & maintenance',
             description:
-              'Collaboration avec votre agence SEO existante pour ajouter la couche IA à votre référencement.',
+              'Hébergement géré, configuration du nom de domaine, mises à jour, sécurité et sauvegardes en abonnement.',
             provider,
           },
         },
@@ -69,9 +69,9 @@ export class ServicesComponent {
           position: 5,
           item: {
             '@type': 'Service',
-            name: 'Relations publiques numériques',
+            name: 'Pack contenu',
             description:
-              'Amplification de votre présence sur les médias et plateformes que les LLM consultent pour construire leurs réponses.',
+              'Rédaction de pages et d\'articles de blog, à l\'article ou en forfait.',
             provider,
           },
         },
@@ -80,9 +80,9 @@ export class ServicesComponent {
           position: 6,
           item: {
             '@type': 'Service',
-            name: 'Suivi & Reporting',
+            name: 'Emailing',
             description:
-              'Mesure régulière de la progression : fréquence de citation, positionnement dans les réponses IA, évolution vs concurrents.',
+              'Mise en place de l\'envoi de mails : transactionnel et newsletter.',
             provider,
           },
         },
@@ -94,7 +94,7 @@ export class ServicesComponent {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Accueil', item: COMPANY.url + '/' },
-        { '@type': 'ListItem', position: 2, name: 'Services', item: COMPANY.url + '/services' },
+        { '@type': 'ListItem', position: 2, name: 'Offres', item: COMPANY.url + '/services' },
       ],
     });
 

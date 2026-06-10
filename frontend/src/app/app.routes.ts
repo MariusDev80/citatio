@@ -6,9 +6,9 @@ export const routes: Routes = [
     path: '',
     data: {
       seo: {
-        title: 'Citatio GEO — Rendez votre entreprise visible sur l\'IA',
+        title: 'Citatio — Studio web : sites vitrines sur mesure',
         description:
-          'Citatio GEO optimise la visibilité de votre entreprise sur les moteurs de recherche IA : ChatGPT, Gemini, Google AI Overview. Soyez cité dans les réponses IA.',
+          'Citatio est un studio web qui crée des sites vitrines sur mesure pour les TPE, PME et indépendants. Référencement Google (SEO) et visibilité sur l\'IA (GEO) en option, hébergement et maintenance inclus.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent),
@@ -17,9 +17,9 @@ export const routes: Routes = [
     path: 'about',
     data: {
       seo: {
-        title: 'À propos — Citatio GEO',
+        title: 'À propos — Citatio, studio web',
         description:
-          'Découvrez Citatio GEO, l\'agence spécialisée en Generative Engine Optimization. Notre mission : rendre votre entreprise visible sur les moteurs IA.',
+          'Découvrez Citatio, le studio web qui conçoit des sites vitrines sur mesure pour les TPE, PME et indépendants, avec le SEO et la visibilité IA (GEO) en option.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/about/about.component').then(m => m.AboutComponent),
@@ -28,9 +28,9 @@ export const routes: Routes = [
     path: 'services',
     data: {
       seo: {
-        title: 'Nos services — Citatio GEO',
+        title: 'Nos offres — Citatio',
         description:
-          'Audit de visibilité IA, stratégie GEO sur mesure, production de contenus optimisés IA, relations publiques numériques et suivi de performance.',
+          'Création de sites vitrines : formules Vitrine Essentiel, Vitrine + SEO et Vitrine + GEO/SEO. Options hébergement, nom de domaine, maintenance et contenu.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/services/services.component').then(m => m.ServicesComponent),
@@ -39,9 +39,9 @@ export const routes: Routes = [
     path: 'faq',
     data: {
       seo: {
-        title: 'FAQ — Citatio GEO',
+        title: 'FAQ — Citatio',
         description:
-          'Réponses aux questions fréquentes sur le GEO, la différence avec le SEO, les délais de résultats et la complémentarité avec votre agence SEO.',
+          'Réponses aux questions fréquentes : création de site vitrine, délais et tarifs, options SEO et GEO, hébergement, nom de domaine et maintenance.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/faq/faq.component').then(m => m.FaqComponent),
@@ -50,9 +50,9 @@ export const routes: Routes = [
     path: 'contact',
     data: {
       seo: {
-        title: 'Contact — Citatio GEO',
+        title: 'Contact — Citatio',
         description:
-          'Contactez Citatio GEO pour un premier échange gratuit sur la visibilité de votre entreprise sur les moteurs de recherche IA.',
+          'Contactez Citatio pour un premier échange gratuit et un devis sur la création de votre site vitrine, avec ou sans options SEO et GEO.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/contact/contact.component').then(m => m.ContactComponent),
@@ -61,9 +61,9 @@ export const routes: Routes = [
     path: 'legal',
     data: {
       seo: {
-        title: 'Mentions légales — Citatio GEO',
+        title: 'Mentions légales — Citatio',
         description:
-          'Mentions légales, politique de confidentialité et conditions générales d\'utilisation du site Citatio GEO.',
+          'Mentions légales, politique de confidentialité et conditions générales d\'utilisation du site Citatio.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/legal/legal.component').then(m => m.LegalComponent),
@@ -72,7 +72,7 @@ export const routes: Routes = [
     path: '**',
     data: {
       seo: {
-        title: 'Page introuvable — Citatio GEO',
+        title: 'Page introuvable — Citatio',
         description: 'La page que vous recherchez n\'existe pas ou a été déplacée.',
       } satisfies SeoData,
     },

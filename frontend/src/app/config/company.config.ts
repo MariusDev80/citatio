@@ -1,14 +1,14 @@
 export const COMPANY = {
-  name: 'Citatio GEO',
+  name: 'Citatio',
   legalName: 'Citatio',
   url: 'https://citatio-geo.com',
   logo: 'https://citatio-geo.com/citatio_logo.png',
   locale: 'fr_FR',
   lang: 'French',
   description:
-    'Citatio GEO optimise la visibilité de votre entreprise sur les moteurs de recherche IA : ChatGPT, Gemini, Google AI Overview.',
+    'Citatio est un studio web qui crée des sites vitrines sur mesure pour les TPE, PME et indépendants, avec le référencement Google (SEO) et la visibilité sur l\'IA (GEO) en option, plus l\'hébergement, le nom de domaine et la maintenance.',
   shortDescription:
-    'Optimisez la visibilité de votre entreprise sur ChatGPT, Gemini et Google AI Overview.',
+    'Studio web : sites vitrines sur mesure, avec SEO et visibilité IA (GEO) en option.',
   email: 'contact@citatio-geo.com',
   phone: '+33-7-67-47-83-72',
   phoneRaw: '+33767478372',
@@ -22,13 +22,15 @@ export const COMPANY = {
   priceRange: '€€',
   foundingYear: 2025,
   knowsAbout: [
+    'Création de site vitrine',
+    'Studio web',
+    'Web design',
+    'SEO',
+    'Référencement Google',
     'Generative Engine Optimization',
     'GEO',
-    'SEO',
     'Visibilité IA',
-    'ChatGPT',
-    'Gemini',
-    'Google AI Overview',
+    'Hébergement web',
   ],
   sameAs: [] as string[],
 } as const;

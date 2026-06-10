@@ -20,36 +20,36 @@ export class FaqComponent {
   private readonly destroyRef = inject(DestroyRef);
   protected readonly faqItems = signal<FaqItem[]>([
     {
-      question: 'Qu\'est-ce que le GEO (Generative Engine Optimization) ?',
-      answer: 'Le GEO est la nouvelle discipline qui optimise votre présence pour les moteurs génératifs comme ChatGPT, Gemini ou Perplexity. Contrairement au SEO qui cible les pages de résultats classiques de Google, le GEO s\'assure que les IA vous connaissent, vous comprennent et vous recommandent dans leurs réponses.',
+      question: 'Que fait Citatio exactement ?',
+      answer: 'Citatio est un studio web qui conçoit des sites vitrines sur mesure pour les TPE, PME, artisans et indépendants. Nous proposons en option le référencement Google (SEO) et la visibilité sur l\'IA (GEO), ainsi que l\'hébergement, le nom de domaine et la maintenance de votre site.',
     },
     {
-      question: 'Quelle est la différence entre SEO et GEO ?',
-      answer: 'Le SEO optimise votre site pour apparaître dans les résultats de recherche traditionnels (liens bleus de Google). Le GEO, lui, travaille sur la façon dont les intelligences artificielles synthétisent et citent votre entreprise dans leurs réponses. C\'est un travail plus proche des relations publiques que du code technique.',
+      question: 'Combien coûte un site vitrine ?',
+      answer: 'Le tarif dépend de votre projet : nombre de pages, niveau de design, contenu à produire et options choisies (SEO, GEO, hébergement, maintenance). Nous établissons un devis clair et sans coûts cachés après un premier échange gratuit.',
     },
     {
-      question: 'J\'ai déjà une agence SEO, pourquoi aurais-je besoin de Citatio ?',
-      answer: 'Votre agence SEO fait probablement un excellent travail sur le référencement Google traditionnel — gardez-la ! Citatio intervient en complément pour ajouter la couche IA que les agences SEO classiques ne traitent pas encore. Nous travaillons en duo avec votre agence, pas en remplacement.',
+      question: 'Combien de temps faut-il pour créer mon site ?',
+      answer: 'Cela dépend de la formule et de la disponibilité de vos contenus. Un site vitrine se réalise généralement en quelques semaines. Nous cadrons ensemble un planning précis au démarrage du projet.',
     },
     {
-      question: 'Mes clients n\'utilisent pas ChatGPT, est-ce vraiment utile ?',
-      answer: 'Même si vos clients n\'utilisent pas directement ChatGPT, Google intègre désormais des réponses générées par IA directement en haut de ses pages de résultats (AI Overviews). Vos clients utilisent Google, et le GEO devient indispensable pour ne pas disparaître de ces nouveaux formats.',
+      question: 'C\'est quoi le SEO et le GEO, et en ai-je besoin ?',
+      answer: 'Le SEO optimise votre site pour apparaître dans les résultats de Google. Le GEO travaille votre visibilité dans les réponses des IA comme ChatGPT, Gemini ou les AI Overviews de Google. Ce sont deux options : on les active selon vos objectifs et votre marché. Un site bien conçu intègre déjà une base SEO technique.',
     },
     {
-      question: 'Combien de temps faut-il pour voir des résultats ?',
-      answer: 'Les premiers résultats sont généralement visibles entre 4 et 8 semaines après le début de la stratégie. Nous mesurons régulièrement votre fréquence de citation dans les réponses IA et vous fournissons des rapports de progression détaillés.',
+      question: 'Pouvez-vous héberger mon site et gérer mon nom de domaine ?',
+      answer: 'Oui. Nous proposons l\'hébergement géré, l\'achat et la configuration de votre nom de domaine, ainsi que la maintenance (mises à jour, sécurité, sauvegardes). Vous gardez un interlocuteur unique, du devis à la mise en ligne et au-delà.',
     },
     {
-      question: 'Comment mesurez-vous la visibilité sur les IA ?',
-      answer: 'Nous interrogeons régulièrement les principaux moteurs génératifs avec les requêtes que vos prospects utilisent réellement. Nous mesurons la fréquence de citation de votre marque, le positionnement dans les réponses, et l\'évolution par rapport à vos concurrents.',
+      question: 'Je n\'ai pas encore de contenu ni de logo, pouvez-vous m\'aider ?',
+      answer: 'Oui. Notre pack contenu couvre la rédaction de vos pages et articles, et nous vous accompagnons sur le design et l\'identité visuelle pour partir sur des bases solides, même si vous démarrez de zéro.',
     },
     {
-      question: 'Est-ce que le GEO va remplacer le SEO ?',
-      answer: 'Non, le GEO ne remplace pas le SEO, il le complète. Le référencement Google traditionnel reste essentiel. Mais à mesure que les IA prennent une place croissante dans la recherche d\'information, le GEO devient une brique stratégique incontournable pour rester visible.',
+      question: 'Mon site sera-t-il adapté au mobile ?',
+      answer: 'Toujours. Tous nos sites sont responsives par défaut : ils s\'affichent parfaitement sur mobile, tablette et ordinateur. Nous soignons aussi la vitesse de chargement et l\'accessibilité.',
     },
     {
       question: 'Comment se passe un premier échange avec Citatio ?',
-      answer: 'Nous proposons un premier échange gratuit de 10 minutes pour évaluer votre visibilité actuelle sur les moteurs génératifs. Pas de vente, pas d\'engagement : juste un diagnostic rapide pour savoir si le GEO est pertinent pour votre activité.',
+      answer: 'Nous proposons un premier échange gratuit, sans engagement, pour comprendre votre activité et vos besoins. À l\'issue, vous recevez un devis adapté à votre projet. Pas de jargon ni de vente forcée : juste un point clair sur ce dont vous avez besoin.',
     },
   ]);
 

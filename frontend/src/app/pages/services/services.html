@@ -1,83 +1,153 @@
-<div class="pt-32 pb-16 max-w-5xl mx-auto px-6">
-  <h1 class="ct-page-title mb-4">Nos Services</h1>
-  <p class="text-center text-lg ct-text-muted max-w-2xl mx-auto mb-12">
-    Citatio vous accompagne dans la transition du SEO vers le GEO pour que votre
-    entreprise soit recommandée par les intelligences artificielles.
+<div class="pt-32 pb-16 max-w-6xl mx-auto px-6">
+  <h1 class="ct-page-title mb-4">Nos offres</h1>
+  <p class="text-center text-lg ct-text-muted max-w-2xl mx-auto mb-14">
+    Citatio crée votre site vitrine sur mesure. Choisissez la formule adaptée à votre
+    ambition, puis composez avec nos options : hébergement, nom de domaine, maintenance et contenu.
   </p>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div class="ct-card hover:border-blue-300 dark:hover:border-blue-500">
-      <div class="flex items-center gap-3 mb-4">
-        <i class="pi pi-eye text-xl ct-text-accent"></i>
-        <h2 class="text-xl font-bold ct-text-heading">Audit de visibilité IA</h2>
+  <!-- ═══ Formules ═══ -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch mb-20">
+
+    <!-- Vitrine Essentiel -->
+    <div class="ct-card flex flex-col">
+      <div class="flex items-center gap-3 mb-2">
+        <i class="pi pi-desktop text-xl ct-text-accent"></i>
+        <h2 class="text-xl font-bold ct-text-heading">Vitrine Essentiel</h2>
       </div>
-      <p class="ct-text-body">
-        Nous interrogeons les principaux moteurs génératifs (ChatGPT, Gemini, Perplexity)
-        avec les requêtes de vos prospects pour mesurer votre présence actuelle.
-        Vous recevez un rapport clair : où vous apparaissez, où vous êtes absent,
-        et ce que vos concurrents font mieux.
-      </p>
+      <p class="ct-text-muted text-sm mb-6">Pour une présence web simple et crédible.</p>
+      <ul class="space-y-3 mb-8 grow">
+        <li class="flex items-start gap-3 ct-text-body">
+          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
+          <span>Site vitrine responsive (3 à 5 pages)</span>
+        </li>
+        <li class="flex items-start gap-3 ct-text-body">
+          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
+          <span>Design sur la base de notre design system</span>
+        </li>
+        <li class="flex items-start gap-3 ct-text-body">
+          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
+          <span>Formulaire de contact</span>
+        </li>
+        <li class="flex items-start gap-3 ct-text-body">
+          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
+          <span>Base SEO technique (balises, sitemap, performances)</span>
+        </li>
+      </ul>
+      <p class="text-lg font-black ct-text-heading mb-4">Sur devis</p>
+      <a routerLink="/contact" class="block text-center px-6 py-3 rounded-xl font-bold border border-slate-300 dark:border-slate-600 ct-text-heading hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
+        Demander un devis
+      </a>
     </div>
 
-    <div class="ct-card hover:border-blue-300 dark:hover:border-blue-500">
-      <div class="flex items-center gap-3 mb-4">
-        <i class="pi pi-chart-line text-xl ct-text-accent"></i>
-        <h2 class="text-xl font-bold ct-text-heading">Stratégie GEO sur mesure</h2>
+    <!-- Vitrine + SEO (mise en avant) -->
+    <div class="relative bg-white dark:bg-slate-800 border-2 border-blue-600 dark:border-blue-500 rounded-2xl p-8 shadow-xl shadow-blue-200/40 dark:shadow-blue-900/20 flex flex-col md:-mt-4">
+      <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider px-4 py-1 rounded-full shadow">Le plus demandé</span>
+      <div class="flex items-center gap-3 mb-2">
+        <i class="pi pi-search text-xl ct-text-accent"></i>
+        <h2 class="text-xl font-bold ct-text-heading">Vitrine + SEO</h2>
       </div>
-      <p class="ct-text-body">
-        À partir de l'audit, nous élaborons un plan d'action adapté à votre secteur :
-        optimisation de vos contenus pour les algorithmes des LLM, construction
-        d'autorité thématique, et création de signaux de confiance que les IA
-        utilisent pour vous recommander.
-      </p>
+      <p class="ct-text-muted text-sm mb-6">Pour être trouvé sur Google.</p>
+      <ul class="space-y-3 mb-8 grow">
+        <li class="flex items-start gap-3 ct-text-body">
+          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
+          <span>Tout le pack Vitrine Essentiel</span>
+        </li>
+        <li class="flex items-start gap-3 ct-text-body">
+          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
+          <span>Optimisation SEO on-page</span>
+        </li>
+        <li class="flex items-start gap-3 ct-text-body">
+          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
+          <span>Recherche de mots-clés</span>
+        </li>
+        <li class="flex items-start gap-3 ct-text-body">
+          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
+          <span>Données structurées (schema.org) et recommandations de contenu</span>
+        </li>
+      </ul>
+      <p class="text-lg font-black ct-text-heading mb-4">Sur devis</p>
+      <a routerLink="/contact" class="block text-center px-6 py-3 rounded-xl font-bold bg-blue-600 text-white hover:bg-blue-700 dark:hover:bg-blue-500 transition-colors shadow-lg active:scale-95">
+        Demander un devis
+      </a>
     </div>
 
-    <div class="ct-card hover:border-blue-300 dark:hover:border-blue-500">
-      <div class="flex items-center gap-3 mb-4">
-        <i class="pi pi-file-edit text-xl ct-text-accent"></i>
-        <h2 class="text-xl font-bold ct-text-heading">Production de contenus optimisés IA</h2>
+    <!-- Vitrine + GEO/SEO -->
+    <div class="ct-card flex flex-col">
+      <div class="flex items-center gap-3 mb-2">
+        <i class="pi pi-sparkles text-xl ct-text-accent"></i>
+        <h2 class="text-xl font-bold ct-text-heading">Vitrine + GEO/SEO</h2>
       </div>
-      <p class="ct-text-body">
-        Nous créons et restructurons vos contenus (articles, pages, FAQ, études de cas)
-        pour qu'ils soient compris, synthétisés et cités par les moteurs génératifs.
-        Un travail plus proche des relations publiques que du SEO technique classique.
-      </p>
-    </div>
-
-    <div class="ct-card hover:border-blue-300 dark:hover:border-blue-500">
-      <div class="flex items-center gap-3 mb-4">
-        <i class="pi pi-sync text-xl ct-text-accent"></i>
-        <h2 class="text-xl font-bold ct-text-heading">Complémentarité SEO + GEO</h2>
-      </div>
-      <p class="ct-text-body">
-        Vous avez déjà une agence SEO ? Nous travaillons en duo avec elle.
-        Nous ne remplaçons pas votre référencement Google traditionnel,
-        nous ajoutons la couche IA que personne ne traite encore.
-      </p>
-    </div>
-
-    <div class="ct-card hover:border-blue-300 dark:hover:border-blue-500">
-      <div class="flex items-center gap-3 mb-4">
-        <i class="pi pi-megaphone text-xl ct-text-accent"></i>
-        <h2 class="text-xl font-bold ct-text-heading">Relations publiques numériques</h2>
-      </div>
-      <p class="ct-text-body">
-        Les IA puisent leurs recommandations dans des sources fiables.
-        Nous amplifions votre présence sur les médias, annuaires et plateformes
-        que les LLM consultent pour construire leurs réponses.
-      </p>
-    </div>
-
-    <div class="ct-card hover:border-blue-300 dark:hover:border-blue-500">
-      <div class="flex items-center gap-3 mb-4">
-        <i class="pi pi-gauge text-xl ct-text-accent"></i>
-        <h2 class="text-xl font-bold ct-text-heading">Suivi &amp; Reporting</h2>
-      </div>
-      <p class="ct-text-body">
-        Nous mesurons régulièrement votre progression : fréquence de citation,
-        positionnement dans les réponses IA, et évolution par rapport à vos concurrents.
-        Vous gardez une visibilité complète sur le retour de votre investissement.
-      </p>
+      <p class="ct-text-muted text-sm mb-6">Pour être trouvé sur Google <em>et</em> les IA.</p>
+      <ul class="space-y-3 mb-8 grow">
+        <li class="flex items-start gap-3 ct-text-body">
+          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
+          <span>Tout le pack Vitrine + SEO</span>
+        </li>
+        <li class="flex items-start gap-3 ct-text-body">
+          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
+          <span>Optimisation GEO (ChatGPT, Gemini, Google AI Overview)</span>
+        </li>
+        <li class="flex items-start gap-3 ct-text-body">
+          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
+          <span>Contenu pensé pour la citation par les IA</span>
+        </li>
+      </ul>
+      <p class="text-lg font-black ct-text-heading mb-4">Sur devis</p>
+      <a routerLink="/contact" class="block text-center px-6 py-3 rounded-xl font-bold border border-slate-300 dark:border-slate-600 ct-text-heading hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
+        Demander un devis
+      </a>
     </div>
   </div>
+
+  <!-- ═══ Options à la carte ═══ -->
+  <div class="text-center mb-10">
+    <h2 class="text-3xl font-black ct-text-heading mb-3">Options à la carte</h2>
+    <p class="ct-text-muted max-w-2xl mx-auto">Complétez votre formule avec ce dont vous avez besoin, quand vous en avez besoin.</p>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="ct-card">
+      <div class="flex items-center gap-3 mb-3">
+        <i class="pi pi-server text-xl ct-text-accent"></i>
+        <h3 class="text-lg font-bold ct-text-heading">Hébergement inclus</h3>
+      </div>
+      <p class="ct-text-body">Hébergement géré sur notre stack, en abonnement mensuel ou annuel. Aucune infrastructure à gérer de votre côté.</p>
+    </div>
+
+    <div class="ct-card">
+      <div class="flex items-center gap-3 mb-3">
+        <i class="pi pi-globe text-xl ct-text-accent"></i>
+        <h3 class="text-lg font-bold ct-text-heading">Nom de domaine</h3>
+      </div>
+      <p class="ct-text-body">Achat de votre nom de domaine, configuration DNS et renouvellement annuel pris en charge.</p>
+    </div>
+
+    <div class="ct-card">
+      <div class="flex items-center gap-3 mb-3">
+        <i class="pi pi-wrench text-xl ct-text-accent"></i>
+        <h3 class="text-lg font-bold ct-text-heading">Maintenance</h3>
+      </div>
+      <p class="ct-text-body">Mises à jour, sécurité, sauvegardes et petites évolutions, en abonnement mensuel.</p>
+    </div>
+
+    <div class="ct-card">
+      <div class="flex items-center gap-3 mb-3">
+        <i class="pi pi-file-edit text-xl ct-text-accent"></i>
+        <h3 class="text-lg font-bold ct-text-heading">Pack contenu</h3>
+      </div>
+      <p class="ct-text-body">Rédaction de vos pages et de vos articles de blog, à l'article ou en forfait.</p>
+    </div>
+
+    <div class="ct-card">
+      <div class="flex items-center gap-3 mb-3">
+        <i class="pi pi-envelope text-xl ct-text-accent"></i>
+        <h3 class="text-lg font-bold ct-text-heading">Emailing</h3>
+      </div>
+      <p class="ct-text-body">Mise en place de l'envoi de mails : transactionnel et newsletter.</p>
+    </div>
+  </div>
+
+  <p class="text-center ct-text-muted text-sm mt-12">
+    Tarifs établis sur devis, adaptés à votre projet. <a routerLink="/contact" class="ct-text-accent font-semibold ct-link-nav">Parlons-en →</a>
+  </p>
 </div>
