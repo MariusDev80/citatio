@@ -2,9 +2,13 @@ citatio-geo.com, www.citatio-geo.com {
     # Compresse les réponses (JS, CSS, HTML)
     encode gzip
 
-    # Redirige les appels API vers le backend Spring Boot
-    handle_path /api/* {
-        reverse_proxy backend:8080
+    # Redirige les appels API vers les microservices
+    handle_path /api/u1/* {
+        reverse_proxy u1-communication:8080
+    }
+
+    handle_path /api/u2/* {
+        reverse_proxy u2-blog:8080
     }
 
     # Tout le reste va vers le frontend Angular
