@@ -14,7 +14,7 @@ test.describe('Page d\'accueil — SEO', () => {
   });
 
   test('le titre de la page est correct', async ({ page }) => {
-    await expect(page).toHaveTitle(/Citatio GEO/);
+    await expect(page).toHaveTitle(/Citatio — Studio web/);
   });
 
   test('la meta description est présente', async ({ page }) => {
@@ -23,7 +23,7 @@ test.describe('Page d\'accueil — SEO', () => {
   });
 
   test('les balises Open Graph sont présentes', async ({ page }) => {
-    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', /Citatio GEO/);
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', /Citatio — Studio web/);
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /citatio-geo\.com/);
     await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content', /citatio-geo\.com/);
   });
@@ -57,7 +57,7 @@ test.describe('Navigation', () => {
   test('la navbar contient les liens principaux', async ({ page }) => {
     await page.goto('/');
     const nav = page.getByRole('navigation');
-    await expect(nav.getByRole('link', { name: /^services$/i })).toBeVisible();
+    await expect(nav.getByRole('link', { name: /^offres$/i })).toBeVisible();
     await expect(nav.getByRole('link', { name: /^faq$/i })).toBeVisible();
     await expect(nav.getByRole('link', { name: /^contact$/i })).toBeVisible();
   });
@@ -68,9 +68,9 @@ test.describe('Navigation', () => {
     await expect(page.getByRole('link', { name: /retour à l'accueil/i })).toBeVisible();
   });
 
-  test('navigation vers la page services', async ({ page }) => {
+  test('navigation vers la page offres', async ({ page }) => {
     await page.goto('/');
-    await page.getByRole('link', { name: /^services$/i }).first().click();
+    await page.getByRole('link', { name: /^offres$/i }).first().click();
     await expect(page).toHaveURL('/services');
   });
 });
