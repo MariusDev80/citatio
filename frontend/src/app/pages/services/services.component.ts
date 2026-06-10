@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { JsonLdService } from '../../services/json-ld.service';
 import { COMPANY } from '../../config/company.config';
 
@@ -7,6 +8,7 @@ import { COMPANY } from '../../config/company.config';
   templateUrl: './services.html',
   styleUrl: './services.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterLink],
 })
 export class ServicesComponent {
   private readonly jsonLd = inject(JsonLdService);
