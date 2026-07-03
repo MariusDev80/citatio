@@ -35,10 +35,10 @@ services:
       DB_NAME: citatio_u1_db
       DB_USER: user
       DB_PASSWORD: password
+    # 'expose' uniquement : joignable par Caddy et par u2 via le reseau Docker
+    # interne, jamais directement depuis Internet. (Debug local : compose override.)
     expose:
       - "8081"
-    ports:
-      - "8081:8081"   # publie sur l'hote pour debug direct
 
   # ── Microservice u2-blog (articles) — port 8082, appelle u1 en REST ──
   u2-blog:
@@ -59,10 +59,10 @@ services:
       DB_USER: user
       DB_PASSWORD: password
       U1_BASE_URL: http://u1-communication:8081
+    # 'expose' uniquement : joignable par Caddy via le reseau Docker interne,
+    # jamais directement depuis Internet.
     expose:
       - "8082"
-    ports:
-      - "8082:8082"   # publie sur l'hote pour debug direct
 
   frontend:
     image: ghcr.io/mariusdev80/citatio/frontend:latest
