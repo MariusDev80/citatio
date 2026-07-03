@@ -134,6 +134,21 @@ jobs:
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
+      # Synchronise la conf d'infra vers le VPS AVANT de (re)démarrer la stack.
+      # Sans ça, modifier docker-compose.yml / Caddyfile / init.sql dans le repo
+      # n'a AUCUN effet sur le VPS (le déploiement ne faisait que tirer les images).
+      - name: Sync infra config to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_IP }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "docker-compose.yml,Caddyfile,backend/docker/postgres/init.sql"
+          target: "/opt/citatio"
+          overwrite: true
+
       - name: SSH Deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -148,7 +163,7 @@ jobs:
             # pour ne plus dépendre d'un login manuel sur le VPS qui expire silencieusement.
             echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u MariusDev80 --password-stdin
             docker compose pull
-            docker compose up -d
+            docker compose up -d --remove-orphans
             docker logout ghcr.io
             docker image prune -f
             docker ps
