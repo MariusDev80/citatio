@@ -1,0 +1,10 @@
+# Artefacts de build (regeneres dans l'image) et donnees locales.
+**/target/
+data/
+.git/
+.gitignore
+.gitattributes
+# Wrapper Maven inutile dans l'image (on utilise le mvn de l'image de base).
+mvnw
+mvnw.cmd
+.mvn/

@@ -2,9 +2,14 @@ citatio-geo.com, www.citatio-geo.com {
     # Compresse les réponses (JS, CSS, HTML)
     encode gzip
 
-    # Redirige les appels API vers le backend Spring Boot
-    handle_path /api/* {
-        reverse_proxy backend:8080
+    # API microservices — le préfixe /api/uX est conservé (handle, pas handle_path)
+    # car les contrôleurs Spring sont mappés sous /api/u1 et /api/u2.
+    handle /api/u1/* {
+        reverse_proxy u1-communication:8081
+    }
+
+    handle /api/u2/* {
+        reverse_proxy u2-blog:8082
     }
 
     # Tout le reste va vers le frontend Angular

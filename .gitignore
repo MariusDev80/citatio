@@ -20,3 +20,6 @@ logs/
 data/
 docker-compose.local.yml
 Caddyfile.local
+
+# OS
+.DS_Store

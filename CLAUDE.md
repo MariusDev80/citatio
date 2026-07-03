@@ -63,14 +63,18 @@ citatio/
 ├── Caddyfile                 ← reverse-proxy / gateway (API routing + TLS)
 ├── frontend/                 ← Angular 21 app (SSR enabled)
 └── backend/                  ← Maven multi-module Spring Boot microservices
-    ├── pom.xml               ← parent POM
+    ├── pom.xml               ← parent POM (aggregator, packaging=pom — no app code here)
     ├── common-libs/          ← shared DTOs / config (NO cross-module DB joins)
-    ├── u1-communication/     ← email / contact / comms microservice (own DB: citatio_u1_db)
-    └── u2-blog/              ← blog microservice (own DB: citatio_u2_db)
+    ├── u1-communication/     ← email / contact / comms microservice (port 8081, own DB: citatio_u1_db)
+    └── u2-blog/              ← blog microservice (port 8082, own DB: citatio_u2_db)
 ```
 
-**Service routing (Caddy):** `/api/u1/*` → `u1-communication:8080`, `/api/u2/*` → `u2-blog:8080`,
-everything else → Angular frontend.
+**Ports:** each microservice listens on its own port — `u1-communication:8081`, `u2-blog:8082`.
+Inter-module calls go through the Docker service name (Spring `RestClient`), e.g. u2 → `http://u1-communication:8081`.
+
+**Service routing (Caddy):** `/api/u1/*` → `u1-communication:8081`, `/api/u2/*` → `u2-blog:8082`,
+everything else → Angular frontend. The `/api/uX` prefix is **preserved** (Caddy `handle`, not
+`handle_path`) — Spring controllers are mapped under `/api/u1` and `/api/u2`.
 
 ---
 

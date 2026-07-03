@@ -9,29 +9,71 @@ services:
       POSTGRES_PASSWORD: password
     volumes:
       - ./data/db:/var/lib/postgresql/data
+      # Cree citatio_u1_db et citatio_u2_db au premier init (volume vide uniquement).
+      - ./backend/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    # Les microservices attendent que la base soit reellement prete (evite les
+    # "Connection refused" au demarrage pendant l'init de Postgres).
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d citatio_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
-  backend:
-    image: ghcr.io/mariusdev80/citatio/backend:latest
-    container_name: citatio-back
+  # ── Microservice u1-communication (email / contact / comms) — port 8081 ──
+  u1-communication:
+    image: ghcr.io/mariusdev80/citatio/u1-communication:latest
+    build:
+      context: ./backend
+      dockerfile: u1-communication/Dockerfile
+    container_name: citatio-u1
+    restart: always
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     environment:
       DB_HOST: database
-      DB_NAME: citatio_db
+      DB_NAME: citatio_u1_db
       DB_USER: user
       DB_PASSWORD: password
-    # On n'ouvre plus de "ports", on "expose" uniquement en interne pour Caddy
     expose:
-      - "8080"
+      - "8081"
+    ports:
+      - "8081:8081"   # publie sur l'hote pour debug direct
+
+  # ── Microservice u2-blog (articles) — port 8082, appelle u1 en REST ──
+  u2-blog:
+    image: ghcr.io/mariusdev80/citatio/u2-blog:latest
+    build:
+      context: ./backend
+      dockerfile: u2-blog/Dockerfile
+    container_name: citatio-u2
+    restart: always
+    depends_on:
+      database:
+        condition: service_healthy
+      u1-communication:
+        condition: service_started
+    environment:
+      DB_HOST: database
+      DB_NAME: citatio_u2_db
+      DB_USER: user
+      DB_PASSWORD: password
+      U1_BASE_URL: http://u1-communication:8081
+    expose:
+      - "8082"
+    ports:
+      - "8082:8082"   # publie sur l'hote pour debug direct
 
   frontend:
     image: ghcr.io/mariusdev80/citatio/frontend:latest
+    build:
+      context: ./frontend
     container_name: citatio-front
     expose:
       - "80"
 
   gateway:
-    image: caddy:latest
+    image: caddy:2.11.4-alpine
     container_name: citatio-gateway
     restart: always
     ports:
@@ -43,4 +85,5 @@ services:
       - ./data/caddy_config:/config
     depends_on:
       - frontend
-      - backend
+      - u1-communication
+      - u2-blog
