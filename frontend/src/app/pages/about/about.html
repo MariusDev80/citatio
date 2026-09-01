@@ -44,12 +44,13 @@
         <div class="grid gap-6 border-t border-rule py-12 md:grid-cols-12 md:gap-10">
           <div class="md:col-span-3">
             @if (founder.portrait) {
+              <!-- 440x550 = 2x le rendu (220px CSS). Genere par
+                   `npm run build:portraits`. -->
               <img
-                [src]="founder.portrait"
+                [ngSrc]="founder.portrait"
                 [alt]="'Portrait de ' + founder.fullName"
-                width="400"
-                height="500"
-                loading="lazy"
+                width="440"
+                height="550"
                 class="w-full max-w-[220px] rounded-md object-cover"
               />
             } @else {

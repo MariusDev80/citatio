@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { JsonLdService } from '../../services/json-ld.service';
 import { COMPANY } from '../../config/company.config';
@@ -32,13 +33,13 @@ interface Founder {
   readonly role: string;
   readonly background: string;
   readonly conviction: string;
-  /** Portrait in `public/team/`, or `null` until a real photo is supplied. */
+  /** Portrait in `public/team/` (640x800, recadre 4:5), ou `null` si absent. */
   readonly portrait: string | null;
 }
 
 @Component({
   selector: 'app-about',
-  imports: [RouterLink],
+  imports: [RouterLink, NgOptimizedImage],
   templateUrl: './about.html',
   styleUrl: './about.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -57,7 +58,7 @@ export class AboutComponent {
       role: 'Commerce et direction',
       background: 'TODO(bios) — parcours en 2 ou 3 phrases.',
       conviction: 'TODO(bios) — une conviction, à la première personne.',
-      portrait: null,
+      portrait: '/team/titouan.webp',
     },
     {
       name: 'Marius',
@@ -66,7 +67,7 @@ export class AboutComponent {
       role: 'Conception et développement',
       background: 'TODO(bios) — parcours en 2 ou 3 phrases.',
       conviction: 'TODO(bios) — une conviction, à la première personne.',
-      portrait: null,
+      portrait: '/team/marius.webp',
     },
     {
       name: 'Ruben',
@@ -75,7 +76,7 @@ export class AboutComponent {
       role: 'Commerce et administration',
       background: 'TODO(bios) — parcours en 2 ou 3 phrases.',
       conviction: 'TODO(bios) — une conviction, à la première personne.',
-      portrait: null,
+      portrait: '/team/ruben.webp',
     },
   ]);
 
