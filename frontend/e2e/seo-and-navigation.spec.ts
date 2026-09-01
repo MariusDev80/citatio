@@ -13,7 +13,7 @@ test.describe('Page d\'accueil — SEO', () => {
   });
 
   test('le titre de la page est correct', async ({ page }) => {
-    await expect(page).toHaveTitle(/Citatio — studio web près de Nantes/i);
+    await expect(page).toHaveTitle(/Citatio, studio web près de Nantes/i);
   });
 
   test('la meta description mentionne l\'ancrage local', async ({ page }) => {

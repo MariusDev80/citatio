@@ -22,7 +22,7 @@
     </dl>
     <p class="ct-prose ct-column mb-3">Siège social : {{ company.address.street }}, {{ company.address.postalCode }} {{ company.address.city }}</p>
     <p class="ct-prose ct-column mb-3">Directeur de la publication : {{ company.legal.publicationDirector }}</p>
-    <p class="ct-prose ct-column mb-3">Contact : <a [href]="'mailto:' + company.email" class="ct-link">{{ company.email }}</a> — <a [href]="'tel:' + company.phoneRaw" class="ct-link">{{ company.phoneDisplay }}</a></p>
+    <p class="ct-prose ct-column mb-3">Contact : <a [href]="'mailto:' + company.email" class="ct-link">{{ company.email }}</a>, <a [href]="'tel:' + company.phoneRaw" class="ct-link">{{ company.phoneDisplay }}</a></p>
 
     <h3 class="ct-title mt-8 mb-2">Hébergeur</h3>
     <p class="ct-prose ct-column mb-3">

@@ -7,7 +7,7 @@ import { COMPANY } from '../../config/company.config';
 import { BUDGET_BRACKETS } from '../../config/pricing.config';
 
 /** Prefilled mail body — see {@link ContactComponent.mailtoHref}. */
-const MAIL_SUBJECT = 'Demande de devis — site vitrine';
+const MAIL_SUBJECT = 'Demande de devis pour un site vitrine';
 
 @Component({
   selector: 'app-contact',

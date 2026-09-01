@@ -5,13 +5,12 @@ import { JsonLdService } from '../../services/json-ld.service';
 import { COMPANY } from '../../config/company.config';
 
 /**
- * One founder. Everything except `name` is owner-supplied copy.
+ * One founder. Every string here describes a real person.
  *
- * ⚠️ TODO(bios): `role`, `background`, `conviction` and the portraits are
- * placeholders. They must be written by Marius, Ruben and Titouan themselves —
- * inventing a plausible-sounding career history would put false statements
- * about real people on a public page, which is exactly the kind of generic
- * filler this redesign exists to remove.
+ * Rule for future edits: nothing in this block may be invented. Roles come
+ * from the Obsidian vault (note 1.2), backgrounds and convictions from the
+ * founders themselves. A plausible-sounding sentence written on their behalf
+ * would put a false statement about a real person on a public page.
  *
  * What to write, per founder:
  *  - `role`      2–4 words. What you actually do day to day, not a job title
@@ -58,7 +57,8 @@ export class AboutComponent {
       role: 'Commerce et direction',
       background:
         'Bachelor à Audencia, en alternance chez Nepsio Conseil. Un parcours de conseil, pas de technique : c’est lui qui écoute d’abord ce que fait l’entreprise, avant qu’on parle de site.',
-      conviction: 'TODO(bios) — une conviction, à la première personne.',
+      conviction:
+        'La plupart des gens qui nous appellent n’ont pas besoin d’un site. Ils ont besoin qu’on comprenne comment ils gagnent leur vie. Le site vient après, s’il sert à quelque chose.',
       portrait: '/team/titouan.webp',
     },
     {
@@ -68,7 +68,8 @@ export class AboutComponent {
       role: 'Conception et développement',
       background:
         'BTS SIO, puis licence MIAGE en alternance à La Poste, comme développeur full stack. Assez longtemps dans une grande structure pour savoir ce que coûte un logiciel mal fait, et pour préférer l’artisanat au volume.',
-      conviction: 'TODO(bios) — une conviction, à la première personne.',
+      conviction:
+        'On peut monter un site en deux heures avec un outil en ligne. Le difficile n’est pas de le monter, c’est de vivre avec pendant cinq ans.',
       portrait: '/team/marius.webp',
     },
     {
@@ -77,8 +78,9 @@ export class AboutComponent {
       office: 'Directeur général',
       role: 'Commerce et administration',
       background:
-        'Bac pro en climatisation et chambres froides, un an comme agent de sûreté à la douane de l’aéroport de Nantes, puis neuf mois en plomberie, à poser des salles de bains. Il connaît de l’intérieur les métiers pour lesquels nous travaillons — il en vient.',
-      conviction: 'TODO(bios) — une conviction, à la première personne.',
+        'Bac pro en climatisation et chambres froides, un an comme agent de sûreté à la douane de l’aéroport de Nantes, puis neuf mois en plomberie, à poser des salles de bains. Il connaît de l’intérieur les métiers pour lesquels nous travaillons, il en vient.',
+      conviction:
+        'J’ai posé des salles de bains. Quand un artisan me dit qu’il n’a pas le temps de s’occuper de son site, je sais que ce n’est pas une excuse.',
       portrait: '/team/ruben.webp',
     },
   ]);

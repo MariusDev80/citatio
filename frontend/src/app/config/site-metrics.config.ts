@@ -77,6 +77,6 @@ export const TECH_FACTS: readonly Metric[] = [
     value: 'WCAG AA',
     howToVerify:
       'Le plus faible rapport de contraste du site est de 5,1:1, pour un minimum '
-      + 'exigé de 4,5:1 — en thème clair comme en thème sombre',
+      + 'exigé de 4,5:1, en thème clair comme en thème sombre',
   },
 ] as const;

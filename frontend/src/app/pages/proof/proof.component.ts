@@ -56,7 +56,7 @@ export class ProofComponent {
       title: 'Aucun traceur',
       body:
         'Pas d’analytics tiers, pas de pixel publicitaire, pas de bannière de '
-        + 'consentement — parce qu’il n’y a rien à consentir. Le site ne dépose '
+        + 'consentement, parce qu’il n’y a rien à consentir. Le site ne dépose '
         + 'qu’une préférence de thème, dans votre navigateur.',
     },
     {
@@ -71,7 +71,7 @@ export class ProofComponent {
       body:
         'Le site tourne dans des conteneurs Docker derrière Caddy, sur un serveur '
         + 'que nous administrons. C’est la même infrastructure que celle proposée '
-        + 'à nos clients — nous en sommes les premiers utilisateurs.',
+        + 'à nos clients : nous en sommes les premiers utilisateurs.',
     },
     {
       title: 'Déployé automatiquement',

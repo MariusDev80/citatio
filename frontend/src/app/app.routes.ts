@@ -6,7 +6,7 @@ export const routes: Routes = [
     path: '',
     data: {
       seo: {
-        title: 'Citatio — studio web près de Nantes, sites vitrines sur mesure',
+        title: 'Citatio, studio web près de Nantes, sites vitrines sur mesure',
         description:
           'Studio web à La Chapelle-sur-Erdre : nous concevons, développons et hébergeons des sites vitrines faits à la main pour les artisans, commerces et indépendants de Loire-Atlantique. SEO et visibilité IA en option.',
       } satisfies SeoData,
@@ -17,7 +17,7 @@ export const routes: Routes = [
     path: 'ce-site',
     data: {
       seo: {
-        title: 'Ce site — la démonstration de notre travail | Citatio',
+        title: 'Ce site, la démonstration de notre travail | Citatio',
         description:
           'Nous démarrons et n\'avons pas encore de client à montrer. Alors nous montrons ce site : scores Lighthouse mesurés, rendu serveur, accessibilité AA, hébergement. Tout est vérifiable.',
       } satisfies SeoData,
@@ -28,7 +28,7 @@ export const routes: Routes = [
     path: 'about',
     data: {
       seo: {
-        title: 'Qui sommes-nous — Marius, Ruben et Titouan | Citatio',
+        title: 'Qui sommes-nous : Marius, Ruben et Titouan | Citatio',
         description:
           'Citatio est un studio web de trois personnes, installé à La Chapelle-sur-Erdre près de Nantes. Nos parcours, notre manière de travailler et ce que nous refusons de faire.',
       } satisfies SeoData,
@@ -39,7 +39,7 @@ export const routes: Routes = [
     path: 'services',
     data: {
       seo: {
-        title: 'Offres et tarifs — sites vitrines | Citatio',
+        title: 'Offres et tarifs des sites vitrines | Citatio',
         description:
           'Trois formules à partir de 1 200 € HT, plus un abonnement de 39 €/mois couvrant hébergement, nom de domaine et maintenance. Devis ferme sous cinq jours.',
       } satisfies SeoData,
@@ -61,7 +61,7 @@ export const routes: Routes = [
     path: 'contact',
     data: {
       seo: {
-        title: 'Contact — parlons de votre projet | Citatio',
+        title: 'Contact : parlons de votre projet | Citatio',
         description:
           'Premier échange de trente minutes, gratuit et sans engagement. Réponse sous deux jours ouvrés. Studio web en Loire-Atlantique.',
       } satisfies SeoData,
@@ -83,7 +83,7 @@ export const routes: Routes = [
     path: '**',
     data: {
       seo: {
-        title: 'Page introuvable — Citatio',
+        title: 'Page introuvable | Citatio',
         description: 'La page que vous recherchez n\'existe pas ou a été déplacée.',
       } satisfies SeoData,
     },
