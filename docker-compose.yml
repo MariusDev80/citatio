@@ -35,10 +35,18 @@ services:
       DB_NAME: citatio_u1_db
       DB_USER: user
       DB_PASSWORD: password
+      U2_BASE_URL: http://u2-blog:8082
     # 'expose' uniquement : joignable par Caddy et par u2 via le reseau Docker
     # interne, jamais directement depuis Internet. (Debug local : compose override.)
     expose:
       - "8081"
+    # Sante propre au service : Docker connait l'etat de u1 independamment de u2.
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8081/api/u1/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 40s
 
   # ── Microservice u2-blog (articles) — port 8082, appelle u1 en REST ──
   u2-blog:
@@ -48,11 +56,12 @@ services:
       dockerfile: u2-blog/Dockerfile
     container_name: citatio-u2
     restart: always
+    # AUCUNE dependance a u1-communication : les deux microservices demarrent et
+    # vivent independamment. Une coupure de u1 ne doit ni empecher u2 de demarrer,
+    # ni l'empecher de repondre (voir UpstreamClient : degradation gracieuse).
     depends_on:
       database:
         condition: service_healthy
-      u1-communication:
-        condition: service_started
     environment:
       DB_HOST: database
       DB_NAME: citatio_u2_db
@@ -63,6 +72,13 @@ services:
     # jamais directement depuis Internet.
     expose:
       - "8082"
+    # Sante propre au service : Docker connait l'etat de u2 independamment de u1.
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8082/api/u2/health || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 40s
 
   frontend:
     image: ghcr.io/mariusdev80/citatio/frontend:latest
