@@ -78,7 +78,7 @@ export class AboutComponent {
       office: 'Directeur général',
       role: 'Commerce et administration',
       background:
-        'Bac pro en climatisation et chambres froides, un an comme agent de sûreté à la douane de l’aéroport de Nantes, puis neuf mois en plomberie, à poser des salles de bains. Il connaît de l’intérieur les métiers pour lesquels nous travaillons, il en vient.',
+        'Bac pro en climatisation et chambres froides, un an comme agent de sûreté à la douane de l’aéroport de Nantes, puis neuf mois en plomberie, à poser des salles de bains. Je connais de l’intérieur les métiers pour lesquels nous travaillons, j’en viens.',
       conviction:
         'J’ai posé des salles de bains. Quand un artisan me dit qu’il n’a pas le temps de s’occuper de son site, je sais que ce n’est pas une excuse.',
       portrait: '/team/ruben.webp',
