@@ -56,7 +56,7 @@ export class AboutComponent {
       office: 'Président',
       role: 'Commerce et direction',
       background:
-        'Bachelor à Audencia, en alternance chez Nepsio Conseil. Un parcours de conseil, pas de technique : c’est lui qui écoute d’abord ce que fait l’entreprise, avant qu’on parle de site.',
+        'Passé par le conseil en développement commercial, j’ai choisi de me consacrer pleinement à Citatio, l’entreprise que j’ai cofondée : concevoir des sites internet qui servent vraiment l’activité de leurs propriétaires.',
       conviction:
         'La plupart des gens qui nous appellent n’ont pas besoin d’un site. Ils ont besoin qu’on comprenne comment ils gagnent leur vie. Le site vient après, s’il sert à quelque chose.',
       portrait: '/team/titouan.webp',
