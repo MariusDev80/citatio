@@ -3,6 +3,7 @@ export const COMPANY = {
   legalName: 'Citatio',
   url: 'https://citatio-geo.com',
   logo: 'https://citatio-geo.com/citatio_logo.png',
+  ogImage: 'https://citatio-geo.com/og-citatio.png',
   locale: 'fr_FR',
   lang: 'French',
   description:
@@ -21,10 +22,45 @@ export const COMPANY = {
   },
   priceRange: '€€',
   foundingYear: 2025,
+
+  /**
+   * Legal identity, surfaced on /legal and in the footer.
+   * TODO(legal): fill these in — the Legal page shipped with visible
+   * `[forme juridique]` / `[numéro SIRET]` placeholders, which is both a
+   * credibility problem and a French compliance one.
+   */
+  legal: {
+    form: 'À COMPLÉTER',
+    siret: 'À COMPLÉTER',
+    capital: 'À COMPLÉTER',
+    rcsCity: 'À COMPLÉTER',
+    publicationDirector: 'À COMPLÉTER',
+    vatNumber: 'À COMPLÉTER',
+  },
+
+  /**
+   * We run this site on the same stack we sell — that is part of the pitch,
+   * and French law requires naming the host on /legal.
+   * TODO(legal): fill in the actual VPS provider, its legal name, address and
+   * phone. The provider is currently only known to the CI (`VPS_IP` secret),
+   * so it is deliberately left blank rather than guessed.
+   */
+  hosting: {
+    provider: 'À COMPLÉTER',
+    address: 'À COMPLÉTER',
+    phone: 'À COMPLÉTER',
+    /** Ours regardless of provider — this part is verifiable from the repo. */
+    stack: 'Docker et Caddy, sur un VPS que nous administrons nous-mêmes',
+  },
+
+  /** The three founders. Bios live in the About page component. */
+  founders: ['Marius', 'Ruben', 'Titouan'] as const,
   knowsAbout: [
     'Création de site vitrine',
     'Studio web',
     'Web design',
+    'Développement web sur mesure',
+    'Accessibilité web',
     'SEO',
     'Référencement Google',
     'Generative Engine Optimization',

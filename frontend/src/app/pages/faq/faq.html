@@ -1,14 +1,32 @@
-<div class="pt-32 pb-16 max-w-3xl mx-auto px-6">
-  <h1 class="ct-page-title mb-12">Questions Fréquemment Posées</h1>
+<article class="pt-36 pb-8 md:pt-44">
+  <header class="ct-section">
+    <p class="ct-eyebrow">Questions fréquentes</p>
+    <h1 class="ct-display-lg mt-6 max-w-[16ch]">Ce qu’on nous demande le plus souvent.</h1>
+    <p class="ct-lede ct-column mt-8">
+      Si votre question n’y est pas, écrivez-nous : nous répondons à tout le monde,
+      même quand cela ne débouche pas sur un devis.
+    </p>
+  </header>
 
-  <p-accordion [multiple]="true" [value]="['0']">
-    @for (item of faqItems(); track item.question; let i = $index) {
-      <p-accordion-panel [value]="i.toString()">
-        <p-accordion-header>{{ item.question }}</p-accordion-header>
-        <p-accordion-content>
-          <p class="ct-text-body py-2">{{ item.answer }}</p>
-        </p-accordion-content>
-      </p-accordion-panel>
-    }
-  </p-accordion>
-</div>
+  <section class="ct-section mt-16">
+    <div class="ct-column border-t border-rule-strong">
+      <p-accordion [multiple]="true" [value]="['0']">
+        @for (item of faqItems(); track item.question; let i = $index) {
+          <p-accordion-panel [value]="i.toString()">
+            <p-accordion-header>{{ item.question }}</p-accordion-header>
+            <p-accordion-content>
+              <p class="ct-prose pb-4">{{ item.answer }}</p>
+            </p-accordion-content>
+          </p-accordion-panel>
+        }
+      </p-accordion>
+    </div>
+  </section>
+
+  <section class="ct-section py-20">
+    <div class="border-t border-rule-strong pt-12">
+      <h2 class="ct-display-md max-w-[18ch]">Une question qui n’est pas là ?</h2>
+      <a routerLink="/contact" class="ct-btn mt-8">Posez-la nous</a>
+    </div>
+  </section>
+</article>

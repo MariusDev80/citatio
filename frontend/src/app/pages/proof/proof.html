@@ -1,0 +1,118 @@
+<article class="pt-36 pb-8 md:pt-44">
+  <header class="ct-section">
+    <p class="ct-eyebrow">Notre preuve</p>
+    <h1 class="ct-display-lg mt-6 max-w-[17ch]">Ce site est notre portfolio.</h1>
+    <div class="ct-lede ct-column mt-8">
+      <p>
+        Nous démarrons. Nous n’avons pas encore de site client à vous montrer, et
+        nous ne mettrons pas en ligne des réalisations que nous n’avons pas faites.
+      </p>
+    </div>
+    <div class="ct-prose ct-column mt-6">
+      <p>
+        Ce que nous pouvons vous montrer, en revanche, c’est le seul site dont nous
+        sommes entièrement responsables : celui que vous lisez. Il a été conçu,
+        développé, déployé et hébergé par nous, avec les mêmes méthodes et sur la
+        même infrastructure que ce que nous vendons. Tout ce qui suit est
+        vérifiable depuis votre navigateur, maintenant.
+      </p>
+    </div>
+  </header>
+
+  <!-- ═══ Measured scores ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="mesures-title">
+    <div class="border-t border-rule-strong pt-10">
+      <h2 id="mesures-title" class="ct-display-md">Les mesures</h2>
+      <p class="ct-prose ct-column mt-5">
+        Relevés au {{ measuredOn }} avec Lighthouse, l’outil d’audit intégré à
+        Chrome, en profil ordinateur sur la page d’accueil. Refaites le test :
+        ouvrez les outils de développement, onglet Lighthouse, et lancez l’analyse.
+      </p>
+    </div>
+
+    <!-- Only <dt>/<dd> may sit inside the per-item <div>: no wrapper element
+         and no <p> in between, or the list stops being a definition list for
+         assistive tech. Layout is handled by the grid, not by extra markup. -->
+    <dl class="mt-12 grid gap-x-12 md:grid-cols-2">
+      @for (metric of metrics; track metric.label) {
+        <div class="grid grid-cols-[1fr_auto] items-baseline gap-x-6 border-t border-rule py-6">
+          <dt class="ct-title">{{ metric.label }}</dt>
+          <dd class="font-display text-4xl tabular-nums text-accent">{{ metric.value }}</dd>
+          <dd class="col-span-2 mt-2 text-sm text-ink-faint">{{ metric.howToVerify }}</dd>
+        </div>
+      }
+    </dl>
+  </section>
+
+  <!-- ═══ Verifiable technical facts ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="verifs-title">
+    <div class="border-t border-rule-strong pt-10">
+      <h2 id="verifs-title" class="ct-display-md">Ce que vous pouvez vérifier</h2>
+    </div>
+
+    <dl class="mt-12">
+      @for (fact of techFacts; track fact.label) {
+        <div class="grid gap-2 border-t border-rule py-6 md:grid-cols-12 md:gap-10">
+          <dt class="ct-title md:col-span-3">{{ fact.label }}</dt>
+          <dd class="md:col-span-3">
+            <span class="font-display text-2xl text-ink">{{ fact.value }}</span>
+          </dd>
+          <dd class="ct-prose text-sm md:col-span-6">{{ fact.howToVerify }}</dd>
+        </div>
+      }
+    </dl>
+  </section>
+
+  <!-- ═══ The choices behind it ═══ -->
+  <section class="mt-24 border-y border-rule bg-surface py-20" aria-labelledby="choix-title">
+    <div class="ct-section">
+      <h2 id="choix-title" class="ct-display-md max-w-[16ch]">Les décisions derrière ces chiffres</h2>
+      <p class="ct-prose ct-column mt-5">
+        Un bon score n’est pas un hasard de fin de projet. Il vient d’une poignée
+        de décisions prises au début, et tenues jusqu’au bout.
+      </p>
+
+      <div class="mt-14 grid gap-x-14 md:grid-cols-2">
+        @for (choice of choices(); track choice.title) {
+          <div class="border-t border-rule py-8">
+            <h3 class="ct-title">{{ choice.title }}</h3>
+            <p class="ct-prose mt-3 text-sm">{{ choice.body }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Honest limits ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="limites-title">
+    <div class="border-t border-rule-strong pt-10">
+      <h2 id="limites-title" class="ct-display-md max-w-[18ch]">Ce que cette page ne prouve pas</h2>
+      <div class="ct-prose ct-column mt-6">
+        <p>
+          Qu’un site soit rapide et accessible ne dit rien de notre capacité à
+          tenir un délai, à encaisser une demande qui change en cours de route, ou
+          à travailler avec vous sur la durée. Cela, seuls de vrais clients
+          pourront l’attester — et le jour où nous en aurons, cette page laissera
+          la place à leurs projets.
+        </p>
+        <p>
+          En attendant, nous préférons une preuve limitée mais vérifiable à une
+          vitrine flatteuse et invérifiable.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ct-section py-20">
+    <div class="border-t border-rule-strong pt-12">
+      <h2 class="ct-display-lg max-w-[18ch]">Vous voulez le même niveau de soin ?</h2>
+      <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+        <a routerLink="/contact" class="ct-btn">Parlons de votre projet</a>
+        <a routerLink="/services" class="ct-link">
+          Voir les offres et les tarifs
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</article>

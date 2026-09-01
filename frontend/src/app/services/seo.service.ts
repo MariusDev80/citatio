@@ -46,7 +46,7 @@ export class SeoService {
   private updateMeta(seo: SeoData | undefined, path: string): void {
     const pageTitle = seo?.title ?? COMPANY.name;
     const description = seo?.description ?? COMPANY.description;
-    const ogImage = seo?.ogImage ?? COMPANY.logo;
+    const ogImage = seo?.ogImage ?? COMPANY.ogImage;
     const canonicalUrl = `${COMPANY.url}/${path}`;
 
     this.title.setTitle(pageTitle);

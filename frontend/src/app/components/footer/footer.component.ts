@@ -1,10 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { COMPANY } from '../../config/company.config';
 
-/**
- * FooterComponent utilise RouterLink pour la navigation interne.
- * On garde le footer simple et accessible avec des liens clairs.
- */
 @Component({
   selector: 'app-footer',
   imports: [RouterLink],
@@ -12,4 +9,10 @@ import { RouterLink } from '@angular/router';
   styleUrl: './footer.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FooterComponent {}
+export class FooterComponent {
+  protected readonly company = COMPANY;
+
+  /** Computed once per render rather than hardcoded — a stale copyright year
+   *  is a small thing that reads as an abandoned site. */
+  protected readonly year = new Date().getFullYear();
+}

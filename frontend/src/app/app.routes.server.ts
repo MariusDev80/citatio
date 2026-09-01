@@ -3,6 +3,7 @@ import type { ServerRoute } from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
   { path: '', renderMode: RenderMode.Prerender },
+  { path: 'ce-site', renderMode: RenderMode.Prerender },
   { path: 'about', renderMode: RenderMode.Prerender },
   { path: 'services', renderMode: RenderMode.Prerender },
   { path: 'faq', renderMode: RenderMode.Prerender },

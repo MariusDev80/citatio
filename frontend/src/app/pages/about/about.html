@@ -1,59 +1,148 @@
-<div class="pt-32 pb-16 max-w-4xl mx-auto px-6">
-  <h1 class="ct-page-title mb-12">Qui sommes-nous ?</h1>
-
-  <div class="space-y-8">
-    <div class="ct-card">
-      <h2 class="ct-card-title">Notre Mission</h2>
-      <p class="ct-text-body">
-        Citatio est un <strong class="ct-text-emphasis">studio web</strong> qui conçoit des
-        <strong class="ct-text-emphasis">sites vitrines sur mesure</strong> pour les TPE, PME,
-        artisans et indépendants. Notre objectif : vous donner une présence en ligne
-        crédible, soignée et efficace, qui transforme vos visiteurs en clients.
+<article class="pt-36 pb-8 md:pt-44">
+  <header class="ct-section">
+    <p class="ct-eyebrow">Qui sommes-nous</p>
+    <h1 class="ct-display-lg mt-6 max-w-[16ch]">Trois personnes, un métier.</h1>
+    <div class="ct-lede ct-column mt-8">
+      <p>
+        Citatio est un studio web installé à {{ company.address.city }}, en
+        Loire-Atlantique. Nous sommes trois à le faire vivre, et nous n’avons
+        personne d’autre derrière nous.
       </p>
     </div>
+  </header>
 
-    <div class="ct-card">
-      <h2 class="ct-card-title">Notre approche</h2>
-      <p class="ct-text-body">
-        Pas de template recyclé : nous partons de votre métier, de votre image et de vos
-        objectifs pour construire un site rapide, responsive et pensé pour la conversion.
-        Vous voulez aller plus loin ? Nous ajoutons en option le
-        <strong class="ct-text-emphasis">SEO</strong> (référencement Google) et le
-        <strong class="ct-text-emphasis">GEO</strong> (visibilité sur ChatGPT, Gemini et
-        les AI Overviews de Google), pour être trouvé partout où vos clients cherchent.
+  <!-- ═══ Why we exist ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="pourquoi-title">
+    <div class="grid gap-10 border-t border-rule-strong pt-10 md:grid-cols-12">
+      <h2 id="pourquoi-title" class="ct-display-md md:col-span-5">Pourquoi nous nous sommes associés</h2>
+      <div class="ct-prose md:col-span-7">
+        <p>
+          Nous avons vu trop d’entreprises locales payer pour un site qu’elles ne
+          peuvent pas modifier, qui met cinq secondes à s’afficher, et dont
+          personne ne sait plus qui l’héberge. Ou pire : un site correct, mais
+          fabriqué en série, impossible à distinguer de celui du concurrent d’à
+          côté.
+        </p>
+        <p>
+          Nous nous sommes associés pour faire l’inverse, sur un périmètre étroit
+          et assumé : des sites vitrines, faits à la main, pour des entreprises de
+          notre région. Nous voulons pouvoir répondre de chaque ligne de code et
+          de chaque décision de design.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Founders ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="fondateurs-title">
+    <div class="border-t border-rule-strong pt-10">
+      <h2 id="fondateurs-title" class="ct-display-md">Les trois</h2>
+    </div>
+
+    <div class="mt-12">
+      @for (founder of founders(); track founder.name) {
+        <div class="grid gap-6 border-t border-rule py-12 md:grid-cols-12 md:gap-10">
+          <div class="md:col-span-3">
+            @if (founder.portrait) {
+              <img
+                [src]="founder.portrait"
+                [alt]="'Portrait de ' + founder.name"
+                width="400"
+                height="500"
+                loading="lazy"
+                class="w-full max-w-[220px] rounded-md object-cover"
+              />
+            } @else {
+              <!-- Placeholder until real portraits are supplied. Deliberately a
+                   plain initial, not a stock avatar. -->
+              <div
+                class="flex aspect-4/5 w-full max-w-[220px] items-center justify-center rounded-md bg-surface"
+                aria-hidden="true">
+                <span class="font-display text-6xl text-ink-faint">{{ initial(founder.name) }}</span>
+              </div>
+            }
+          </div>
+
+          <div class="md:col-span-9">
+            <h3 class="ct-display-md">{{ founder.name }}</h3>
+            <p class="ct-eyebrow mt-3">{{ founder.role }}</p>
+            <p class="ct-prose ct-column mt-5">{{ founder.background }}</p>
+            <blockquote class="ct-column mt-6 border-l-2 border-accent pl-5">
+              <p class="font-display text-xl leading-snug text-ink">{{ founder.conviction }}</p>
+            </blockquote>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ═══ How we work ═══ -->
+  <section class="mt-16 border-y border-rule bg-surface py-20" aria-labelledby="maniere-title">
+    <div class="ct-section">
+      <div class="grid gap-10 md:grid-cols-12">
+        <h2 id="maniere-title" class="ct-display-md md:col-span-5">Notre manière de travailler</h2>
+        <div class="ct-prose md:col-span-7">
+          <p>
+            <strong>Un interlocuteur, pas un service client.</strong> Vous parlez à
+            l’un de nous trois, du premier échange à la mise en ligne, et après.
+          </p>
+          <p>
+            <strong>Le devis est ferme.</strong> Le prix annoncé est le prix payé.
+            Si le périmètre change en cours de route, on en discute avant, pas sur
+            la facture.
+          </p>
+          <p>
+            <strong>Vous restez propriétaire.</strong> Nom de domaine, contenu,
+            code : tout est à vous. Si vous partez, vous partez avec.
+          </p>
+          <p>
+            <strong>On explique le pourquoi.</strong> Vous n’avez pas à comprendre
+            la technique, mais vous avez le droit de savoir ce que vous achetez et
+            pourquoi nous vous le recommandons.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ What we refuse ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="refus-title">
+    <div class="grid gap-10 border-t border-rule-strong pt-10 md:grid-cols-12">
+      <h2 id="refus-title" class="ct-display-md md:col-span-5">Ce que nous ne faisons pas</h2>
+      <div class="ct-prose md:col-span-7">
+        <p>
+          Un studio se définit autant par ce qu’il refuse. Nous ne faisons pas de
+          boutique en ligne, pas d’application métier, pas de refonte d’un site
+          existant dont nous n’avons pas la main sur le code.
+        </p>
+        <p>
+          Nous ne promettons pas non plus la première place sur Google : personne
+          ne peut la garantir, et ceux qui le font vous vendent du vent. Nous
+          travaillons votre référencement, nous vous montrons ce qui bouge, et
+          nous vous disons quand un mot-clé est hors de portée.
+        </p>
+        <p>
+          Si votre projet ne rentre pas dans ce cadre, nous vous le dirons dès le
+          premier échange, quitte à vous orienter ailleurs.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ct-section py-20">
+    <div class="border-t border-rule-strong pt-12">
+      <h2 class="ct-display-lg max-w-[18ch]">Envie de savoir à qui vous parlez ?</h2>
+      <p class="ct-lede ct-column mt-6">
+        Le premier échange dure trente minutes et ne coûte rien. C’est le meilleur
+        moyen de voir si le courant passe.
       </p>
+      <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+        <a routerLink="/contact" class="ct-btn">Prendre contact</a>
+        <a routerLink="/ce-site" class="ct-link">
+          Voir comment nous travaillons
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
     </div>
-
-    <div class="ct-card">
-      <h2 class="ct-card-title">Une présence sans prise de tête</h2>
-      <p class="ct-text-body">
-        Au-delà de la création, nous gérons aussi l'<strong class="ct-text-emphasis">hébergement</strong>,
-        le <strong class="ct-text-emphasis">nom de domaine</strong> et la
-        <strong class="ct-text-emphasis">maintenance</strong> de votre site. Vous gardez
-        un interlocuteur unique et vous vous concentrez sur votre activité, pas sur la technique.
-      </p>
-    </div>
-
-    <div class="ct-card">
-      <h2 class="ct-card-title">Nos Valeurs</h2>
-      <ul class="space-y-4">
-        <li class="flex items-center gap-3 ct-text-muted">
-          <i class="pi pi-check-circle ct-text-accent text-lg shrink-0"></i>
-          <span><strong class="ct-text-emphasis">Sur mesure</strong> — Un site pensé pour vous, pas un modèle générique</span>
-        </li>
-        <li class="flex items-center gap-3 ct-text-muted">
-          <i class="pi pi-check-circle ct-text-accent text-lg shrink-0"></i>
-          <span><strong class="ct-text-emphasis">Transparence</strong> — Des devis clairs, pas de coûts cachés</span>
-        </li>
-        <li class="flex items-center gap-3 ct-text-muted">
-          <i class="pi pi-check-circle ct-text-accent text-lg shrink-0"></i>
-          <span><strong class="ct-text-emphasis">Proximité</strong> — Un interlocuteur unique, du devis à la mise en ligne</span>
-        </li>
-        <li class="flex items-center gap-3 ct-text-muted">
-          <i class="pi pi-check-circle ct-text-accent text-lg shrink-0"></i>
-          <span><strong class="ct-text-emphasis">Pédagogie</strong> — On vous explique le pourquoi, pas juste le comment</span>
-        </li>
-      </ul>
-    </div>
-  </div>
-</div>
+  </section>
+</article>

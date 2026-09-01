@@ -1,14 +1,17 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { JsonLdService } from '../../services/json-ld.service';
 import { COMPANY } from '../../config/company.config';
+import { BUDGET_BRACKETS } from '../../config/pricing.config';
+
+/** Prefilled mail body — see {@link ContactComponent.mailtoHref}. */
+const MAIL_SUBJECT = 'Demande de devis — site vitrine';
 
 @Component({
   selector: 'app-contact',
-  imports: [ReactiveFormsModule, ButtonModule, InputTextModule, TextareaModule],
+  imports: [ReactiveFormsModule, InputTextModule, TextareaModule],
   templateUrl: './contact.html',
   styleUrl: './contact.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -17,17 +20,62 @@ export class ContactComponent {
   private readonly fb = inject(FormBuilder);
   private readonly jsonLd = inject(JsonLdService);
 
-  protected readonly submitted = signal(false);
-  protected readonly submitSuccess = signal(false);
+  protected readonly company = COMPANY;
 
-  protected readonly contactForm = this.fb.group({
+  /** Set once the user has attempted a submit — gates error display. */
+  protected readonly submitted = signal(false);
+
+  protected readonly projectTypes = [
+    'Création d’un premier site',
+    'Refonte d’un site existant',
+    'Site + référencement (SEO)',
+    'Site + visibilité IA (GEO)',
+    'Je ne sais pas encore',
+  ];
+
+  protected readonly budgets = BUDGET_BRACKETS;
+
+  protected readonly deadlines = [
+    'Dès que possible',
+    'Dans les 3 mois',
+    'Dans les 6 mois',
+    'Pas de date arrêtée',
+  ];
+
+  protected readonly contactForm = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
     email: ['', [Validators.required, Validators.email]],
-    subject: ['', [Validators.required, Validators.minLength(5)]],
-    message: ['', [Validators.required, Validators.minLength(10)]],
+    company: [''],
+    projectType: ['', Validators.required],
+    budget: [''],
+    deadline: [''],
+    message: ['', [Validators.required, Validators.minLength(20)]],
   });
 
-  protected readonly company = COMPANY;
+  /**
+   * The form is not wired to a backend yet — `u1-communication` will own that.
+   * Rather than pretending, submitting composes a prefilled email the visitor
+   * actually sends from their own client, so a real message still reaches us.
+   */
+  protected readonly mailtoHref = computed(() => {
+    const v = this.contactForm.getRawValue();
+    const body = [
+      `Nom : ${v.name}`,
+      `Email : ${v.email}`,
+      v.company ? `Entreprise : ${v.company}` : null,
+      `Type de projet : ${v.projectType}`,
+      v.budget ? `Budget envisagé : ${v.budget}` : null,
+      v.deadline ? `Échéance : ${v.deadline}` : null,
+      '',
+      v.message,
+    ]
+      .filter((line) => line !== null)
+      .join('\n');
+
+    return `mailto:${COMPANY.email}`
+      + `?subject=${encodeURIComponent(MAIL_SUBJECT)}`
+      + `&body=${encodeURIComponent(body)}`;
+  });
 
   constructor() {
     this.jsonLd.setSchema('local-business', {
@@ -63,13 +111,30 @@ export class ContactComponent {
     });
   }
 
-  submitForm(): void {
+  /** True once the field is both invalid and worth complaining about. */
+  protected showError(field: string): boolean {
+    const control = this.contactForm.get(field);
+    return !!control && control.invalid && (control.touched || this.submitted());
+  }
+
+  protected submitForm(): void {
     this.submitted.set(true);
-    if (this.contactForm.valid) {
-      console.log('Form submitted:', this.contactForm.value);
-      this.submitSuccess.set(true);
-      this.contactForm.reset();
-      this.submitted.set(false);
+
+    if (this.contactForm.invalid) {
+      this.contactForm.markAllAsTouched();
+      // Send focus to the first field in error so keyboard and screen-reader
+      // users are not left guessing why nothing happened.
+      const firstInvalid = Object.keys(this.contactForm.controls).find(
+        (key) => this.contactForm.get(key)?.invalid,
+      );
+      if (firstInvalid) {
+        document.getElementById(firstInvalid)?.focus();
+      }
+      return;
     }
+
+    // Hands off to the visitor's mail client. No silent console.log, and no
+    // "message envoyé" banner for a message that was never sent.
+    window.location.href = this.mailtoHref();
   }
 }

@@ -6,20 +6,31 @@ export const routes: Routes = [
     path: '',
     data: {
       seo: {
-        title: 'Citatio — Studio web : sites vitrines sur mesure',
+        title: 'Citatio — studio web près de Nantes, sites vitrines sur mesure',
         description:
-          'Citatio est un studio web qui crée des sites vitrines sur mesure pour les TPE, PME et indépendants. Référencement Google (SEO) et visibilité sur l\'IA (GEO) en option, hébergement et maintenance inclus.',
+          'Studio web à La Chapelle-sur-Erdre : nous concevons, développons et hébergeons des sites vitrines faits à la main pour les artisans, commerces et indépendants de Loire-Atlantique. SEO et visibilité IA en option.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent),
   },
   {
+    path: 'ce-site',
+    data: {
+      seo: {
+        title: 'Ce site — la démonstration de notre travail | Citatio',
+        description:
+          'Nous démarrons et n\'avons pas encore de client à montrer. Alors nous montrons ce site : scores Lighthouse mesurés, rendu serveur, accessibilité AA, hébergement. Tout est vérifiable.',
+      } satisfies SeoData,
+    },
+    loadComponent: () => import('./pages/proof/proof.component').then(m => m.ProofComponent),
+  },
+  {
     path: 'about',
     data: {
       seo: {
-        title: 'À propos — Citatio, studio web',
+        title: 'Qui sommes-nous — Marius, Ruben et Titouan | Citatio',
         description:
-          'Découvrez Citatio, le studio web qui conçoit des sites vitrines sur mesure pour les TPE, PME et indépendants, avec le SEO et la visibilité IA (GEO) en option.',
+          'Citatio est un studio web de trois personnes, installé à La Chapelle-sur-Erdre près de Nantes. Nos parcours, notre manière de travailler et ce que nous refusons de faire.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/about/about.component').then(m => m.AboutComponent),
@@ -28,9 +39,9 @@ export const routes: Routes = [
     path: 'services',
     data: {
       seo: {
-        title: 'Nos offres — Citatio',
+        title: 'Offres et tarifs — sites vitrines | Citatio',
         description:
-          'Création de sites vitrines : formules Vitrine Essentiel, Vitrine + SEO et Vitrine + GEO/SEO. Options hébergement, nom de domaine, maintenance et contenu.',
+          'Trois formules à partir de 1 200 € HT, plus un abonnement de 39 €/mois couvrant hébergement, nom de domaine et maintenance. Devis ferme sous cinq jours.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/services/services.component').then(m => m.ServicesComponent),
@@ -50,9 +61,9 @@ export const routes: Routes = [
     path: 'contact',
     data: {
       seo: {
-        title: 'Contact — Citatio',
+        title: 'Contact — parlons de votre projet | Citatio',
         description:
-          'Contactez Citatio pour un premier échange gratuit et un devis sur la création de votre site vitrine, avec ou sans options SEO et GEO.',
+          'Premier échange de trente minutes, gratuit et sans engagement. Réponse sous deux jours ouvrés. Studio web en Loire-Atlantique.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/contact/contact.component').then(m => m.ContactComponent),

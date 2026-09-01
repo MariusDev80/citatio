@@ -1,45 +1,61 @@
-<footer class="bg-slate-50 dark:bg-slate-950 pt-20 pb-10 border-t border-slate-200 dark:border-slate-800 transition-colors duration-500">
-  <div class="max-w-7xl mx-auto px-6">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+<footer class="mt-24 border-t border-rule">
+  <div class="ct-section py-16">
+    <div class="grid gap-12 md:grid-cols-12">
 
-      <!-- Brand -->
-      <div class="col-span-1 md:col-span-2">
-        <div class="flex items-center gap-2 mb-6">
-          <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
-            <i class="pi pi-search text-sm"></i>
-          </div>
-          <span class="text-xl font-black tracking-tighter text-slate-800 dark:text-white uppercase">CITATIO</span>
-        </div>
-        <p class="text-slate-500 dark:text-slate-400 max-w-xs leading-relaxed">
-          Studio web : des sites vitrines sur mesure, avec le SEO et la visibilité sur l'IA (GEO) en option. Votre présence en ligne, notre métier.
+      <div class="md:col-span-5">
+        <p class="ct-wordmark">Citatio</p>
+        <p class="ct-prose ct-column mt-4 text-sm">
+          Studio web à {{ company.address.city }}, près de Nantes. Nous concevons,
+          développons et hébergeons des sites vitrines sur mesure. Le SEO et la
+          visibilité dans les IA sont proposés en option.
+        </p>
+        <p class="mt-6 text-sm text-ink-faint">
+          Ce site est conçu, développé et hébergé par nous, sur la même
+          infrastructure que celle de nos clients.
+          <a routerLink="/ce-site" class="ct-link ml-1">Voir le détail</a>
         </p>
       </div>
 
-      <!-- Navigation -->
-      <div>
-        <h4 class="font-bold ct-text-heading mb-6 uppercase text-xs tracking-widest">Navigation</h4>
-        <ul class="space-y-4 ct-text-muted font-medium">
-          <li><a routerLink="/" class="ct-link-nav">Accueil</a></li>
-          <li><a routerLink="/services" class="ct-link-nav">Offres</a></li>
-          <li><a routerLink="/about" class="ct-link-nav">Qui sommes nous</a></li>
-          <li><a routerLink="/faq" class="ct-link-nav">FAQ</a></li>
-          <li><a routerLink="/contact" class="ct-link-nav">Contact</a></li>
+      <div class="md:col-span-2 md:col-start-7">
+        <h2 class="ct-eyebrow">Navigation</h2>
+        <ul class="mt-5 space-y-3 text-sm">
+          <li><a routerLink="/" class="ct-navlink">Accueil</a></li>
+          <li><a routerLink="/services" class="ct-navlink">Offres</a></li>
+          <li><a routerLink="/ce-site" class="ct-navlink">Ce site</a></li>
+          <li><a routerLink="/about" class="ct-navlink">Qui sommes-nous</a></li>
+          <li><a routerLink="/faq" class="ct-navlink">FAQ</a></li>
+          <li><a routerLink="/contact" class="ct-navlink">Contact</a></li>
         </ul>
       </div>
 
-      <!-- Legal -->
-      <div>
-        <h4 class="font-bold ct-text-heading mb-6 uppercase text-xs tracking-widest">Légal</h4>
-        <ul class="space-y-4 ct-text-muted font-medium">
-          <li><a routerLink="/legal" fragment="mentions" class="ct-link-nav">Mentions légales</a></li>
-          <li><a routerLink="/legal" fragment="confidentialite" class="ct-link-nav">Politique de confidentialité</a></li>
-          <li><a routerLink="/legal" fragment="cgu" class="ct-link-nav">CGU</a></li>
+      <div class="md:col-span-2">
+        <h2 class="ct-eyebrow">Contact</h2>
+        <ul class="mt-5 space-y-3 text-sm">
+          <li>
+            <a [href]="'mailto:' + company.email" class="ct-navlink break-all">{{ company.email }}</a>
+          </li>
+          <li>
+            <a [href]="'tel:' + company.phoneRaw" class="ct-navlink">{{ company.phoneDisplay }}</a>
+          </li>
+          <li class="text-ink-soft">
+            {{ company.address.postalCode }} {{ company.address.city }}
+          </li>
+        </ul>
+      </div>
+
+      <div class="md:col-span-2">
+        <h2 class="ct-eyebrow">Légal</h2>
+        <ul class="mt-5 space-y-3 text-sm">
+          <li><a routerLink="/legal" fragment="mentions" class="ct-navlink">Mentions légales</a></li>
+          <li><a routerLink="/legal" fragment="confidentialite" class="ct-navlink">Confidentialité</a></li>
+          <li><a routerLink="/legal" fragment="cgu" class="ct-navlink">CGU</a></li>
         </ul>
       </div>
     </div>
 
-    <div class="pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 dark:text-slate-500 text-sm font-medium">
-      <p>&copy; 2026 Citatio. Tous droits réservés.</p>
+    <div class="mt-16 flex flex-col gap-2 border-t border-rule pt-6 text-xs text-ink-faint md:flex-row md:items-center md:justify-between">
+      <p>&copy; {{ year }} {{ company.legalName }}. Tous droits réservés.</p>
+      <p>SIRET {{ company.legal.siret }}</p>
     </div>
   </div>
 </footer>
