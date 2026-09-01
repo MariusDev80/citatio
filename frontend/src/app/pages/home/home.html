@@ -1,223 +1,118 @@
-<!-- ═══ Hero Section ═══ -->
-<section class="relative pt-40 pb-40 overflow-hidden min-h-[95vh] flex items-center transition-colors duration-500">
+<!-- ═══ Hero, typographic, no decorative artwork ═══ -->
+<section class="ct-section pt-40 pb-24 md:pt-48 md:pb-32">
+  <p class="ct-hero-stagger ct-eyebrow" style="animation-delay: 60ms">
+    Studio web · La Chapelle-sur-Erdre, Loire-Atlantique
+  </p>
 
-  <app-radar-animation />
+  <!-- LCP element: no entrance animation, paints immediately. -->
+  <h1 class="ct-display-xl mt-6 max-w-[16ch]">
+    Des sites vitrines faits à la main, près de Nantes.
+  </h1>
 
-  <!-- Contenu Hero -->
-  <div class="ct-section relative z-30 grid lg:grid-cols-2 gap-12 lg:gap-8 items-center w-full">
+  <p class="ct-hero-stagger ct-lede ct-column mt-8" style="animation-delay: 160ms">
+    Nous sommes trois. Nous concevons, développons et hébergeons des sites vitrines
+    pour les artisans, commerces et indépendants de Loire-Atlantique. Pas de
+    gabarit acheté, pas de constructeur de pages : du code écrit pour vous.
+  </p>
 
-    <!-- Colonne texte (centrée < lg, alignée à gauche ≥ lg) -->
-    <div class="flex flex-col items-center text-center lg:items-start lg:text-left">
-
-      <div class="ct-hero-stagger inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50/90 dark:bg-blue-900/20 backdrop-blur-md border border-blue-100 dark:border-blue-800 text-blue-700 dark:text-blue-400 text-xs font-bold mb-10 shadow-sm cursor-default" style="animation-delay: 80ms">
-        <i class="pi pi-desktop text-sm" aria-hidden="true"></i>
-        STUDIO WEB · SITES VITRINES
-      </div>
-
-      <div class="relative">
-        <!-- LCP element: reste net, pas d'opacity:0 au démarrage -->
-        <h1 class="text-6xl md:text-8xl font-black text-slate-900 dark:text-white leading-[1] tracking-tight mb-8">
-          Un site vitrine qui fait <br />
-          <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-400 dark:from-blue-400 dark:via-indigo-400 dark:to-blue-300">
-            décoller votre activité
-          </span>
-        </h1>
-        <div class="absolute -top-12 -right-16 text-blue-400/40 dark:text-blue-400/20 animate-pulse hidden lg:block" aria-hidden="true">
-          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-        </div>
-      </div>
-
-      <p class="ct-hero-stagger max-w-2xl text-xl ct-text-muted leading-relaxed mb-12" style="animation-delay: 180ms">
-        Nous concevons votre site vitrine sur mesure : design soigné, rapide et responsive.
-        <span class="font-bold text-slate-800 dark:text-slate-200">Référencement Google (SEO) et visibilité sur l'IA (GEO) en option.</span>
-      </p>
-
-      <div class="ct-hero-stagger flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-5" style="animation-delay: 280ms">
-        <a routerLink="/services" class="cta-primary ct-focus-ring group relative bg-blue-600 text-white px-10 py-5 rounded-2xl font-bold text-lg hover:bg-blue-700 dark:hover:bg-blue-500 hover:-translate-y-0.5 transition-all shadow-2xl shadow-blue-200/50 dark:shadow-blue-900/40 hover:shadow-blue-300/60 dark:hover:shadow-blue-800/50 overflow-hidden">
-          <span class="relative z-10 flex items-center gap-2">
-            Voir nos offres
-            <i class="pi pi-chevron-right text-sm"></i>
-          </span>
-          <div class="shine-effect"></div>
-        </a>
-        <a routerLink="/contact" class="ct-focus-ring px-10 py-5 rounded-2xl font-bold text-lg text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 hover:shadow-md transition-all flex items-center gap-2 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm">
-          <i class="pi pi-send text-lg"></i>
-          Demander un devis gratuit
-        </a>
-      </div>
-    </div>
-
-    <!-- Colonne mockup (≥ lg uniquement, pour ne pas écraser le LCP/contenu mobile) -->
-    <div class="ct-hero-stagger relative hidden lg:block" style="animation-delay: 360ms">
-      <div class="relative rounded-3xl overflow-hidden shadow-2xl shadow-blue-300/30 dark:shadow-blue-900/40 ring-1 ring-slate-200/60 dark:ring-slate-700/60 rotate-1 hover:rotate-0 transition-transform duration-500">
-        <img
-          ngSrc="/mockups/hero-laptop.webp"
-          width="1800"
-          height="1005"
-          priority
-          sizes="(min-width: 1024px) 45vw, 100vw"
-          alt="Aperçu d'un site vitrine moderne affiché sur un ordinateur portable"
-          class="w-full h-auto"
-        />
-      </div>
-    </div>
+  <div class="ct-hero-stagger mt-10 flex flex-col gap-4 sm:flex-row sm:items-center" style="animation-delay: 240ms">
+    <a routerLink="/contact" class="ct-btn">Parlons de votre projet</a>
+    <a routerLink="/services" class="ct-link">
+      Voir les offres et les tarifs
+      <span aria-hidden="true">→</span>
+    </a>
   </div>
 </section>
 
-<!-- ═══ Problem Section ═══ -->
-<section class="py-24 relative z-30">
+<!-- ═══ What we do, numbered entries, separated by rules, no cards ═══ -->
+<section class="ct-section py-20" aria-labelledby="metier-title">
+  <div class="border-t border-rule-strong pt-10">
+    <h2 id="metier-title" class="ct-display-md max-w-[14ch]">Ce que nous faisons</h2>
+  </div>
+
+  <div ctReveal class="mt-14">
+    @for (item of craft(); track item.numeral) {
+      <article class="grid gap-4 border-t border-rule py-10 md:grid-cols-12 md:gap-10">
+        <p class="ct-numeral md:col-span-1">{{ item.numeral }}</p>
+        <h3 class="ct-title md:col-span-4">{{ item.title }}</h3>
+        <p class="ct-prose md:col-span-7">{{ item.body }}</p>
+      </article>
+    }
+  </div>
+</section>
+
+<!-- ═══ Proof, this site is the portfolio, and we say why ═══ -->
+<section class="mt-10 border-y border-rule bg-surface py-20" aria-labelledby="preuve-title">
   <div class="ct-section">
-    <div class="grid md:grid-cols-2 gap-16 items-center">
-      <div ctReveal class="ct-reveal-left">
-        <h2 class="text-4xl font-black ct-text-heading mb-6 leading-tight">
-          Aujourd'hui, votre site<br>est votre vitrine.
+    <div class="grid gap-12 md:grid-cols-12">
+      <div class="md:col-span-6">
+        <p class="ct-eyebrow">Notre preuve</p>
+        <h2 id="preuve-title" class="ct-display-md mt-5 max-w-[15ch]">
+          Nous n’avons pas encore de client à vous montrer.
         </h2>
-        <div class="space-y-6 text-lg ct-text-muted">
+        <div class="ct-prose ct-column mt-6">
           <p>
-            Vos clients vous cherchent en ligne avant même de vous contacter. Un site lent, daté ou introuvable, c'est une opportunité qui passe son chemin.
+            Nous démarrons, et nous préférons le dire plutôt que d’habiller la page
+            de logos empruntés ou de témoignages inventés.
           </p>
-          <p class="p-6 bg-slate-50 dark:bg-slate-900 rounded-2xl border-l-4 border-blue-600 italic transition-colors">
-            "Un site vitrine soigné, c'est <span class="ct-text-heading font-bold">votre meilleur commercial</span> — disponible 24h/24, 7j/7."
-          </p>
-        </div>
-
-        <!-- Visuel d'accompagnement « Design sur mesure » -->
-        <div class="mt-8 rounded-2xl overflow-hidden shadow-xl shadow-slate-200/60 dark:shadow-black/30 ring-1 ring-slate-200/60 dark:ring-slate-700/60 hidden md:block">
-          <img
-            ngSrc="/mockups/ui-craft.webp"
-            width="1200"
-            height="896"
-            loading="lazy"
-            sizes="(min-width: 768px) 45vw, 100vw"
-            alt="Gros plan sur une interface web soignée"
-            class="w-full h-auto"
-          />
-        </div>
-      </div>
-
-      <div ctReveal class="ct-reveal-right grid grid-cols-1 gap-6">
-        <div ctReveal [ctRevealDelay]="0" class="ct-feature-row group">
-          <div class="ct-icon-box ct-text-accent transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
-            <i class="pi pi-palette text-xl"></i>
-          </div>
-          <div>
-            <h3 class="text-xl font-bold ct-text-heading mb-1">Design sur mesure</h3>
-            <p class="ct-text-muted">Un site pensé pour votre métier et votre image, pas un template recyclé.</p>
-          </div>
-        </div>
-
-        <div ctReveal [ctRevealDelay]="90" class="ct-feature-row group">
-          <div class="ct-icon-box text-indigo-600 dark:text-indigo-400 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
-            <i class="pi pi-search text-xl"></i>
-          </div>
-          <div>
-            <h3 class="text-xl font-bold ct-text-heading mb-1">Trouvé sur Google et l'IA</h3>
-            <p class="ct-text-muted">Options SEO et GEO pour apparaître sur Google et dans les réponses de ChatGPT, Gemini &amp; co.</p>
-          </div>
-        </div>
-
-        <div ctReveal [ctRevealDelay]="180" class="ct-feature-row group">
-          <div class="ct-icon-box text-blue-400 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
-            <i class="pi pi-shield text-xl"></i>
-          </div>
-          <div>
-            <h3 class="text-xl font-bold ct-text-heading mb-1">Géré de A à Z</h3>
-            <p class="ct-text-muted">Hébergement, nom de domaine et maintenance en option : vous vous concentrez sur votre activité.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ Services Section ═══ -->
-<section class="py-24 bg-slate-50 dark:bg-slate-900/50 transition-colors duration-500">
-  <div class="ct-section text-center mb-12">
-    <h2 ctReveal [ctRevealDelay]="0" class="text-4xl font-black ct-text-heading mb-4">Ce que nous faisons pour vous</h2>
-    <p ctReveal [ctRevealDelay]="80" class="ct-text-muted max-w-xl mx-auto">De la conception à la mise en ligne, un accompagnement complet pour votre présence web.</p>
-  </div>
-
-  <!-- Bandeau de confiance — éléments factuels uniquement (cf. garde-fou honnêteté) -->
-  <div ctReveal class="ct-section mb-16">
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 py-8 px-6 rounded-3xl bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 shadow-sm">
-      @for (item of stats(); track item.label) {
-        <ct-stat ctReveal [ctRevealDelay]="$index * 120" [stat]="item" />
-      }
-    </div>
-  </div>
-
-  <div class="ct-section grid grid-cols-1 md:grid-cols-3 gap-8">
-    <!-- Création de site — carte principale -->
-    <div ctReveal [ctRevealDelay]="0" class="ct-gradient-animated md:col-span-2 rounded-3xl p-10 text-white relative overflow-hidden group shadow-2xl shadow-blue-200/50 dark:shadow-blue-900/20 transition-all hover:scale-[1.01] hover:-translate-y-1 hover:shadow-blue-300/60 dark:hover:shadow-blue-800/40">
-      <!-- Mockup responsive en fond + overlay sombre pour garantir le contraste AA du texte blanc -->
-      <img
-        ngSrc="/mockups/responsive-devices.webp"
-        width="1264"
-        height="848"
-        loading="lazy"
-        sizes="(min-width: 768px) 66vw, 100vw"
-        alt="Site vitrine responsive affiché sur ordinateur portable et smartphone"
-        class="pointer-events-none absolute bottom-0 right-0 w-2/3 max-w-md h-auto opacity-25 mix-blend-luminosity"
-      />
-      <div class="absolute inset-0 bg-gradient-to-tr from-blue-700/80 via-blue-600/40 to-transparent"></div>
-
-      <div class="relative z-10 flex flex-col h-full justify-between">
-        <div>
-          <i class="pi pi-objects-column mb-6 opacity-90" style="font-size: 2.75rem" aria-hidden="true"></i>
-          <h3 class="text-3xl font-black mb-4 tracking-tight">Création de site vitrine</h3>
-          <p class="text-blue-50 text-lg max-w-md leading-relaxed">
-            Nous concevons et développons votre site sur mesure : design, contenu, responsive et performances. Un site prêt à transformer vos visiteurs en clients.
+          <p>
+            Alors nous montrons le seul site dont nous sommes entièrement
+            responsables : <strong>celui-ci</strong>. Sa vitesse, son accessibilité,
+            son référencement et son hébergement sont exactement ce que nous vendons.
+            Tout est mesurable, tout de suite, par vous.
           </p>
         </div>
-        <a routerLink="/contact" class="ct-focus-ring mt-8 self-start px-6 py-3 bg-white text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-colors shadow-lg">
-          Demander un devis
+        <a routerLink="/ce-site" class="ct-link mt-8">
+          Comment ce site est fait
+          <span aria-hidden="true">→</span>
         </a>
       </div>
-      <div class="absolute top-[-20%] right-[-10%] w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-1000"></div>
-    </div>
 
-    <!-- SEO & GEO en option -->
-    <div ctReveal [ctRevealDelay]="120" class="bg-white dark:bg-slate-800 rounded-3xl p-10 border border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-black/20 hover:border-blue-300 dark:hover:border-blue-500 transition-all flex flex-col justify-between hover:scale-[1.01] hover:-translate-y-1 group">
-      <div>
-        <i class="pi pi-chart-line mb-6 ct-text-accent transition-transform duration-300 group-hover:scale-110" style="font-size: 2.75rem" aria-hidden="true"></i>
-        <h3 class="text-2xl font-black mb-4 ct-text-heading">SEO &amp; GEO en option</h3>
-        <p class="ct-text-body">
-          Soyez trouvé sur Google (SEO) et cité par les IA (GEO). Deux options pour décupler votre visibilité.
+      <div class="md:col-span-5 md:col-start-8">
+        <dl class="border-t border-rule-strong">
+          @for (metric of metrics; track metric.label) {
+            <div class="flex items-baseline justify-between gap-6 border-b border-rule py-4">
+              <dt class="text-sm text-ink-soft">{{ metric.label }}</dt>
+              <dd class="font-display text-2xl tabular-nums text-ink">{{ metric.value }}</dd>
+            </div>
+          }
+        </dl>
+        <p class="mt-4 text-xs text-ink-faint">
+          Lighthouse, profil ordinateur, relevé le {{ measuredOn }}.
         </p>
       </div>
-    </div>
-
-    <!-- Hébergement, domaine & maintenance — full width -->
-    <div ctReveal [ctRevealDelay]="240" class="md:col-span-3 bg-white dark:bg-slate-800 rounded-3xl p-10 border border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-black/20 hover:border-indigo-300 dark:hover:border-indigo-500 transition-all flex flex-col md:flex-row items-center gap-10 hover:scale-[1.01] hover:-translate-y-1 group">
-      <div class="w-20 h-20 md:w-32 md:h-32 shrink-0 rounded-3xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 transition-transform duration-300 group-hover:scale-110">
-        <i class="pi pi-server" style="font-size: 3.5rem" aria-hidden="true"></i>
-      </div>
-      <div class="flex-1 text-center md:text-left">
-        <h3 class="text-2xl font-black mb-4 ct-text-heading">Hébergement, domaine &amp; maintenance</h3>
-        <p class="ct-text-body text-lg">
-          On héberge votre site, gère votre nom de domaine et assure les mises à jour et la sécurité. Une présence en ligne sans prise de tête.
-        </p>
-      </div>
-      <a routerLink="/services" class="ct-focus-ring px-8 py-4 bg-slate-900 dark:bg-slate-700 text-white rounded-2xl font-bold hover:bg-slate-800 dark:hover:bg-slate-600 transition-all shadow-lg active:scale-95">
-        Voir les offres
-      </a>
     </div>
   </div>
 </section>
 
-<!-- ═══ CTA Section ═══ -->
-<section class="py-24 px-6">
-  <div ctReveal class="ct-cta-reveal max-w-5xl mx-auto bg-slate-900 border border-slate-800 rounded-[3rem] p-12 md:p-20 text-center relative overflow-hidden shadow-2xl">
-    <div class="ct-radial-pulse absolute inset-0" aria-hidden="true"></div>
-    <div class="relative z-10">
-      <h2 class="text-3xl md:text-5xl font-black text-white mb-6">Prêt à lancer votre site vitrine ?</h2>
-      <a routerLink="/contact" class="cta-primary ct-focus-ring group relative bg-white dark:bg-blue-600 text-slate-900 dark:text-white px-10 py-5 rounded-2xl font-black text-xl hover:scale-105 active:scale-95 transition-all shadow-2xl inline-flex items-center gap-3 overflow-hidden focus-visible:ring-offset-slate-900">
-        <span class="relative z-10 flex items-center gap-3">
-          <i class="pi pi-send text-xl"></i>
-          Demander un devis gratuit
-        </span>
-        <div class="shine-effect"></div>
-      </a>
-    </div>
+<!-- ═══ Process, real durations ═══ -->
+<section class="ct-section py-20" aria-labelledby="process-title">
+  <h2 id="process-title" class="ct-display-md max-w-[16ch]">Comment ça se passe</h2>
+
+  <ol ctReveal class="mt-14 grid gap-x-10 gap-y-0 md:grid-cols-2">
+    @for (step of steps(); track step.numeral) {
+      <li class="border-t border-rule py-8">
+        <div class="flex items-baseline gap-4">
+          <span class="ct-numeral">{{ step.numeral }}</span>
+          <h3 class="ct-title">{{ step.title }}</h3>
+        </div>
+        <p class="ct-eyebrow mt-3">{{ step.duration }}</p>
+        <p class="ct-prose mt-3 text-sm">{{ step.body }}</p>
+      </li>
+    }
+  </ol>
+</section>
+
+<!-- ═══ Closing ═══ -->
+<section class="ct-section py-20">
+  <div ctReveal class="border-t border-rule-strong pt-12">
+    <h2 class="ct-display-lg max-w-[18ch]">
+      Un premier échange, et vous saurez si nous sommes faits pour travailler ensemble.
+    </h2>
+    <p class="ct-lede ct-column mt-6">
+      Trente minutes, gratuit, sans engagement. Si votre projet ne relève pas de
+      notre métier, nous vous le dirons.
+    </p>
+    <a routerLink="/contact" class="ct-btn mt-10">Prendre contact</a>
   </div>
 </section>

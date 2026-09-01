@@ -16,7 +16,7 @@ import { routes } from './app.routes';
 /**
  * "Cutting the mustard": flag the document as JS-capable as early as possible
  * in the browser. CSS scroll-reveal hidden states (`.ct-reveal`) only apply
- * under `html.ct-js`, so the server-rendered / no-JS HTML is always visible —
+ * under `html.ct-js`, so the server-rendered / no-JS HTML is always visible:
  * no content hidden from crawlers, no blank flash before hydration.
  */
 function markJsCapable(): void {

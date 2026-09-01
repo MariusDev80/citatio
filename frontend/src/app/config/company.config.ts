@@ -3,6 +3,7 @@ export const COMPANY = {
   legalName: 'Citatio',
   url: 'https://citatio-geo.com',
   logo: 'https://citatio-geo.com/citatio_logo.png',
+  ogImage: 'https://citatio-geo.com/og-citatio.png',
   locale: 'fr_FR',
   lang: 'French',
   description:
@@ -21,10 +22,70 @@ export const COMPANY = {
   },
   priceRange: '€€',
   foundingYear: 2025,
+
+  /**
+   * Legal identity, surfaced on /legal and in the footer.
+   *
+   * Source: vault Obsidian « Citatio », notes 1.2 (Fondateurs & Gouvernance),
+   * 1.3 (Siège, Capital & Actionnariat), 2.1 (Forme Juridique), complétées et
+   * confirmées par le propriétaire pour l'immatriculation et le régime de TVA.
+   */
+  legal: {
+    form: 'société par actions simplifiée (SAS)',
+    capital: '1 500 €',
+    /** SIREN 105 241 855, établissement 00011. Clé de Luhn vérifiée. */
+    siren: '105 241 855',
+    siret: '105 241 855 00011',
+    rcsCity: 'Nantes',
+    /**
+     * Régime réel normal, donc assujettie : le numéro intracommunautaire est
+     * obligatoire sur le site (art. R123-237 c. com.). Clé 83 calculée depuis
+     * le SIREN : (12 + 3 × (SIREN mod 97)) mod 97, et non recopiée.
+     */
+    vatNumber: 'FR83105241855',
+    /**
+     * Directeur de la publication : le représentant légal de la société
+     * (art. 6 III LCEN). Pour une SAS, le président.
+     */
+    publicationDirector: 'Titouan Poinot, président',
+  },
+
+  /**
+   * Hosting provider, which French law requires naming on /legal
+   * (art. 6 III LCEN). Source: vault, note 6.1, VPS chez Hostinger.
+   * Coordonnees legales publiees par Hostinger dans ses conditions generales.
+   */
+  hosting: {
+    provider: 'Hostinger International Ltd',
+    address: '61 Lordou Vironos Street, Lumiel Building, 4e étage, 6023 Larnaca, Chypre',
+    phone: '+370 645 03378',
+    /** Ours regardless of provider, this part is verifiable from the repo. */
+    stack: 'Docker et Caddy, sur un VPS que nous administrons nous-mêmes',
+  },
+
+  /**
+   * The three founders, president first, same order as the About page, so the
+   * Organization schema and the page never disagree on who leads.
+   */
+  founders: ['Titouan', 'Marius', 'Ruben'] as const,
+
+  /**
+   * Service area, surfaced as `areaServed` in the structured data.
+   * The whole repositioning is local ("près de Nantes"), so search engines and
+   * AI answers need to be told that explicitly, the copy alone is not enough.
+   */
+  areaServed: [
+    'Nantes',
+    'La Chapelle-sur-Erdre',
+    'Loire-Atlantique',
+    'Pays de la Loire',
+  ] as const,
   knowsAbout: [
     'Création de site vitrine',
     'Studio web',
     'Web design',
+    'Développement web sur mesure',
+    'Accessibilité web',
     'SEO',
     'Référencement Google',
     'Generative Engine Optimization',
@@ -32,5 +93,22 @@ export const COMPANY = {
     'Visibilité IA',
     'Hébergement web',
   ],
-  sameAs: [] as string[],
+  /**
+   * Fiche Google Business Profile, sous sa forme canonique par CID.
+   * L'URL Maps longue porte des parametres de session (`entry`, `g_ep`, `skid`)
+   * qui changent a chaque partage ; la forme `?cid=` est stable dans le temps.
+   * CID 0x73e977b496b34132 = 8352338601441444146 en decimal.
+   */
+  googleBusinessProfile: 'https://maps.google.com/?cid=8352338601441444146',
+
+  /** Coordonnees de la fiche, pour relier le site au point sur la carte. */
+  geo: { latitude: 47.3047519, longitude: -1.5564386 },
+
+  /** Horaires declares sur la fiche Google : 9h-18h, sept jours sur sept. */
+  openingHours: { opens: '09:00', closes: '18:00' },
+
+  /** Categorie principale de la fiche Google. */
+  googleCategory: 'Concepteur de sites Web',
+
+  sameAs: ['https://maps.google.com/?cid=8352338601441444146'] as string[],
 } as const;

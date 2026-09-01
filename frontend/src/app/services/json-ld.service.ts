@@ -5,7 +5,7 @@ import { inject, Injectable } from '@angular/core';
  * Service centralisé pour gérer les scripts JSON-LD (Schema.org) de manière SSR-compatible.
  *
  * Utilise le token DOCUMENT d'Angular (fonctionne aussi côté serveur pendant le prerendering)
- * pour que les données structurées soient présentes dans le HTML pré-rendu — visible
+ * pour que les données structurées soient présentes dans le HTML pré-rendu, visible
  * par Googlebot, les LLM et tout autre crawler.
  *
  * Chaque schéma est identifié par une clé unique. Appeler `setSchema` avec la même clé

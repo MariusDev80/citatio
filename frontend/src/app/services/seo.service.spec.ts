@@ -5,7 +5,7 @@ import { DOCUMENT } from '@angular/common';
 import { Component } from '@angular/core';
 import { SeoService } from './seo.service';
 
-// Composant stub minimaliste — uniquement pour le routing de test
+// Composant stub minimaliste, uniquement pour le routing de test
 @Component({ template: '', standalone: true })
 class StubComponent {}
 
@@ -13,12 +13,12 @@ const testRoutes = [
   {
     path: '',
     component: StubComponent,
-    data: { seo: { title: 'Accueil — Test', description: 'Description accueil test' } },
+    data: { seo: { title: 'Accueil : Test', description: 'Description accueil test' } },
   },
   {
     path: 'about',
     component: StubComponent,
-    data: { seo: { title: 'À propos — Test', description: 'Description à propos test' } },
+    data: { seo: { title: 'À propos, Test', description: 'Description à propos test' } },
   },
 ];
 
@@ -41,7 +41,7 @@ describe('SeoService', () => {
 
   it('met à jour le titre et la meta description après navigation', async () => {
     await RouterTestingHarness.create('/');
-    expect(document.title).toBe('Accueil — Test');
+    expect(document.title).toBe('Accueil : Test');
     const meta = document.querySelector('meta[name="description"]');
     expect(meta?.getAttribute('content')).toBe('Description accueil test');
   });
@@ -58,7 +58,7 @@ describe('SeoService', () => {
     const harness = await RouterTestingHarness.create('/');
     await harness.navigateByUrl('/about');
     expect(document.querySelector('meta[property="og:title"]')?.getAttribute('content'))
-      .toBe('À propos — Test');
+      .toBe('À propos, Test');
     expect(document.querySelector('meta[property="og:description"]')?.getAttribute('content'))
       .toBe('Description à propos test');
   });

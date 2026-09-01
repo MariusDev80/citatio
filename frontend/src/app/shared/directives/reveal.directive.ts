@@ -9,7 +9,7 @@ import {
 import { isPlatformBrowser } from '@angular/common';
 
 /**
- * `ctReveal` — scroll-reveal directive (free, CSS + IntersectionObserver).
+ * `ctReveal` : scroll-reveal directive (free, CSS + IntersectionObserver).
  *
  * On enter-viewport it adds `is-visible` to play the CSS transition declared
  * by `.ct-reveal` (see `styles.css`). One-shot: it unobserves after the first
@@ -23,7 +23,7 @@ import { isPlatformBrowser } from '@angular/common';
  *   would crash the render and break hydration.
  * - **The hidden state is opt-in from JS, never the server default.** The
  *   `.ct-reveal` hidden state only bites under `html.ct-js` (added at bootstrap).
- *   So if JS is disabled or before hydration, content is fully visible — no
+ *   So if JS is disabled or before hydration, content is fully visible, no
  *   "blank until JS" flash, no SEO content hidden from crawlers.
  * - **Reduced-motion.** If the user asked for reduced motion we do nothing:
  *   we neither create an observer nor rely on the transition. CSS also forces
@@ -47,7 +47,7 @@ export class RevealDirective {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   constructor() {
-    // `afterNextRender` runs only in the browser, after the first paint — the
+    // `afterNextRender` runs only in the browser, after the first paint, the
     // safe place to read media queries and wire up an IntersectionObserver.
     afterNextRender(() => {
       if (!this.isBrowser) {

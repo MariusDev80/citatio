@@ -1,12 +1,14 @@
-<section class="min-h-[80vh] flex flex-col items-center justify-center px-6 text-center">
-  <span class="text-8xl font-black text-blue-600 dark:text-blue-400 mb-4" aria-hidden="true">404</span>
-  <h1 class="text-3xl md:text-4xl font-bold ct-text-heading mb-4">Page introuvable</h1>
-  <p class="ct-text-muted max-w-md mb-10 text-lg leading-relaxed">
-    La page que vous recherchez n'existe pas ou a été déplacée.
+<section class="ct-section flex min-h-[70vh] flex-col justify-center py-32">
+  <p class="ct-eyebrow">Erreur 404</p>
+  <h1 class="ct-display-lg mt-6 max-w-[16ch]">Cette page n’existe pas.</h1>
+  <p class="ct-lede ct-column mt-8">
+    Le lien est peut-être erroné, ou la page a été déplacée. Rien de grave.
   </p>
-  <a routerLink="/"
-     class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-950">
-    <i class="pi pi-home" aria-hidden="true"></i>
-    Retour à l'accueil
-  </a>
+  <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+    <a routerLink="/" class="ct-btn">Retour à l’accueil</a>
+    <a routerLink="/contact" class="ct-link">
+      Signaler le problème
+      <span aria-hidden="true">→</span>
+    </a>
+  </div>
 </section>

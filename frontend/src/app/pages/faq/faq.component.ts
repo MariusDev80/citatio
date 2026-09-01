@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { AccordionModule } from 'primeng/accordion';
+import { RouterLink } from '@angular/router';
 import { JsonLdService } from '../../services/json-ld.service';
 import { COMPANY } from '../../config/company.config';
 
@@ -10,7 +11,7 @@ interface FaqItem {
 
 @Component({
   selector: 'app-faq',
-  imports: [AccordionModule],
+  imports: [AccordionModule, RouterLink],
   templateUrl: './faq.html',
   styleUrl: './faq.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

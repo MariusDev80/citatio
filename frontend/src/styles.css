@@ -4,72 +4,135 @@
 
 @variant dark (&:where(.dark, .dark *));
 
+/* ══════════════════════════════════════════════════════════════════════
+   Self-hosted type. Latin subset only, it fully covers French, and it
+   keeps all three faces under 75 kB combined. See public/fonts/LICENSE.md.
+   ══════════════════════════════════════════════════════════════════════ */
+
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/instrument-serif-400.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/instrument-serif-400-italic.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Variable face: one file covers 400–600. */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('/fonts/geist-var.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 @theme {
-  --animate-slow-spin: slow-spin 80s linear infinite;
-  --animate-float-1: float 15s infinite alternate;
-  --animate-float-2: float 20s infinite alternate-reverse;
-  --animate-float-3: float 12s infinite alternate;
+  /* ── Type ───────────────────────────────────────────────────────────
+     Instrument Serif is a 400-only display face: it is reserved for
+     genuinely large sizes (ct-display-*). Everything at title size and
+     below is Geist, because a light serif set small reads as frail, not refined. */
+  --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
-  /* Animated gradient sweep — Services "Création de site vitrine" card. */
-  --animate-gradient-pan: gradient-pan 16s ease infinite;
-  /* Pulsing radial glow — final CTA banner. */
-  --animate-radial-pulse: radial-pulse 9s ease-in-out infinite alternate;
-  /* Staged hero entrance (badge → paragraph → CTAs). */
-  --animate-hero-in: hero-in 0.7s ease-out both;
+  /* ── Colour: semantic tokens, redefined wholesale under html.dark ──
+     Templates use `bg-paper text-ink` and never a `dark:` colour pair.
+     That is deliberate: the mechanical `dark:` twin on every utility was
+     one of the generic-template tells this redesign set out to remove. */
+  --color-paper: #f9f8f5;
+  --color-surface: #f2f0ea;
+  --color-ink: #12131a;
+  --color-ink-soft: #4a4c57;
+  /* Verified >= 4.5:1 against BOTH --color-paper and the darker
+     --color-surface: eyebrows and captions sit on either. */
+  --color-ink-faint: #63656f;
+  --color-rule: rgba(18, 19, 26, 0.14);
+  --color-rule-strong: rgba(18, 19, 26, 0.28);
+  --color-accent: #26359c;
+  --color-accent-strong: #1b2778;
+  --color-accent-wash: rgba(38, 53, 156, 0.07);
+  --color-on-accent: #ffffff;
 
-  @keyframes slow-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
+  /* ── Radii: exactly two. The old sheet had six competing scales. ── */
+  --radius-sm: 2px;
+  --radius-md: 6px;
 
-  @keyframes float {
-    0% { transform: translate(0, 0) scale(1); }
-    100% { transform: translate(60px, 40px) scale(1.1); }
-  }
-
-  @keyframes gradient-pan {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
-  @keyframes radial-pulse {
-    0% { opacity: 0.25; transform: scale(1) translateY(0); }
-    100% { opacity: 0.5; transform: scale(1.15) translateY(-4%); }
-  }
+  /* Ambient page-transition timing, shared by the theme swap. */
+  --animate-hero-in: hero-in 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) both;
 
   @keyframes hero-in {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
 
 @layer base {
+  /* The dark palette is a token swap, not a second set of utilities.
+     `html.dark` (0,1,1) outranks the `:root` (0,1,0) block Tailwind emits
+     for @theme, and @layer base sorts after @layer theme, so this wins
+     on both specificity and layer order. */
+  html.dark {
+    --color-paper: #0e0f15;
+    --color-surface: #171923;
+    --color-ink: #e8e9f0;
+    --color-ink-soft: #a9abb8;
+    --color-ink-faint: #8a8c9b;
+    --color-rule: rgba(232, 233, 240, 0.16);
+    --color-rule-strong: rgba(232, 233, 240, 0.32);
+    --color-accent: #8894f5;
+    --color-accent-strong: #a9b2f8;
+    --color-accent-wash: rgba(136, 148, 245, 0.1);
+    --color-on-accent: #0e0f15;
+  }
+
   html,
   body {
     margin: 0;
     padding: 0;
-    font-family:
-      -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
-      sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
 
   html {
-    @apply bg-[#fafafa] text-slate-900 transition-colors duration-500;
+    @apply bg-paper text-ink font-sans;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
 
-    &.dark {
-      @apply bg-slate-950 text-slate-100;
-    }
+  body {
+    @apply bg-paper;
+    font-size: 1rem;
+    line-height: 1.6;
   }
 
   ::selection {
-    @apply bg-blue-100 text-blue-700;
+    @apply bg-accent text-on-accent;
   }
 
-  .dark ::selection {
-    @apply bg-blue-900 text-blue-200;
+  /* Anchor targets sit below the fixed masthead. */
+  :where([id]) {
+    scroll-margin-top: 6rem;
   }
 
   /* No-JS / pre-hydration safety net: if the `ct-js` flag was never added
@@ -81,9 +144,9 @@
     transform: none !important;
   }
 
-  /* Global reduced-motion neutralizer. The JS directives already opt out of
-     animation when this is set, but we also kill it in CSS so nothing moves —
-     ambient loops, hover transforms, reveals and the parallax-y glows. */
+  /* Global reduced-motion neutralizer. The reveal directive already opts out
+     of animating when this is set; killing it in CSS too means nothing moves
+     even if a stylesheet grows a new transition later. */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -91,174 +154,198 @@
       animation-duration: 0.001ms !important;
       /* Cancel any animation-delay too: a staged entrance (e.g. the hero
          `ct-hero-stagger`, hidden via its keyframe's backwards fill) must not
-         leave content invisible during its delay — show it immediately. */
+         leave content invisible during its delay, show it immediately. */
       animation-delay: 0ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.001ms !important;
       scroll-behavior: auto !important;
     }
 
-    /* Force every reveal target to its final, visible state. */
     .ct-reveal {
       opacity: 1 !important;
-      transform: none !important;
-    }
-
-    /* Neutralize decorative hover/scale motion (content stays legible). */
-    .hover\:scale-105:hover,
-    .hover\:scale-\[1\.01\]:hover,
-    .group:hover .group-hover\:scale-110,
-    .group:hover .group-hover\:scale-125,
-    .group:hover .group-hover\:-rotate-3 {
       transform: none !important;
     }
   }
 }
 
+/* Declared as @utility, not a @layer components class: only @utility rules
+   can be consumed by @apply in Tailwind v4, and every action below applies it. */
+@utility ct-focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
 @layer components {
-  .ct-card {
-    @apply bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-8 shadow-sm transition-colors;
-  }
+  /* ══ Layout ══════════════════════════════════════════════════════════ */
 
-  .ct-card-title {
-    @apply text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4;
-  }
-
-  .ct-text-body {
-    @apply text-slate-600 dark:text-slate-400 leading-relaxed;
-  }
-
-  .ct-page-title {
-    @apply text-4xl md:text-5xl font-black text-center text-slate-900 dark:text-white;
-  }
-
-  /* Text color tokens — eliminates repeated dark-mode pairs */
-  .ct-text-heading {
-    @apply text-slate-900 dark:text-white;
-  }
-
-  .ct-text-muted {
-    @apply text-slate-600 dark:text-slate-400;
-  }
-
-  .ct-text-secondary {
-    @apply text-slate-700 dark:text-slate-300;
-  }
-
-  .ct-text-accent {
-    @apply text-blue-600 dark:text-blue-400;
-  }
-
-  .ct-text-emphasis {
-    @apply text-slate-900 dark:text-slate-200;
-  }
-
-  /* Navigation link hover pattern */
-  .ct-link-nav {
-    @apply hover:text-blue-600 dark:hover:text-blue-400 transition-colors;
-  }
-
-  /* Common layout container */
+  /* Full-bleed container. Editorial measure comes from ct-column, not here. */
   .ct-section {
-    @apply max-w-7xl mx-auto px-6;
+    @apply mx-auto w-full max-w-6xl px-6 md:px-10;
   }
 
-  /* Icon container — home feature section */
-  .ct-icon-box {
-    @apply w-12 h-12 shrink-0 rounded-xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center border border-slate-100 dark:border-slate-700 transition-colors;
+  /* Reading measure for long-form prose. ~68 characters is the editorial
+     sweet spot; anything wider and the eye loses the line return. */
+  .ct-column {
+    @apply max-w-[68ch];
   }
 
-  /* Feature row — home problem section */
-  .ct-feature-row {
-    @apply flex gap-5 p-6 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors border border-transparent hover:border-slate-100 dark:hover:border-slate-800;
+  /* ══ Type ════════════════════════════════════════════════════════════ */
+
+  .ct-display-xl {
+    @apply font-display font-normal;
+    font-size: clamp(3rem, 1.1rem + 7.2vw, 6.5rem);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
   }
 
-  /* Legal page typography */
-  .ct-legal-title {
-    @apply text-2xl font-bold text-blue-600 dark:text-blue-400 mb-5 pb-2 border-b-2 border-slate-200 dark:border-slate-700;
+  .ct-display-lg {
+    @apply font-display font-normal;
+    font-size: clamp(2.5rem, 1.5rem + 3.6vw, 4.25rem);
+    line-height: 1.04;
+    letter-spacing: -0.018em;
+    text-wrap: balance;
   }
 
-  .ct-legal-subtitle {
-    @apply text-lg font-semibold text-slate-900 dark:text-white mt-6 mb-2;
+  .ct-display-md {
+    @apply font-display font-normal;
+    font-size: clamp(1.875rem, 1.3rem + 2.2vw, 2.875rem);
+    line-height: 1.1;
+    letter-spacing: -0.012em;
+    text-wrap: balance;
   }
 
-  .ct-legal-text {
-    @apply text-slate-600 dark:text-slate-400 leading-relaxed mb-3;
+  /* Small headings stay in Geist. See the note on --font-display. */
+  .ct-title {
+    @apply font-sans text-xl font-medium tracking-[-0.01em] text-ink;
   }
 
-  /* Navbar scroll states */
-  .ct-navbar {
-    @apply fixed w-full z-50 transition-all duration-300 bg-transparent py-5;
+  .ct-lede {
+    @apply text-ink-soft;
+    font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.3125rem);
+    line-height: 1.55;
+    text-wrap: pretty;
   }
 
-  .ct-navbar--scrolled {
-    @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 py-3;
+  .ct-prose {
+    @apply text-ink-soft;
+    line-height: 1.7;
+    text-wrap: pretty;
   }
 
-  /* ── Scroll-reveal (driven by the `ctReveal` directive) ──
-     The hidden state only bites under `html.ct-js` (see @layer base) so the
-     server / no-JS render stays visible. The directive adds `.ct-reveal` in
-     the browser, then `.is-visible` when the element enters the viewport. */
+  .ct-prose p + p {
+    @apply mt-4;
+  }
+
+  .ct-prose strong {
+    @apply font-medium text-ink;
+  }
+
+  .ct-prose a {
+    @apply text-accent underline decoration-accent/35 underline-offset-4 transition-colors;
+  }
+
+  .ct-prose a:hover {
+    @apply decoration-accent;
+  }
+
+  .ct-eyebrow {
+    @apply font-sans text-xs font-medium uppercase text-ink-faint;
+    letter-spacing: 0.18em;
+  }
+
+  /* Editorial numeral (01 / 02 / 03), replaces the decorative icon boxes. */
+  .ct-numeral {
+    @apply font-display text-3xl leading-none text-accent tabular-nums;
+  }
+
+  /* ══ Rules, the structural device that replaced most cards ══════════ */
+
+  .ct-rule {
+    @apply border-0 border-t border-rule;
+  }
+
+  .ct-rule-strong {
+    @apply border-0 border-t border-rule-strong;
+  }
+
+  /* ══ Actions ═════════════════════════════════════════════════════════ */
+
+  .ct-btn {
+    @apply ct-focus-ring inline-flex items-center justify-center gap-2 rounded-sm bg-accent px-6 py-3
+      font-sans text-sm font-medium text-on-accent transition-colors;
+  }
+
+  .ct-btn:hover {
+    @apply bg-accent-strong;
+  }
+
+  .ct-btn--ghost {
+    @apply bg-transparent text-ink;
+    box-shadow: inset 0 0 0 1px var(--color-rule-strong);
+  }
+
+  .ct-btn--ghost:hover {
+    @apply bg-transparent text-accent;
+    box-shadow: inset 0 0 0 1px var(--color-accent);
+  }
+
+  /* Inline text link with an arrow, the editorial "read on" affordance. */
+  .ct-link {
+    @apply ct-focus-ring inline-flex items-center gap-1.5 font-sans text-sm font-medium text-accent transition-colors;
+  }
+
+  .ct-link:hover {
+    @apply text-accent-strong;
+  }
+
+  /* ══ Surfaces, used sparingly: offers and the contact panel only ════ */
+
+  .ct-panel {
+    @apply rounded-md bg-surface p-8;
+  }
+
+  /* ══ Masthead ════════════════════════════════════════════════════════ */
+
+  .ct-masthead {
+    @apply fixed inset-x-0 top-0 z-50 border-b border-transparent py-5 transition-[background-color,border-color,padding] duration-300;
+  }
+
+  .ct-masthead--scrolled {
+    @apply border-rule bg-paper/95 py-3 backdrop-blur-md;
+  }
+
+  .ct-wordmark {
+    @apply font-display text-[1.75rem] leading-none tracking-[-0.01em] text-ink;
+  }
+
+  .ct-navlink {
+    @apply ct-focus-ring font-sans text-sm text-ink-soft transition-colors hover:text-ink;
+  }
+
+  .ct-navlink--active {
+    @apply text-ink;
+  }
+
+  /* ══ Motion, deliberately minimal ════════════════════════════════════
+     Two devices only: a staged hero entrance that plays once at first
+     paint, and a scroll reveal used at most three times per page. */
+
   .ct-js .ct-reveal {
-    @apply opacity-0 translate-y-6 transition-all duration-700 ease-out;
+    @apply translate-y-4 opacity-0 transition-[opacity,transform] duration-[600ms] ease-out;
     will-change: opacity, transform;
   }
 
-  .ct-js .ct-reveal.ct-reveal-left {
-    @apply translate-y-0 -translate-x-8;
-  }
-
-  .ct-js .ct-reveal.ct-reveal-right {
-    @apply translate-y-0 translate-x-8;
-  }
-
   .ct-js .ct-reveal.is-visible {
-    @apply opacity-100 translate-x-0 translate-y-0;
+    @apply translate-y-0 opacity-100;
   }
 
-  /* ── Trust-band stat (`ct-stat`) ── */
-  .ct-stat-icon {
-    @apply flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-2xl text-blue-600
-      dark:bg-blue-900/30 dark:text-blue-400;
-  }
-
-  .ct-stat-figure {
-    @apply text-4xl font-black tabular-nums tracking-tight text-slate-900 dark:text-white;
-  }
-
-  /* ── Animated gradient surface — Services primary card ── */
-  .ct-gradient-animated {
-    @apply bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-500;
-    background-size: 200% 200%;
-    animation: var(--animate-gradient-pan);
-  }
-
-  /* ── Pulsing radial glow — final CTA ── */
-  .ct-radial-pulse {
-    background: radial-gradient(circle at 50% 120%, #3b82f6, transparent 70%);
-    animation: var(--animate-radial-pulse);
-  }
-
-  /* Shared accessible focus ring for every CTA on the page. */
-  .ct-focus-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500
-      focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950;
-  }
-
-  /* Hero staged entrance — plays once at first paint. Gated on `html.ct-js` so
-     the server / no-JS render shows the content in its final visible state
-     (never starts at opacity:0). The h1 is deliberately excluded so the LCP
-     text paints crisp & immediately. Per-element delay set inline in template. */
+  /* Gated on `html.ct-js` so the server / no-JS render shows content in its
+     final state and never starts at opacity:0. The h1 is deliberately
+     excluded so the LCP text paints immediately. */
   .ct-js .ct-hero-stagger {
     animation: var(--animate-hero-in);
-  }
-
-  /* Final CTA: extend the `ctReveal` reveal with a gentle scale-in (0.98 → 1). */
-  .ct-js .ct-cta-reveal.ct-reveal {
-    @apply translate-y-6 scale-[0.98];
-  }
-
-  .ct-js .ct-cta-reveal.ct-reveal.is-visible {
-    @apply translate-y-0 scale-100;
   }
 }
