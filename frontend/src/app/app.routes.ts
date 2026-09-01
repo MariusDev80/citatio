@@ -50,9 +50,9 @@ export const routes: Routes = [
     path: 'faq',
     data: {
       seo: {
-        title: 'FAQ — Citatio',
+        title: 'Questions fréquentes sur la création de site vitrine | Citatio',
         description:
-          'Réponses aux questions fréquentes : création de site vitrine, délais et tarifs, options SEO et GEO, hébergement, nom de domaine et maintenance.',
+          'Combien coûte un site vitrine, en combien de temps, qu\'est-ce que le SEO et le GEO, qui héberge le site : nos réponses, sans jargon. Studio web en Loire-Atlantique.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/faq/faq.component').then(m => m.FaqComponent),
@@ -72,9 +72,9 @@ export const routes: Routes = [
     path: 'legal',
     data: {
       seo: {
-        title: 'Mentions légales — Citatio',
+        title: 'Mentions légales et confidentialité | Citatio',
         description:
-          'Mentions légales, politique de confidentialité et conditions générales d\'utilisation du site Citatio.',
+          'Éditeur, hébergeur, propriété intellectuelle, politique de confidentialité et conditions générales d\'utilisation du site Citatio.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/legal/legal.component').then(m => m.LegalComponent),

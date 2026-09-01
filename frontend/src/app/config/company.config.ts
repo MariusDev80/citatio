@@ -55,6 +55,18 @@ export const COMPANY = {
 
   /** The three founders. Bios live in the About page component. */
   founders: ['Marius', 'Ruben', 'Titouan'] as const,
+
+  /**
+   * Service area, surfaced as `areaServed` in the structured data.
+   * The whole repositioning is local ("près de Nantes"), so search engines and
+   * AI answers need to be told that explicitly — the copy alone is not enough.
+   */
+  areaServed: [
+    'Nantes',
+    'La Chapelle-sur-Erdre',
+    'Loire-Atlantique',
+    'Pays de la Loire',
+  ] as const,
   knowsAbout: [
     'Création de site vitrine',
     'Studio web',

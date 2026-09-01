@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { JsonLdService } from '../../services/json-ld.service';
 import { COMPANY } from '../../config/company.config';
 
 /**
@@ -39,6 +40,8 @@ interface Founder {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AboutComponent {
+  private readonly jsonLd = inject(JsonLdService);
+
   protected readonly company = COMPANY;
 
   protected readonly founders = signal<readonly Founder[]>([
@@ -64,6 +67,44 @@ export class AboutComponent {
       portrait: null,
     },
   ]);
+
+  constructor() {
+    this.jsonLd.setSchema('breadcrumb-about', {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Accueil', item: COMPANY.url + '/' },
+        { '@type': 'ListItem', position: 2, name: 'Qui sommes-nous', item: COMPANY.url + '/about' },
+      ],
+    });
+
+    // Names the three founders as real people attached to the organisation.
+    // `jobTitle` and `description` are intentionally absent until the bios are
+    // written — publishing invented roles for real people is not an option.
+    this.jsonLd.setSchema('about-page', {
+      '@context': 'https://schema.org',
+      '@type': 'AboutPage',
+      name: 'Qui sommes-nous',
+      url: COMPANY.url + '/about',
+      mainEntity: {
+        '@type': 'Organization',
+        name: COMPANY.name,
+        url: COMPANY.url,
+        foundingDate: String(COMPANY.foundingYear),
+        founder: COMPANY.founders.map((name) => ({
+          '@type': 'Person',
+          name,
+          worksFor: { '@type': 'Organization', name: COMPANY.name },
+        })),
+        areaServed: COMPANY.areaServed.map((name) => ({ '@type': 'Place', name })),
+      },
+    });
+
+    inject(DestroyRef).onDestroy(() => {
+      this.jsonLd.removeSchema('breadcrumb-about');
+      this.jsonLd.removeSchema('about-page');
+    });
+  }
 
   /** Initial shown in the portrait slot while no photo is supplied. */
   protected initial(name: string): string {

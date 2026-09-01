@@ -186,3 +186,29 @@ test.describe('Garde-fous de la refonte', () => {
       .toBe(!wasDark);
   });
 });
+
+test.describe('Sitemap', () => {
+  // Le vrai risque n'est pas le sitemap d'aujourd'hui, c'est celui de demain :
+  // une route ajoutée sans toucher au sitemap reste invisible des crawlers.
+  // Ce test verrouille la correspondance dans les deux sens.
+  const prerendered = ['/', '/ce-site', '/services', '/about', '/faq', '/contact', '/legal'];
+
+  test('le sitemap couvre exactement les routes prérendues', async ({ request }) => {
+    const xml = await (await request.get('/sitemap.xml')).text();
+    const listed = [...xml.matchAll(/<loc>https:\/\/citatio-geo\.com([^<]*)<\/loc>/g)]
+      .map((m) => m[1] || '/');
+
+    expect([...listed].sort()).toEqual([...prerendered].sort());
+  });
+
+  test('chaque URL du sitemap répond et porte une canonique cohérente', async ({ page }) => {
+    for (const route of prerendered) {
+      const response = await page.goto(route);
+      expect(response?.status(), `${route} doit répondre 200`).toBe(200);
+      const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
+      expect(canonical, `canonique de ${route}`).toBe(
+        'https://citatio-geo.com' + (route === '/' ? '/' : route),
+      );
+    }
+  });
+});

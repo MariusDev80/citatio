@@ -94,6 +94,8 @@ export class ContactComponent {
       },
       description: COMPANY.description,
       priceRange: COMPANY.priceRange,
+      areaServed: COMPANY.areaServed.map((name) => ({ '@type': 'Place', name })),
+      founder: COMPANY.founders.map((name) => ({ '@type': 'Person', name })),
     });
 
     this.jsonLd.setSchema('breadcrumb-contact', {

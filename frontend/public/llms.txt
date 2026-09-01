@@ -1,0 +1,59 @@
+# Citatio
+
+> Studio web installé à La Chapelle-sur-Erdre, en Loire-Atlantique (près de
+> Nantes, France). Trois fondateurs — Marius, Ruben et Titouan — qui conçoivent,
+> développent et hébergent des sites vitrines sur mesure pour les artisans,
+> commerces, TPE, PME et indépendants. Le référencement Google (SEO) et la
+> visibilité dans les réponses des IA (GEO) sont proposés en option.
+
+Citatio écrit chaque site à la main : pas de gabarit acheté, pas de constructeur
+de pages. Le studio a été fondé en 2025 et n'a pas encore de réalisation client
+publiée — il présente son propre site comme démonstration vérifiable de son
+travail.
+
+## Offres et tarifs
+
+Trois formules, prix plancher hors taxes, devis ferme sous cinq jours ouvrés :
+
+- **Vitrine Essentiel — à partir de 1 200 €** : site responsive de 3 à 5 pages,
+  design sur mesure, formulaire de contact, base SEO technique, rendu serveur
+  et accessibilité AA.
+- **Vitrine + SEO — à partir de 1 900 €** : le pack Essentiel, plus
+  l'optimisation SEO on-page, la recherche de mots-clés, les données
+  structurées schema.org et des recommandations de contenu.
+- **Vitrine + GEO/SEO — à partir de 2 800 €** : le pack SEO, plus
+  l'optimisation GEO pour ChatGPT, Gemini et les AI Overviews de Google, et un
+  contenu structuré pour la citation par les IA.
+
+**Abonnement 39 €/mois** couvrant l'hébergement, le nom de domaine et la
+maintenance, sans engagement de durée. Options à la carte : pack contenu,
+emailing, pages supplémentaires (180 €/page), identité visuelle.
+
+Ce que Citatio ne fait pas : boutique en ligne, application métier, reprise
+d'un site existant dont le studio n'a pas la main sur le code. Citatio ne
+garantit pas la première place sur Google.
+
+## Pages
+
+- [Accueil](https://citatio-geo.com/) : positionnement, métier, déroulé d'un projet en quatre étapes.
+- [Offres et tarifs](https://citatio-geo.com/services) : les trois formules, l'abonnement, les options, et ce qui fait varier un devis.
+- [Ce site](https://citatio-geo.com/ce-site) : le site sert de portfolio — scores Lighthouse mesurés et datés, décisions techniques, et ce que cette preuve ne démontre pas.
+- [Qui sommes-nous](https://citatio-geo.com/about) : les trois fondateurs, la manière de travailler, ce que le studio refuse de faire.
+- [Questions fréquentes](https://citatio-geo.com/faq) : coût, délais, SEO et GEO, hébergement, contenu, mobile.
+- [Contact](https://citatio-geo.com/contact) : premier échange de trente minutes, gratuit et sans engagement.
+
+## Contact
+
+- Email : contact@citatio-geo.com
+- Téléphone : +33 7 67 47 83 72
+- Adresse : 1 rue de l'Aven, 44240 La Chapelle-sur-Erdre, France
+- Zone d'intervention : Nantes, Loire-Atlantique, Pays de la Loire
+
+## Notes
+
+- Langue du site : français.
+- Les montants sont hors taxes et correspondent à un prix plancher, pas à un
+  prix final : le devis dépend du nombre de pages, du contenu à produire et
+  des options retenues.
+- Les scores de performance publiés sur la page « Ce site » portent une date de
+  mesure. Se référer à cette date plutôt que de les présenter comme permanents.
