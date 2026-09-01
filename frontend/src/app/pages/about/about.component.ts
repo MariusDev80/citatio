@@ -48,7 +48,17 @@ export class AboutComponent {
 
   protected readonly company = COMPANY;
 
+  /** Ordre d'affichage : le président d'abord, puis les directeurs généraux. */
   protected readonly founders = signal<readonly Founder[]>([
+    {
+      name: 'Titouan',
+      fullName: 'Titouan Poinot',
+      office: 'Président',
+      role: 'Commerce et direction',
+      background: 'TODO(bios) — parcours en 2 ou 3 phrases.',
+      conviction: 'TODO(bios) — une conviction, à la première personne.',
+      portrait: null,
+    },
     {
       name: 'Marius',
       fullName: 'Marius Dudouet',
@@ -63,15 +73,6 @@ export class AboutComponent {
       fullName: 'Ruben Perrichet',
       office: 'Directeur général',
       role: 'Commerce et administration',
-      background: 'TODO(bios) — parcours en 2 ou 3 phrases.',
-      conviction: 'TODO(bios) — une conviction, à la première personne.',
-      portrait: null,
-    },
-    {
-      name: 'Titouan',
-      fullName: 'Titouan Poinot',
-      office: 'Président',
-      role: 'Commerce et direction',
       background: 'TODO(bios) — parcours en 2 ou 3 phrases.',
       conviction: 'TODO(bios) — une conviction, à la première personne.',
       portrait: null,

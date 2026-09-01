@@ -63,8 +63,11 @@ export const COMPANY = {
     stack: 'Docker et Caddy, sur un VPS que nous administrons nous-mêmes',
   },
 
-  /** The three founders. Bios live in the About page component. */
-  founders: ['Marius', 'Ruben', 'Titouan'] as const,
+  /**
+   * The three founders, president first — same order as the About page, so the
+   * Organization schema and the page never disagree on who leads.
+   */
+  founders: ['Titouan', 'Marius', 'Ruben'] as const,
 
   /**
    * Service area, surfaced as `areaServed` in the structured data.
