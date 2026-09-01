@@ -2,7 +2,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 
 /**
- * ThemeService — manages the dark / light mode toggle.
+ * ThemeService : manages the dark / light mode toggle.
  *
  * Toggles the `.dark` class on `<html>` so that both Tailwind CSS
  * (`darkMode: 'class'`) and PrimeNG (`darkModeSelector: '.dark'`)

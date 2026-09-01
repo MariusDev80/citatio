@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { PLATFORM_ID } from '@angular/core';
 import { ThemeService } from './theme.service';
 
-// JSDOM n'implémente pas window.matchMedia — mock minimal requis
+// JSDOM n'implémente pas window.matchMedia, mock minimal requis
 function mockMatchMedia(matches: boolean): void {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
@@ -19,7 +19,7 @@ function mockMatchMedia(matches: boolean): void {
   });
 }
 
-describe('ThemeService — navigateur', () => {
+describe('ThemeService : navigateur', () => {
   let service: ThemeService;
 
   beforeEach(() => {
@@ -70,7 +70,7 @@ describe('ThemeService — navigateur', () => {
   });
 });
 
-describe('ThemeService — serveur (SSR)', () => {
+describe('ThemeService : serveur (SSR)', () => {
   let service: ThemeService;
 
   beforeEach(() => {

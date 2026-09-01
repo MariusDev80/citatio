@@ -6,7 +6,7 @@ import { JsonLdService } from '../../services/json-ld.service';
 import { COMPANY } from '../../config/company.config';
 import { BUDGET_BRACKETS } from '../../config/pricing.config';
 
-/** Prefilled mail body — see {@link ContactComponent.mailtoHref}. */
+/** Prefilled mail body, see {@link ContactComponent.mailtoHref}. */
 const MAIL_SUBJECT = 'Demande de devis pour un site vitrine';
 
 @Component({
@@ -22,7 +22,7 @@ export class ContactComponent {
 
   protected readonly company = COMPANY;
 
-  /** Set once the user has attempted a submit — gates error display. */
+  /** Set once the user has attempted a submit, gates error display. */
   protected readonly submitted = signal(false);
 
   protected readonly projectTypes = [
@@ -53,7 +53,7 @@ export class ContactComponent {
   });
 
   /**
-   * The form is not wired to a backend yet — `u1-communication` will own that.
+   * The form is not wired to a backend yet, `u1-communication` will own that.
    * Rather than pretending, submitting composes a prefilled email the visitor
    * actually sends from their own client, so a real message still reaches us.
    */

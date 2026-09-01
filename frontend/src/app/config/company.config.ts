@@ -26,7 +26,7 @@ export const COMPANY = {
   /**
    * Legal identity, surfaced on /legal and in the footer.
    *
-   * Source: vault Obsidian « Citatio » — notes 1.2 (Fondateurs & Gouvernance),
+   * Source: vault Obsidian « Citatio », notes 1.2 (Fondateurs & Gouvernance),
    * 1.3 (Siège, Capital & Actionnariat), 2.1 (Forme Juridique), complétées et
    * confirmées par le propriétaire pour l'immatriculation et le régime de TVA.
    */
@@ -40,7 +40,7 @@ export const COMPANY = {
     /**
      * Régime réel normal, donc assujettie : le numéro intracommunautaire est
      * obligatoire sur le site (art. R123-237 c. com.). Clé 83 calculée depuis
-     * le SIREN — (12 + 3 × (SIREN mod 97)) mod 97 — et non recopiée.
+     * le SIREN : (12 + 3 × (SIREN mod 97)) mod 97, et non recopiée.
      */
     vatNumber: 'FR83105241855',
     /**
@@ -52,19 +52,19 @@ export const COMPANY = {
 
   /**
    * Hosting provider, which French law requires naming on /legal
-   * (art. 6 III LCEN). Source: vault, note 6.1 — VPS chez Hostinger.
+   * (art. 6 III LCEN). Source: vault, note 6.1, VPS chez Hostinger.
    * Coordonnees legales publiees par Hostinger dans ses conditions generales.
    */
   hosting: {
     provider: 'Hostinger International Ltd',
     address: '61 Lordou Vironos Street, Lumiel Building, 4e étage, 6023 Larnaca, Chypre',
     phone: '+370 645 03378',
-    /** Ours regardless of provider — this part is verifiable from the repo. */
+    /** Ours regardless of provider, this part is verifiable from the repo. */
     stack: 'Docker et Caddy, sur un VPS que nous administrons nous-mêmes',
   },
 
   /**
-   * The three founders, president first — same order as the About page, so the
+   * The three founders, president first, same order as the About page, so the
    * Organization schema and the page never disagree on who leads.
    */
   founders: ['Titouan', 'Marius', 'Ruben'] as const,
@@ -72,7 +72,7 @@ export const COMPANY = {
   /**
    * Service area, surfaced as `areaServed` in the structured data.
    * The whole repositioning is local ("près de Nantes"), so search engines and
-   * AI answers need to be told that explicitly — the copy alone is not enough.
+   * AI answers need to be told that explicitly, the copy alone is not enough.
    */
   areaServed: [
     'Nantes',

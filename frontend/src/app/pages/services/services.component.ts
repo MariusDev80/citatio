@@ -39,7 +39,7 @@ export class ServicesComponent {
     const provider = { '@type': 'Organization', name: COMPANY.name };
 
     // Offers now carry a real `offers.price`, which makes them eligible for
-    // rich results — one concrete benefit of dropping « Sur devis ».
+    // rich results, one concrete benefit of dropping « Sur devis ».
     this.jsonLd.setSchema('services', {
       '@context': 'https://schema.org',
       '@type': 'ItemList',

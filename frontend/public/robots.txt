@@ -21,5 +21,5 @@ Allow: /
 Sitemap: https://citatio-geo.com/sitemap.xml
 
 # Resume structure pour les moteurs generatifs : https://citatio-geo.com/llms.txt
-# (convention llmstxt.org — le fichier se decouvre a la racine, il n'existe
+# (convention llmstxt.org : le fichier se decouvre a la racine, il n'existe
 #  aucune directive robots.txt normalisee pour le declarer.)

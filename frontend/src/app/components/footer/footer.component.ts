@@ -12,7 +12,7 @@ import { COMPANY } from '../../config/company.config';
 export class FooterComponent {
   protected readonly company = COMPANY;
 
-  /** Computed once per render rather than hardcoded — a stale copyright year
+  /** Computed once per render rather than hardcoded, a stale copyright year
    *  is a small thing that reads as an abandoned site. */
   protected readonly year = new Date().getFullYear();
 }

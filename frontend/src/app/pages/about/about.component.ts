@@ -20,7 +20,7 @@ import { COMPANY } from '../../config/company.config';
  *                a real constraint, a real mistake.
  *  - `conviction` 1–2 sentences in the first person. Something you believe
  *                about this work that not everyone agrees with. This is the
- *                line that makes the page unrepeatable — avoid consensus
+ *                line that makes the page unrepeatable, avoid consensus
  *                statements like "je crois en la qualité".
  */
 interface Founder {
@@ -97,7 +97,7 @@ export class AboutComponent {
 
     // Names the three founders as real people attached to the organisation.
     // `jobTitle` is the statutory office from the vault; `description` stays
-    // absent until the bios are written — no invented biography for real people.
+    // absent until the bios are written, no invented biography for real people.
     this.jsonLd.setSchema('about-page', {
       '@context': 'https://schema.org',
       '@type': 'AboutPage',

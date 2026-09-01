@@ -66,7 +66,7 @@ function getTarget(fixture: ComponentFixture<HostComponent>): HTMLElement {
 
 // ── Specs ────────────────────────────────────────────────────────────────────
 
-describe('RevealDirective — navigateur, mouvement autorisé', () => {
+describe('RevealDirective : navigateur, mouvement autorisé', () => {
   beforeEach(() => {
     mockMatchMedia(false);
     vi.stubGlobal('IntersectionObserver', FakeIntersectionObserver);
@@ -111,7 +111,7 @@ describe('RevealDirective — navigateur, mouvement autorisé', () => {
   });
 });
 
-describe('RevealDirective — reduced-motion', () => {
+describe('RevealDirective : reduced-motion', () => {
   beforeEach(() => {
     mockMatchMedia(true);
     vi.stubGlobal('IntersectionObserver', FakeIntersectionObserver);
@@ -132,7 +132,7 @@ describe('RevealDirective — reduced-motion', () => {
   });
 });
 
-describe('RevealDirective — serveur (SSR)', () => {
+describe('RevealDirective : serveur (SSR)', () => {
   beforeEach(() => {
     vi.stubGlobal('IntersectionObserver', FakeIntersectionObserver);
     FakeIntersectionObserver.last = undefined;

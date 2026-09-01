@@ -2,7 +2,7 @@ import { definePreset } from '@primeuix/themes';
 import Aura from '@primeuix/themes/aura';
 
 /**
- * Citatio PrimeNG preset — Aura base, remapped onto the editorial palette
+ * Citatio PrimeNG preset, Aura base, remapped onto the editorial palette
  * (paper / ink / ultramarine) defined in `styles.css`.
  *
  * PrimeNG only dresses two surfaces on this site: the FAQ accordion and the
@@ -16,7 +16,7 @@ import Aura from '@primeuix/themes/aura';
  * `<html>`, shared with Tailwind so both react to the same toggle.
  */
 
-/** Ultramarine ramp — the accent from `styles.css`, expanded for PrimeNG. */
+/** Ultramarine ramp, the accent from `styles.css`, expanded for PrimeNG. */
 const ULTRAMARINE = {
   50: '#eef0fb',
   100: '#d8dcf5',
@@ -31,7 +31,7 @@ const ULTRAMARINE = {
   950: '#0a0e2b',
 } as const;
 
-/** Paper/ink neutrals — warm, matching `--color-paper` and `--color-ink`. */
+/** Paper/ink neutrals, warm, matching `--color-paper` and `--color-ink`. */
 const NEUTRAL = {
   0: '#ffffff',
   50: '#f9f8f5',
@@ -87,8 +87,8 @@ const CitatioPreset = definePreset(Aura, {
   components: {
     /**
      * The FAQ accordion is the one place PrimeNG paints a large surface.
-     * Left alone it renders a pure-white card with `surface.500` labels —
-     * 4.09:1, below AA — inside our warm paper page. These tokens strip the
+     * Left alone it renders a pure-white card with `surface.500` labels at
+     * 4.09:1, below AA, inside our warm paper page. These tokens strip the
      * card entirely so the accordion reads as ruled editorial rows, and pin
      * the label to `ink` in both schemes.
      */

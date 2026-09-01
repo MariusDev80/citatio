@@ -1,13 +1,13 @@
 import { test, expect } from '@playwright/test';
 
 /**
- * Tests de non-régression — SEO, navigation et garde-fous de la refonte.
+ * Tests de non-régression, SEO, navigation et garde-fous de la refonte.
  *
  * Ces tests tournent contre le dist/ pré-rendu servi statiquement, pas un
  * serveur live : ils vérifient donc ce que voient réellement les crawlers.
  */
 
-test.describe('Page d\'accueil — SEO', () => {
+test.describe('Page d\'accueil, SEO', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
   });
@@ -43,7 +43,7 @@ test.describe('Page d\'accueil — SEO', () => {
   });
 });
 
-test.describe('Page FAQ — JSON-LD', () => {
+test.describe('Page FAQ : JSON-LD', () => {
   test('le script JSON-LD FAQPage est présent et valide', async ({ page }) => {
     await page.goto('/faq');
     const jsonLd = page.locator('script[type="application/ld+json"][data-jsonld="faq"]');
@@ -54,7 +54,7 @@ test.describe('Page FAQ — JSON-LD', () => {
   });
 });
 
-test.describe('Page Offres — tarifs et données structurées', () => {
+test.describe('Page Offres : tarifs et données structurées', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/services');
   });
@@ -79,7 +79,7 @@ test.describe('Page Offres — tarifs et données structurées', () => {
   });
 });
 
-test.describe('Page Ce site — la preuve', () => {
+test.describe('Page Ce site, la preuve', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/ce-site');
   });
@@ -134,7 +134,7 @@ test.describe('Accessibilité de base', () => {
   const pages = ['/', '/services', '/ce-site', '/about', '/faq', '/contact', '/legal'];
 
   for (const path of pages) {
-    test(`${path} — un h1 unique et visible`, async ({ page }) => {
+    test(`${path}, un h1 unique et visible`, async ({ page }) => {
       await page.goto(path);
       const h1 = page.getByRole('heading', { level: 1 });
       await expect(h1).toHaveCount(1);

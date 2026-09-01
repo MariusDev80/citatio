@@ -1,10 +1,10 @@
 /**
- * ⚠️ TODO(pricing): PROVISIONAL AMOUNTS — NOT CONTRACTUAL.
+ * ⚠️ TODO(pricing): PROVISIONAL AMOUNTS, NOT CONTRACTUAL.
  *
  * `docs/product/offres.md` §3 still lists every price as « À DÉFINIR ». These
  * figures are placeholders chosen with the owner so the Offers page can be
  * judged with realistic numbers instead of three « Sur devis » rows. Replace
- * them here — this file is the single source of truth, nothing else in the app
+ * them here, this file is the single source of truth, nothing else in the app
  * hardcodes an amount.
  *
  * Owner decision (validated): showing a floor price beats « Sur devis », which
@@ -68,7 +68,7 @@ export const FORMULAS: readonly Formula[] = [
   },
 ] as const;
 
-/** Bundled recurring subscription — hosting + domain + maintenance. */
+/** Bundled recurring subscription, hosting + domain + maintenance. */
 export const SUBSCRIPTION = {
   price: 39,
   period: 'mois',
@@ -102,7 +102,7 @@ export const OPTIONS: readonly Option[] = [
   },
 ] as const;
 
-/** What makes a quote move — used on the Offers page. */
+/** What makes a quote move, used on the Offers page. */
 export const PRICE_FACTORS: readonly string[] = [
   'Le nombre de pages et la complexité des gabarits',
   'Le contenu : le vôtre est prêt, ou nous le rédigeons',

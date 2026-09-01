@@ -5,7 +5,7 @@
 @variant dark (&:where(.dark, .dark *));
 
 /* ══════════════════════════════════════════════════════════════════════
-   Self-hosted type. Latin subset only — it fully covers French, and it
+   Self-hosted type. Latin subset only, it fully covers French, and it
    keeps all three faces under 75 kB combined. See public/fonts/LICENSE.md.
    ══════════════════════════════════════════════════════════════════════ */
 
@@ -47,7 +47,7 @@
   /* ── Type ───────────────────────────────────────────────────────────
      Instrument Serif is a 400-only display face: it is reserved for
      genuinely large sizes (ct-display-*). Everything at title size and
-     below is Geist — a light serif set small reads as frail, not refined. */
+     below is Geist, because a light serif set small reads as frail, not refined. */
   --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
   --font-sans: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
@@ -154,7 +154,7 @@
       animation-duration: 0.001ms !important;
       /* Cancel any animation-delay too: a staged entrance (e.g. the hero
          `ct-hero-stagger`, hidden via its keyframe's backwards fill) must not
-         leave content invisible during its delay — show it immediately. */
+         leave content invisible during its delay, show it immediately. */
       animation-delay: 0ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.001ms !important;
@@ -217,7 +217,7 @@
     text-wrap: balance;
   }
 
-  /* Small headings stay in Geist — see the note on --font-display. */
+  /* Small headings stay in Geist. See the note on --font-display. */
   .ct-title {
     @apply font-sans text-xl font-medium tracking-[-0.01em] text-ink;
   }
@@ -256,12 +256,12 @@
     letter-spacing: 0.18em;
   }
 
-  /* Editorial numeral (01 / 02 / 03) — replaces the decorative icon boxes. */
+  /* Editorial numeral (01 / 02 / 03), replaces the decorative icon boxes. */
   .ct-numeral {
     @apply font-display text-3xl leading-none text-accent tabular-nums;
   }
 
-  /* ══ Rules — the structural device that replaced most cards ══════════ */
+  /* ══ Rules, the structural device that replaced most cards ══════════ */
 
   .ct-rule {
     @apply border-0 border-t border-rule;
@@ -292,7 +292,7 @@
     box-shadow: inset 0 0 0 1px var(--color-accent);
   }
 
-  /* Inline text link with an arrow — the editorial "read on" affordance. */
+  /* Inline text link with an arrow, the editorial "read on" affordance. */
   .ct-link {
     @apply ct-focus-ring inline-flex items-center gap-1.5 font-sans text-sm font-medium text-accent transition-colors;
   }
@@ -301,7 +301,7 @@
     @apply text-accent-strong;
   }
 
-  /* ══ Surfaces — used sparingly: offers and the contact panel only ════ */
+  /* ══ Surfaces, used sparingly: offers and the contact panel only ════ */
 
   .ct-panel {
     @apply rounded-md bg-surface p-8;
@@ -329,7 +329,7 @@
     @apply text-ink;
   }
 
-  /* ══ Motion — deliberately minimal ═══════════════════════════════════
+  /* ══ Motion, deliberately minimal ════════════════════════════════════
      Two devices only: a staged hero entrance that plays once at first
      paint, and a scroll reveal used at most three times per page. */
 

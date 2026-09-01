@@ -4,7 +4,7 @@ import { chromium } from '@playwright/test';
  * Dark-mode contrast sweep.
  *
  * Lighthouse only ever audits the light theme, but /ce-site claims AA contrast
- * "en thème clair comme en thème sombre" — this script is what backs that
+ * "en thème clair comme en thème sombre", this script is what backs that
  * claim. It walks every visible text node on every route, resolves the real
  * painted background, and asserts the WCAG AA ratio for the node's size.
  *
@@ -71,7 +71,7 @@ for (const route of routes) {
     if (got < worst.r) worst = { r: got, sel: r.sel, route };
   }
 }
-console.log(`\nPire ratio observé : ${worst.r.toFixed(2)}:1 — ${worst.sel} sur ${worst.route}`);
+console.log(`\nPire ratio observé : ${worst.r.toFixed(2)}:1, ${worst.sel} sur ${worst.route}`);
 console.log(failures === 0 ? 'MODE SOMBRE : aucun échec de contraste AA.' : `MODE SOMBRE : ${failures} échecs.`);
 await browser.close();
 process.exit(failures === 0 ? 0 : 1);

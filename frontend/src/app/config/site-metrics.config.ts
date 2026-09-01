@@ -2,7 +2,7 @@
  * Measured facts about THIS site, shown on `/ce-site` and on the home page.
  *
  * Hard rule: every figure here must be something a visitor can reproduce.
- * We have no clients to show yet, so this site is the portfolio — which only
+ * We have no clients to show yet, so this site is the portfolio, which only
  * works if the numbers are real. Never round up, never estimate, and always
  * ship `measuredOn` so a stale figure is visible as stale.
  *

@@ -15,7 +15,7 @@ interface Choice {
 }
 
 /**
- * `/ce-site` — the portfolio stand-in.
+ * `/ce-site` : the portfolio stand-in.
  *
  * Citatio has no client work to show yet and will not fabricate any, so this
  * page makes the site itself the deliverable on display. Everything asserted
