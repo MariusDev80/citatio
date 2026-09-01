@@ -96,6 +96,24 @@ export class ContactComponent {
       priceRange: COMPANY.priceRange,
       areaServed: COMPANY.areaServed.map((name) => ({ '@type': 'Place', name })),
       founder: COMPANY.founders.map((name) => ({ '@type': 'Person', name })),
+      // Relie explicitement le site a la fiche Google Business Profile :
+      // meme point sur la carte, memes horaires, meme identite.
+      sameAs: [...COMPANY.sameAs],
+      hasMap: COMPANY.googleBusinessProfile,
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: COMPANY.geo.latitude,
+        longitude: COMPANY.geo.longitude,
+      },
+      openingHoursSpecification: {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: [
+          'Monday', 'Tuesday', 'Wednesday', 'Thursday',
+          'Friday', 'Saturday', 'Sunday',
+        ],
+        opens: COMPANY.openingHours.opens,
+        closes: COMPANY.openingHours.closes,
+      },
     });
 
     this.jsonLd.setSchema('breadcrumb-contact', {

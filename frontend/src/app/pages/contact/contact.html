@@ -35,6 +35,22 @@
               {{ company.address.street }}<br />
               {{ company.address.postalCode }} {{ company.address.city }}
             </dd>
+            <dd class="mt-2">
+              <a
+                [href]="company.googleBusinessProfile"
+                target="_blank"
+                rel="noopener"
+                class="ct-link">
+                Ouvrir dans Google Maps
+                <span aria-hidden="true">→</span>
+              </a>
+            </dd>
+          </div>
+          <div>
+            <dt class="ct-eyebrow">Horaires</dt>
+            <dd class="ct-prose mt-1">
+              Du lundi au dimanche, de 9 h à 18 h.
+            </dd>
           </div>
         </dl>
       </div>

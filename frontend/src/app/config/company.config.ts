@@ -93,5 +93,22 @@ export const COMPANY = {
     'Visibilité IA',
     'Hébergement web',
   ],
-  sameAs: [] as string[],
+  /**
+   * Fiche Google Business Profile, sous sa forme canonique par CID.
+   * L'URL Maps longue porte des parametres de session (`entry`, `g_ep`, `skid`)
+   * qui changent a chaque partage ; la forme `?cid=` est stable dans le temps.
+   * CID 0x73e977b496b34132 = 8352338601441444146 en decimal.
+   */
+  googleBusinessProfile: 'https://maps.google.com/?cid=8352338601441444146',
+
+  /** Coordonnees de la fiche, pour relier le site au point sur la carte. */
+  geo: { latitude: 47.3047519, longitude: -1.5564386 },
+
+  /** Horaires declares sur la fiche Google : 9h-18h, sept jours sur sept. */
+  openingHours: { opens: '09:00', closes: '18:00' },
+
+  /** Categorie principale de la fiche Google. */
+  googleCategory: 'Concepteur de sites Web',
+
+  sameAs: ['https://maps.google.com/?cid=8352338601441444146'] as string[],
 } as const;
