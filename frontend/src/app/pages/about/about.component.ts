@@ -56,7 +56,8 @@ export class AboutComponent {
       fullName: 'Titouan Poinot',
       office: 'Président',
       role: 'Commerce et direction',
-      background: 'TODO(bios) — parcours en 2 ou 3 phrases.',
+      background:
+        'Bachelor à Audencia, en alternance chez Nepsio Conseil. Un parcours de conseil, pas de technique : c’est lui qui écoute d’abord ce que fait l’entreprise, avant qu’on parle de site.',
       conviction: 'TODO(bios) — une conviction, à la première personne.',
       portrait: '/team/titouan.webp',
     },
@@ -65,7 +66,8 @@ export class AboutComponent {
       fullName: 'Marius Dudouet',
       office: 'Directeur général',
       role: 'Conception et développement',
-      background: 'TODO(bios) — parcours en 2 ou 3 phrases.',
+      background:
+        'BTS SIO, puis licence MIAGE en alternance à La Poste, comme développeur full stack. Assez longtemps dans une grande structure pour savoir ce que coûte un logiciel mal fait, et pour préférer l’artisanat au volume.',
       conviction: 'TODO(bios) — une conviction, à la première personne.',
       portrait: '/team/marius.webp',
     },
@@ -74,7 +76,8 @@ export class AboutComponent {
       fullName: 'Ruben Perrichet',
       office: 'Directeur général',
       role: 'Commerce et administration',
-      background: 'TODO(bios) — parcours en 2 ou 3 phrases.',
+      background:
+        'Bac pro en climatisation et chambres froides, un an comme agent de sûreté à la douane de l’aéroport de Nantes, puis neuf mois en plomberie, à poser des salles de bains. Il connaît de l’intérieur les métiers pour lesquels nous travaillons — il en vient.',
       conviction: 'TODO(bios) — une conviction, à la première personne.',
       portrait: '/team/ruben.webp',
     },
