@@ -8,11 +8,18 @@
 
     <h3 class="ct-title mt-8 mb-2">Éditeur du site</h3>
     <p class="ct-prose ct-column mb-3">
-      Le site <strong class="font-medium text-ink">{{ company.url }}</strong> est édité par {{ company.legalName }},
-      {{ company.legal.form }}, au capital de {{ company.legal.capital }},
-      immatriculée au RCS de {{ company.legal.rcsCity }} sous le numéro SIRET
-      {{ company.legal.siret }}.
+      Le site <strong class="font-medium text-ink">{{ company.url }}</strong> est édité par
+      <strong class="font-medium text-ink">{{ company.legalName }}</strong>,
+      {{ company.legal.form }} au capital de {{ company.legal.capital }},
+      immatriculée au registre du commerce et des sociétés de {{ company.legal.rcsCity }}
+      sous le numéro SIREN {{ company.legal.siren }}.
     </p>
+    <dl class="ct-prose ct-column mb-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1">
+      <dt>SIRET</dt>
+      <dd class="tabular-nums">{{ company.legal.siret }}</dd>
+      <dt>TVA intracommunautaire</dt>
+      <dd class="tabular-nums">{{ company.legal.vatNumber }}</dd>
+    </dl>
     <p class="ct-prose ct-column mb-3">Siège social : {{ company.address.street }}, {{ company.address.postalCode }} {{ company.address.city }}</p>
     <p class="ct-prose ct-column mb-3">Directeur de la publication : {{ company.legal.publicationDirector }}</p>
     <p class="ct-prose ct-column mb-3">Contact : <a [href]="'mailto:' + company.email" class="ct-link">{{ company.email }}</a> — <a [href]="'tel:' + company.phoneRaw" class="ct-link">{{ company.phoneDisplay }}</a></p>

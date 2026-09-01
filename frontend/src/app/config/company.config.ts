@@ -25,30 +25,40 @@ export const COMPANY = {
 
   /**
    * Legal identity, surfaced on /legal and in the footer.
-   * TODO(legal): fill these in — the Legal page shipped with visible
-   * `[forme juridique]` / `[numéro SIRET]` placeholders, which is both a
-   * credibility problem and a French compliance one.
+   *
+   * Source: vault Obsidian « Citatio » — notes 1.2 (Fondateurs & Gouvernance),
+   * 1.3 (Siège, Capital & Actionnariat), 2.1 (Forme Juridique), complétées et
+   * confirmées par le propriétaire pour l'immatriculation et le régime de TVA.
    */
   legal: {
-    form: 'À COMPLÉTER',
-    siret: 'À COMPLÉTER',
-    capital: 'À COMPLÉTER',
-    rcsCity: 'À COMPLÉTER',
-    publicationDirector: 'À COMPLÉTER',
-    vatNumber: 'À COMPLÉTER',
+    form: 'société par actions simplifiée (SAS)',
+    capital: '1 500 €',
+    /** SIREN 105 241 855, établissement 00011. Clé de Luhn vérifiée. */
+    siren: '105 241 855',
+    siret: '105 241 855 00011',
+    rcsCity: 'Nantes',
+    /**
+     * Régime réel normal, donc assujettie : le numéro intracommunautaire est
+     * obligatoire sur le site (art. R123-237 c. com.). Clé 83 calculée depuis
+     * le SIREN — (12 + 3 × (SIREN mod 97)) mod 97 — et non recopiée.
+     */
+    vatNumber: 'FR83105241855',
+    /**
+     * Directeur de la publication : le représentant légal de la société
+     * (art. 6 III LCEN). Pour une SAS, le président.
+     */
+    publicationDirector: 'Titouan Poinot, président',
   },
 
   /**
-   * We run this site on the same stack we sell — that is part of the pitch,
-   * and French law requires naming the host on /legal.
-   * TODO(legal): fill in the actual VPS provider, its legal name, address and
-   * phone. The provider is currently only known to the CI (`VPS_IP` secret),
-   * so it is deliberately left blank rather than guessed.
+   * Hosting provider, which French law requires naming on /legal
+   * (art. 6 III LCEN). Source: vault, note 6.1 — VPS chez Hostinger.
+   * Coordonnees legales publiees par Hostinger dans ses conditions generales.
    */
   hosting: {
-    provider: 'À COMPLÉTER',
-    address: 'À COMPLÉTER',
-    phone: 'À COMPLÉTER',
+    provider: 'Hostinger International Ltd',
+    address: '61 Lordou Vironos Street, Lumiel Building, 4e étage, 6023 Larnaca, Chypre',
+    phone: '+370 645 03378',
     /** Ours regardless of provider — this part is verifiable from the repo. */
     stack: 'Docker et Caddy, sur un VPS que nous administrons nous-mêmes',
   },

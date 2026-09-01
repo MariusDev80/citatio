@@ -25,6 +25,10 @@ import { COMPANY } from '../../config/company.config';
  */
 interface Founder {
   readonly name: string;
+  readonly fullName: string;
+  /** Statutory office, used for the Person schema. */
+  readonly office: string;
+  /** What they actually do day to day. */
   readonly role: string;
   readonly background: string;
   readonly conviction: string;
@@ -47,21 +51,27 @@ export class AboutComponent {
   protected readonly founders = signal<readonly Founder[]>([
     {
       name: 'Marius',
-      role: 'TODO(bios) — rôle',
+      fullName: 'Marius Dudouet',
+      office: 'Directeur général',
+      role: 'Conception et développement',
       background: 'TODO(bios) — parcours en 2 ou 3 phrases.',
       conviction: 'TODO(bios) — une conviction, à la première personne.',
       portrait: null,
     },
     {
       name: 'Ruben',
-      role: 'TODO(bios) — rôle',
+      fullName: 'Ruben Perrichet',
+      office: 'Directeur général',
+      role: 'Commerce et administration',
       background: 'TODO(bios) — parcours en 2 ou 3 phrases.',
       conviction: 'TODO(bios) — une conviction, à la première personne.',
       portrait: null,
     },
     {
       name: 'Titouan',
-      role: 'TODO(bios) — rôle',
+      fullName: 'Titouan Poinot',
+      office: 'Président',
+      role: 'Commerce et direction',
       background: 'TODO(bios) — parcours en 2 ou 3 phrases.',
       conviction: 'TODO(bios) — une conviction, à la première personne.',
       portrait: null,
@@ -79,8 +89,8 @@ export class AboutComponent {
     });
 
     // Names the three founders as real people attached to the organisation.
-    // `jobTitle` and `description` are intentionally absent until the bios are
-    // written — publishing invented roles for real people is not an option.
+    // `jobTitle` is the statutory office from the vault; `description` stays
+    // absent until the bios are written — no invented biography for real people.
     this.jsonLd.setSchema('about-page', {
       '@context': 'https://schema.org',
       '@type': 'AboutPage',
@@ -91,9 +101,10 @@ export class AboutComponent {
         name: COMPANY.name,
         url: COMPANY.url,
         foundingDate: String(COMPANY.foundingYear),
-        founder: COMPANY.founders.map((name) => ({
+        founder: this.founders().map((f) => ({
           '@type': 'Person',
-          name,
+          name: f.fullName,
+          jobTitle: f.office,
           worksFor: { '@type': 'Organization', name: COMPANY.name },
         })),
         areaServed: COMPANY.areaServed.map((name) => ({ '@type': 'Place', name })),
