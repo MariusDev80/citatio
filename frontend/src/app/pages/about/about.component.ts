@@ -56,7 +56,7 @@ export class AboutComponent {
       office: 'Président',
       role: 'Commerce et direction',
       background:
-        'Passé par le conseil en développement commercial, j’ai choisi de me consacrer pleinement à Citatio, l’entreprise que j’ai cofondée : concevoir des sites internet qui servent vraiment l’activité de leurs propriétaires.',
+        'Diplômé du Bachelor management des entreprises d’Audencia, j’ai appris l’innovation et l’automatisation des process chez The Links, puis le développement commercial chez Nepsio Conseil. Je consacre aujourd’hui tout cela à Citatio, l’entreprise que j’ai cofondée : des sites internet pensés pour l’activité de ceux qui les portent.',
       conviction:
         'La plupart des gens qui nous appellent n’ont pas besoin d’un site. Ils ont besoin qu’on comprenne comment ils gagnent leur vie. Le site vient après, s’il sert à quelque chose.',
       portrait: '/team/titouan.webp',
