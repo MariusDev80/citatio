@@ -13,7 +13,15 @@
       <p-accordion [multiple]="true" [value]="['0']">
         @for (item of faqItems(); track item.question; let i = $index) {
           <p-accordion-panel [value]="i.toString()">
-            <p-accordion-header>{{ item.question }}</p-accordion-header>
+            <!-- Le <h2> enveloppe l'en-tete plutot que d'etre imbrique dedans :
+                 p-accordion-header porte role="button", et un titre place a
+                 l'interieur d'un bouton n'est pas restitue comme titre par les
+                 lecteurs d'ecran. C'est aussi le motif de l'ARIA APG. Sans lui,
+                 les huit questions de la FAQ n'apparaissaient dans aucun plan de
+                 page : seul le JSON-LD FAQPage les portait. -->
+            <h2 class="ct-faq-question">
+              <p-accordion-header>{{ item.question }}</p-accordion-header>
+            </h2>
             <p-accordion-content>
               <p class="ct-prose pb-4">{{ item.answer }}</p>
             </p-accordion-content>

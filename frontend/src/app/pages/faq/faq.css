@@ -8,3 +8,13 @@
   border-radius: 1rem;
   overflow: hidden;
 }
+
+/* Le <h2> n'existe que pour donner aux questions leur place dans le plan de la
+   page. Il ne doit rien changer au rendu : l'apparence reste portee par
+   p-accordion-header, style par le preset PrimeNG. */
+:host .ct-faq-question {
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
