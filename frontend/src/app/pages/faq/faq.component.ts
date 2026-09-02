@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
-import { AccordionModule } from 'primeng/accordion';
 import { RouterLink } from '@angular/router';
 import { JsonLdService } from '../../services/json-ld.service';
 import { COMPANY } from '../../config/company.config';
@@ -43,7 +42,7 @@ const euros = (amount: number) => `${formatEuro(amount)} €`;
  */
 @Component({
   selector: 'app-faq',
-  imports: [AccordionModule, RouterLink, FlourishComponent],
+  imports: [RouterLink, FlourishComponent],
   templateUrl: './faq.html',
   styleUrl: './faq.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

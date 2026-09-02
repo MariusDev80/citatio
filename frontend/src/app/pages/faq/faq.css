@@ -1,28 +1,68 @@
-/* Le preset PrimeNG habille deja l'accordeon en lignes reglees : fond
-   transparent et un filet d'un pixel sous chaque panneau, dans la couleur de
-   --color-rule. La feuille locale se contente donc de ne pas le contrarier.
+/* Les questions sont des <details> natifs : pas d'etat a hydrater, donc rien
+   qui puisse se desynchroniser entre le rendu serveur et le navigateur, et une
+   page qui reste utilisable sans JavaScript. Les filets pleine largeur
+   reprennent la grammaire du reste du site, ou le rayon ne depasse jamais 6px
+   et ou tous les separateurs vont d'un bord a l'autre. */
+:host .ct-faq-item {
+  border-bottom: 1px solid var(--color-rule);
+}
 
-   Elle le contrariait : un border-radius de 1rem double d'un overflow:hidden
-   arrondissait ce filet et le rognait a ses deux extremites, si bien qu'il se
-   lisait comme une petite barre flottante sous chaque question au lieu du filet
-   pleine largeur employe partout ailleurs sur le site, ou le rayon ne depasse
-   jamais 6px. L'espacement entre panneaux acheve de rompre la continuite des
-   lignes. */
-:host p-accordion {
+:host .ct-faq-summary {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.25rem 0;
+  cursor: pointer;
+  color: var(--color-ink);
+  transition: color 0.15s var(--ease-out);
+  /* Retire le triangle par defaut, dans les deux familles de moteurs. */
+  list-style: none;
 }
 
-:host p-accordion-panel {
-  border-radius: 0;
+:host .ct-faq-summary::-webkit-details-marker {
+  display: none;
 }
 
-/* Le <h2> n'existe que pour donner aux questions leur place dans le plan de la
-   page. Il ne doit rien changer au rendu : l'apparence reste portee par
-   p-accordion-header, style par le preset PrimeNG. */
+:host .ct-faq-summary:hover {
+  color: var(--color-accent);
+}
+
+:host .ct-faq-summary:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Le <h3> existe pour donner aux questions leur place dans le plan de la page.
+   La specification HTML prevoit explicitement un titre comme premier enfant de
+   <summary> ; il ne doit rien ajouter au rendu. */
 :host .ct-faq-question {
   margin: 0;
-  font: inherit;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
   color: inherit;
-  letter-spacing: inherit;
+}
+
+:host .ct-faq-chevron {
+  flex-shrink: 0;
+  color: var(--color-ink-faint);
+  transition: transform 0.2s var(--ease-out);
+}
+
+:host .ct-faq-item[open] .ct-faq-chevron {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host .ct-faq-chevron {
+    transition: none;
+  }
+}
+
+:host .ct-faq-answer {
+  padding-bottom: 1.5rem;
 }

@@ -5,10 +5,13 @@ import Aura from '@primeuix/themes/aura';
  * Citatio PrimeNG preset, Aura base, remapped onto the editorial palette
  * (paper / ink / ultramarine) defined in `styles.css`.
  *
- * PrimeNG only dresses two surfaces on this site: the FAQ accordion and the
- * contact form fields. Everything else is plain Tailwind on our own tokens, so
- * this file exists purely to stop those two from rendering in Aura's stock
- * blue-and-slate.
+ * PrimeNG now dresses a single surface on this site: the contact form fields.
+ * Everything else is plain Tailwind on our own tokens, so this file exists
+ * purely to stop those from rendering in Aura's stock blue-and-slate.
+ *
+ * The per-component block that used to strip the FAQ accordion went with the
+ * accordion itself: it did not survive prerendering and was replaced by native
+ * <details>. Semantic tokens are enough for the form fields.
  *
  * Values are literals rather than `var(--color-*)` because PrimeNG derives
  * hover/active shades from them at theme-build time and cannot resolve a
@@ -80,61 +83,6 @@ const CitatioPreset = definePreset(Aura, {
           focusColor: '#ffffff',
         },
         surface: NEUTRAL,
-      },
-    },
-  },
-
-  components: {
-    /**
-     * The FAQ accordion is the one place PrimeNG paints a large surface.
-     * Left alone it renders a pure-white card with `surface.500` labels at
-     * 4.09:1, below AA, inside our warm paper page. These tokens strip the
-     * card entirely so the accordion reads as ruled editorial rows, and pin
-     * the label to `ink` in both schemes.
-     */
-    accordion: {
-      panel: {
-        borderWidth: '0 0 1px 0',
-      },
-      header: {
-        padding: '1.25rem 0',
-        borderWidth: '0',
-        borderRadius: '0',
-        fontWeight: '500',
-      },
-      content: {
-        padding: '0 0 1.25rem 0',
-        borderWidth: '0',
-      },
-      colorScheme: {
-        light: {
-          panel: { borderColor: 'rgba(18, 19, 26, 0.14)' },
-          header: {
-            background: 'transparent',
-            hoverBackground: 'transparent',
-            activeBackground: 'transparent',
-            activeHoverBackground: 'transparent',
-            color: '#12131a',
-            hoverColor: '#26359c',
-            activeColor: '#12131a',
-            activeHoverColor: '#26359c',
-          },
-          content: { background: 'transparent', color: '#4a4c57' },
-        },
-        dark: {
-          panel: { borderColor: 'rgba(232, 233, 240, 0.16)' },
-          header: {
-            background: 'transparent',
-            hoverBackground: 'transparent',
-            activeBackground: 'transparent',
-            activeHoverBackground: 'transparent',
-            color: '#e8e9f0',
-            hoverColor: '#8894f5',
-            activeColor: '#e8e9f0',
-            activeHoverColor: '#8894f5',
-          },
-          content: { background: 'transparent', color: '#a9abb8' },
-        },
       },
     },
   },

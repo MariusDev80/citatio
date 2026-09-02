@@ -8,8 +8,13 @@ import { chromium } from '@playwright/test';
  * claim. It walks every visible text node on every route, resolves the real
  * painted background, and asserts the WCAG AA ratio for the node's size.
  *
- *   npm run build && npx serve dist/citatio-front/browser -p 4173 --single
+ *   npm run build
+ *   node tools/serve-dist.mjs dist/citatio-front/browser 4173
  *   npm run check:contrast
+ *
+ * Servir avec `serve --single` fausserait la mesure : il renvoie la page
+ * d'accueil pour toutes les routes, donc le balayage mesurerait dix fois la
+ * même page. tools/serve-dist.mjs applique les règles de nginx.
  */
 const BASE = process.env.BASE_URL ?? 'http://localhost:4173';
 
@@ -32,11 +37,17 @@ const routes = ['/', '/ce-site', '/qui-sommes-nous', '/offres-et-tarifs',
   '/creation-site-vitrine', '/referencement-seo', '/visibilite-ia-geo', '/faq', '/contact', '/legal'];
 let worst = { r: 99, sel: '', route: '' };
 let failures = 0;
+let inspected = 0;
+const skipped = [];
 
 for (const route of routes) {
-  await page.goto(BASE + route, { waitUntil: 'networkidle' });
+  const response = await page.goto(BASE + route, { waitUntil: 'networkidle' });
+  if (response?.status() !== 200) {
+    skipped.push(`${route} a répondu ${response?.status() ?? 'rien'}`);
+    continue;
+  }
   const isDark = await page.evaluate(() => document.documentElement.classList.contains('dark'));
-  if (!isDark) { console.log(`  ${route}: PAS EN MODE SOMBRE`); continue; }
+  if (!isDark) { skipped.push(`${route} n'est pas en mode sombre`); continue; }
 
   const results = await page.evaluate(() => {
     const out = [];
@@ -71,8 +82,24 @@ for (const route of routes) {
     if (got < need) { failures++; console.log(`  ECHEC ${route} ${r.sel} ${got.toFixed(2)}:1 (min ${need})`); }
     if (got < worst.r) worst = { r: got, sel: r.sel, route };
   }
+  inspected += results.length;
 }
-console.log(`\nPire ratio observé : ${worst.r.toFixed(2)}:1, ${worst.sel} sur ${worst.route}`);
-console.log(failures === 0 ? 'MODE SOMBRE : aucun échec de contraste AA.' : `MODE SOMBRE : ${failures} échecs.`);
 await browser.close();
-process.exit(failures === 0 ? 0 : 1);
+
+// Une campagne qui n'a rien pu inspecter doit échouer, pas se déclarer verte.
+// Ce script adosse la mention « contraste AA en thème clair comme en thème
+// sombre » de /ce-site : tant qu'il sortait 0 quand toutes les pages
+// répondaient 404, il donnait un feu vert sans avoir rien mesuré.
+if (skipped.length > 0) {
+  console.log(`\nROUTES NON MESURÉES :\n  ${skipped.join('\n  ')}`);
+}
+if (inspected === 0) {
+  console.log('\nÉCHEC : aucun nœud de texte inspecté. Le serveur est-il lancé ?');
+  console.log('  node tools/serve-dist.mjs dist/citatio-front/browser 4173');
+  process.exit(1);
+}
+
+console.log(`\n${inspected} nœuds de texte inspectés sur ${routes.length - skipped.length} routes.`);
+console.log(`Pire ratio observé : ${worst.r.toFixed(2)}:1, ${worst.sel} sur ${worst.route}`);
+console.log(failures === 0 ? 'MODE SOMBRE : aucun échec de contraste AA.' : `MODE SOMBRE : ${failures} échecs.`);
+process.exit(failures === 0 && skipped.length === 0 ? 0 : 1);

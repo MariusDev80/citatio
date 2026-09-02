@@ -7,14 +7,16 @@ export default defineConfig({
   reporter: [['html', { outputFolder: 'playwright-report', open: 'never' }]],
 
   use: {
-    // L'app est servie depuis le dist pré-rendu via http-server dans le CI
+    // L'app est servie depuis le dist pré-rendu, avec les règles de nginx.
     baseURL: 'http://localhost:4173',
     trace: 'on-first-retry',
   },
 
-  // serve --single : fallback vers index.html pour les routes inconnues (SPA mode)
+  // `serve --single` renvoyait index.html pour TOUTES les routes : les tests
+  // ne voyaient jamais les pages prérendues, seulement le SPA après hydratation.
+  // tools/serve-dist.mjs applique les mêmes règles que frontend/nginx.conf.
   webServer: {
-    command: 'npx serve dist/citatio-front/browser -p 4173 --single --no-clipboard',
+    command: 'node tools/serve-dist.mjs dist/citatio-front/browser 4173',
     url: 'http://localhost:4173',
     reuseExistingServer: !process.env['CI'],
     timeout: 30000,
