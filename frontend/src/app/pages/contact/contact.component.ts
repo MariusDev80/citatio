@@ -95,7 +95,12 @@ export class ContactComponent {
       description: COMPANY.description,
       priceRange: COMPANY.priceRange,
       areaServed: COMPANY.areaServed.map((name) => ({ '@type': 'Place', name })),
-      founder: COMPANY.founders.map((name) => ({ '@type': 'Person', name })),
+      founder: COMPANY.founders.map((f) => ({
+        '@type': 'Person',
+        name: f.fullName,
+        jobTitle: f.office,
+        sameAs: [...f.sameAs],
+      })),
       // Relie explicitement le site a la fiche Google Business Profile :
       // meme point sur la carte, memes horaires, meme identite.
       sameAs: [...COMPANY.sameAs],

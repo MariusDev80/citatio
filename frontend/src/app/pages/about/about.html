@@ -71,6 +71,23 @@
             <blockquote class="ct-column mt-6 border-l-2 border-accent pl-5">
               <p class="font-display text-xl leading-snug text-ink">{{ founder.conviction }}</p>
             </blockquote>
+
+            <!-- Les memes URL que le `sameAs` du schema Person. Un lien visible
+                 corrobore ce que le JSON-LD se contente d'affirmer, et il sert
+                 au lecteur autant qu'au moteur. -->
+            <ul class="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+              @for (profile of founder.sameAs; track profile) {
+                <li>
+                  <a
+                    [href]="profile"
+                    target="_blank"
+                    rel="me noopener"
+                    class="ct-link text-sm">
+                    {{ profileLabel(profile) }} de {{ founder.name }}
+                  </a>
+                </li>
+              }
+            </ul>
           </div>
         </div>
       }

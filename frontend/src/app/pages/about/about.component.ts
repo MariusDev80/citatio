@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { JsonLdService } from '../../services/json-ld.service';
@@ -23,11 +23,13 @@ import { COMPANY } from '../../config/company.config';
  *                line that makes the page unrepeatable, avoid consensus
  *                statements like "je crois en la qualité".
  */
-interface Founder {
+/**
+ * The editorial half of a founder. Legal name, statutory office and `sameAs`
+ * profiles live in COMPANY.founders and are merged in by `name` below, so the
+ * page and the Organization schema cannot disagree about who these people are.
+ */
+interface FounderProfile {
   readonly name: string;
-  readonly fullName: string;
-  /** Statutory office, used for the Person schema. */
-  readonly office: string;
   /** What they actually do day to day. */
   readonly role: string;
   readonly background: string;
@@ -49,11 +51,9 @@ export class AboutComponent {
   protected readonly company = COMPANY;
 
   /** Ordre d'affichage : le président d'abord, puis les directeurs généraux. */
-  protected readonly founders = signal<readonly Founder[]>([
+  private readonly profiles = signal<readonly FounderProfile[]>([
     {
       name: 'Titouan',
-      fullName: 'Titouan Poinot',
-      office: 'Président',
       role: 'Commerce et direction',
       background:
         'Diplômé du Bachelor management des entreprises d’Audencia, j’ai appris l’innovation et l’automatisation des process chez The Links, puis le développement commercial chez Nepsio Conseil. Je consacre aujourd’hui tout cela à Citatio, l’entreprise que j’ai cofondée : des sites internet pensés pour l’activité de ceux qui les portent.',
@@ -63,8 +63,6 @@ export class AboutComponent {
     },
     {
       name: 'Marius',
-      fullName: 'Marius Dudouet',
-      office: 'Directeur général',
       role: 'Conception et développement',
       background:
         'BTS SIO, puis licence MIAGE en alternance à La Poste, comme développeur full stack. Assez longtemps dans une grande structure pour savoir ce que coûte un logiciel mal fait, et pour préférer l’artisanat au volume.',
@@ -74,8 +72,6 @@ export class AboutComponent {
     },
     {
       name: 'Ruben',
-      fullName: 'Ruben Perrichet',
-      office: 'Directeur général',
       role: 'Commerce et administration',
       background:
         'Bac pro en climatisation et chambres froides, un an comme agent de sûreté à la douane de l’aéroport de Nantes, puis neuf mois en plomberie, à poser des salles de bains. Je connais de l’intérieur les métiers pour lesquels nous travaillons, j’en viens.',
@@ -84,6 +80,41 @@ export class AboutComponent {
       portrait: '/team/ruben.webp',
     },
   ]);
+
+  /**
+   * Editorial profile joined with the identity record from COMPANY.founders.
+   * The join is on `name` and throws if an entry is missing, so removing a
+   * founder from one file and not the other fails loudly at first render
+   * rather than silently dropping a person from the page.
+   */
+  /**
+   * Nomme la plateforme d'un profil a partir de son hote. Deliberement une
+   * liste explicite : un domaine inconnu doit se voir, pas s'afficher sous une
+   * etiquette generique qui masquerait une URL collee par erreur.
+   */
+  protected profileLabel(url: string): string {
+    const host = new URL(url).hostname.replace(/^www\./, '');
+    switch (host) {
+      case 'linkedin.com':
+        return 'LinkedIn';
+      case 'github.com':
+        return 'GitHub';
+      default:
+        return host;
+    }
+  }
+
+  protected readonly founders = computed(() =>
+    this.profiles().map((profile) => {
+      const identity = COMPANY.founders.find((f) => f.name === profile.name);
+      if (!identity) {
+        throw new Error(
+          `Fondateur « ${profile.name} » absent de COMPANY.founders : les deux listes ont divergé.`,
+        );
+      }
+      return { ...profile, ...identity };
+    }),
+  );
 
   constructor() {
     this.jsonLd.setSchema('breadcrumb-about', {
@@ -113,6 +144,9 @@ export class AboutComponent {
           name: f.fullName,
           jobTitle: f.office,
           worksFor: { '@type': 'Organization', name: COMPANY.name },
+          // Corroboration de l'identite hors du site. C'est ce qui distingue
+          // une personne reelle d'un nom pose sur une page.
+          sameAs: [...f.sameAs],
         })),
         areaServed: COMPANY.areaServed.map((name) => ({ '@type': 'Place', name })),
       },

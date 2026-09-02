@@ -40,6 +40,26 @@
           <li class="text-ink-soft">
             {{ company.address.postalCode }} {{ company.address.city }}
           </li>
+          <!-- Les memes profils que le `sameAs` de l'Organization : le lien
+               visible corrobore l'affirmation du JSON-LD. -->
+          <li>
+            <a
+              [href]="company.googleBusinessProfile"
+              target="_blank"
+              rel="noopener"
+              class="ct-navlink">
+              Fiche Google
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://www.linkedin.com/company/citatio-geo/"
+              target="_blank"
+              rel="me noopener"
+              class="ct-navlink">
+              LinkedIn
+            </a>
+          </li>
         </ul>
       </div>
 

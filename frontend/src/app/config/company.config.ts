@@ -66,8 +66,40 @@ export const COMPANY = {
   /**
    * The three founders, president first, same order as the About page, so the
    * Organization schema and the page never disagree on who leads.
+   *
+   * This block is the identity record: legal name, statutory office, and the
+   * profiles that corroborate the person elsewhere on the web. The About page
+   * owns the editorial half (role, background, conviction, portrait) and merges
+   * the two by `name`, so neither file can drift from the other.
+   *
+   * `sameAs` is what lets an engine tie the person on this page to the same
+   * person on LinkedIn or GitHub. Only add a URL that the person actually
+   * controls and that names them: a wrong link here is a false claim about a
+   * real person, and it also poisons the entity for everyone else.
    */
-  founders: ['Titouan', 'Marius', 'Ruben'] as const,
+  founders: [
+    {
+      name: 'Titouan',
+      fullName: 'Titouan Poinot',
+      office: 'Président',
+      sameAs: ['https://www.linkedin.com/in/titouan-poinot/'],
+    },
+    {
+      name: 'Marius',
+      fullName: 'Marius Dudouet',
+      office: 'Directeur général',
+      sameAs: [
+        'https://www.linkedin.com/in/marius-dudouet/',
+        'https://github.com/MariusDev80',
+      ],
+    },
+    {
+      name: 'Ruben',
+      fullName: 'Ruben Perrichet',
+      office: 'Directeur général',
+      sameAs: ['https://www.linkedin.com/in/ruben-perrichet-682076433/'],
+    },
+  ] as const,
 
   /**
    * Service area, surfaced as `areaServed` in the structured data.
@@ -110,5 +142,14 @@ export const COMPANY = {
   /** Categorie principale de la fiche Google. */
   googleCategory: 'Concepteur de sites Web',
 
-  sameAs: ['https://maps.google.com/?cid=8352338601441444146'] as string[],
+  /**
+   * Profils officiels de l'entreprise. Chaque entree est un point de
+   * corroboration : c'est ce qui permet a un moteur, ou a un modele, de
+   * rattacher « Citatio » a une entite reelle plutot qu'a une chaine de
+   * caracteres vue sur un seul site.
+   */
+  sameAs: [
+    'https://maps.google.com/?cid=8352338601441444146',
+    'https://www.linkedin.com/company/citatio-geo/',
+  ] as string[],
 } as const;
