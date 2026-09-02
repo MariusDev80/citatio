@@ -72,7 +72,7 @@ export class ServicesComponent {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Accueil', item: COMPANY.url + '/' },
-        { '@type': 'ListItem', position: 2, name: 'Offres', item: COMPANY.url + '/services' },
+        { '@type': 'ListItem', position: 2, name: 'Offres', item: COMPANY.url + '/offres-et-tarifs' },
       ],
     });
 

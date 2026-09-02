@@ -16,7 +16,7 @@ const testRoutes = [
     data: { seo: { title: 'Accueil : Test', description: 'Description accueil test' } },
   },
   {
-    path: 'about',
+    path: 'qui-sommes-nous',
     component: StubComponent,
     data: { seo: { title: 'À propos, Test', description: 'Description à propos test' } },
   },
@@ -48,15 +48,15 @@ describe('SeoService', () => {
 
   it('met à jour le lien canonical après navigation', async () => {
     const harness = await RouterTestingHarness.create('/');
-    await harness.navigateByUrl('/about');
+    await harness.navigateByUrl('/qui-sommes-nous');
     const canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
     expect(canonical).not.toBeNull();
-    expect(canonical.getAttribute('href')).toContain('about');
+    expect(canonical.getAttribute('href')).toContain('qui-sommes-nous');
   });
 
   it('met à jour les meta OG:title et OG:description', async () => {
     const harness = await RouterTestingHarness.create('/');
-    await harness.navigateByUrl('/about');
+    await harness.navigateByUrl('/qui-sommes-nous');
     expect(document.querySelector('meta[property="og:title"]')?.getAttribute('content'))
       .toBe('À propos, Test');
     expect(document.querySelector('meta[property="og:description"]')?.getAttribute('content'))

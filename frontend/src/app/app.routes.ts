@@ -25,7 +25,7 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/proof/proof.component').then(m => m.ProofComponent),
   },
   {
-    path: 'about',
+    path: 'qui-sommes-nous',
     data: {
       seo: {
         title: 'Qui sommes-nous : Marius, Ruben et Titouan | Citatio',
@@ -36,7 +36,7 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/about/about.component').then(m => m.AboutComponent),
   },
   {
-    path: 'services',
+    path: 'offres-et-tarifs',
     data: {
       seo: {
         title: 'Offres et tarifs des sites vitrines | Citatio',

@@ -56,7 +56,7 @@ test.describe('Page FAQ : JSON-LD', () => {
 
 test.describe('Page Offres : tarifs et données structurées', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/services');
+    await page.goto('/offres-et-tarifs');
   });
 
   test('des prix sont affichés, pas « sur devis » partout', async ({ page }) => {
@@ -114,7 +114,7 @@ test.describe('Navigation', () => {
   test('navigation vers la page offres', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('link', { name: /^offres$/i }).first().click();
-    await expect(page).toHaveURL('/services');
+    await expect(page).toHaveURL('/offres-et-tarifs');
   });
 
   test('navigation vers la page preuve', async ({ page }) => {
@@ -131,7 +131,7 @@ test.describe('Navigation', () => {
 });
 
 test.describe('Accessibilité de base', () => {
-  const pages = ['/', '/services', '/ce-site', '/about', '/faq', '/contact', '/legal'];
+  const pages = ['/', '/offres-et-tarifs', '/ce-site', '/qui-sommes-nous', '/faq', '/contact', '/legal'];
 
   for (const path of pages) {
     test(`${path}, un h1 unique et visible`, async ({ page }) => {
@@ -191,7 +191,7 @@ test.describe('Sitemap', () => {
   // Le vrai risque n'est pas le sitemap d'aujourd'hui, c'est celui de demain :
   // une route ajoutée sans toucher au sitemap reste invisible des crawlers.
   // Ce test verrouille la correspondance dans les deux sens.
-  const prerendered = ['/', '/ce-site', '/services', '/about', '/faq', '/contact', '/legal'];
+  const prerendered = ['/', '/ce-site', '/offres-et-tarifs', '/qui-sommes-nous', '/faq', '/contact', '/legal'];
 
   test('le sitemap couvre exactement les routes prérendues', async ({ request }) => {
     const xml = await (await request.get('/sitemap.xml')).text();

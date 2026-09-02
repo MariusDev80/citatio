@@ -91,7 +91,7 @@ export class AboutComponent {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Accueil', item: COMPANY.url + '/' },
-        { '@type': 'ListItem', position: 2, name: 'Qui sommes-nous', item: COMPANY.url + '/about' },
+        { '@type': 'ListItem', position: 2, name: 'Qui sommes-nous', item: COMPANY.url + '/qui-sommes-nous' },
       ],
     });
 
@@ -102,7 +102,7 @@ export class AboutComponent {
       '@context': 'https://schema.org',
       '@type': 'AboutPage',
       name: 'Qui sommes-nous',
-      url: COMPANY.url + '/about',
+      url: COMPANY.url + '/qui-sommes-nous',
       mainEntity: {
         '@type': 'Organization',
         name: COMPANY.name,
