@@ -47,6 +47,39 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/services/services.component').then(m => m.ServicesComponent),
   },
   {
+    path: 'creation-site-vitrine',
+    data: {
+      seo: {
+        title: 'Création de site vitrine sur mesure près de Nantes | Citatio',
+        description:
+          'Nous concevons et développons votre site vitrine à la main, sans gabarit ni constructeur de pages : 3 à 5 pages, rendu serveur, accessibilité AA, hébergement inclus. À partir de 1 200 € HT, devis ferme sous cinq jours.',
+      } satisfies SeoData,
+    },
+    loadComponent: () => import('./pages/showcase/showcase.component').then(m => m.ShowcaseComponent),
+  },
+  {
+    path: 'referencement-seo',
+    data: {
+      seo: {
+        title: 'Référencement naturel SEO pour site vitrine | Citatio',
+        description:
+          'Recherche de mots-clés sur votre marché, optimisation on-page, données structurées et recommandations de contenu. Ce que le SEO change, en combien de temps, et ce que nous ne promettons pas. À partir de 1 900 € HT.',
+      } satisfies SeoData,
+    },
+    loadComponent: () => import('./pages/seo-offer/seo-offer.component').then(m => m.SeoOfferComponent),
+  },
+  {
+    path: 'visibilite-ia-geo',
+    data: {
+      seo: {
+        title: 'GEO : être cité par ChatGPT, Gemini et les AI Overviews | Citatio',
+        description:
+          'Le GEO travaille la présence de votre entreprise dans les réponses des IA : données structurées, llms.txt, accès des crawlers, contenu citable, identité cohérente. Tout est en place sur ce site, vérifiable. À partir de 2 800 € HT.',
+      } satisfies SeoData,
+    },
+    loadComponent: () => import('./pages/geo-offer/geo-offer.component').then(m => m.GeoOfferComponent),
+  },
+  {
     path: 'faq',
     data: {
       seo: {

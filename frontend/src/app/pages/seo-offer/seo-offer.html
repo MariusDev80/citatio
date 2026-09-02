@@ -1,0 +1,196 @@
+<article class="pt-36 pb-8 md:pt-44">
+  <header class="ct-section">
+    <p class="ct-eyebrow">Référencement naturel · SEO</p>
+    <h1 class="ct-display-lg mt-6 max-w-[16ch]">
+      Le référencement, sans promesse en l’air.
+    </h1>
+    <div class="ct-lede ct-column mt-8">
+      <p>
+        Le référencement naturel consiste à faire apparaître votre site dans les
+        résultats de Google quand quelqu’un cherche ce que vous faites, sans payer
+        la place. C’est lent, c’est mesurable, et personne ne peut vous en garantir
+        le résultat. Nous non plus.
+      </p>
+    </div>
+    <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+      <a routerLink="/contact" class="ct-btn">Parlons de votre visibilité</a>
+      <a routerLink="/creation-site-vitrine" class="ct-link">
+        La création du site
+        <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ═══ Ce que ca change, et en combien de temps ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="delai-title">
+    <div class="grid gap-10 border-t border-rule-strong pt-10 md:grid-cols-12">
+      <div class="md:col-span-5">
+        <h2 id="delai-title" class="ct-display-md max-w-[15ch]">
+          Ce que ça change, et quand
+        </h2>
+      </div>
+      <div class="ct-prose ct-column md:col-span-7">
+        <p>
+          Le référencement ne produit rien le mois de la mise en ligne. Un domaine
+          récent doit d’abord être exploré, indexé, puis gagner la confiance qui ne
+          s’obtient qu’avec le temps et avec ce que d’autres sites disent de vous.
+        </p>
+        <p>
+          <strong>Comptez trois à six mois</strong> avant de voir bouger des
+          requêtes locales et peu disputées, et davantage sur des termes que des
+          agences installées depuis vingt ans occupent déjà. Une entreprise qui vous
+          annonce la première place en six semaines vous vend soit du référencement
+          payant sous un autre nom, soit rien.
+        </p>
+        <p>
+          En revanche, les requêtes où figure le nom de votre commune ou de votre
+          métier sont souvent accessibles, parce que peu d’entreprises locales
+          prennent la peine d’écrire une page qui y répond vraiment.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Le socle inclus partout ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="socle-title">
+    <div class="border-t border-rule-strong pt-10">
+      <p class="ct-eyebrow">Sans option, dans toutes les formules</p>
+      <h2 id="socle-title" class="ct-display-md mt-5">Le socle technique</h2>
+      <p class="ct-prose ct-column mt-5">
+        Ces quatre points ne sont pas une option, parce qu’un site qui les rate ne
+        se rattrape pas ensuite : il faut le refaire.
+      </p>
+    </div>
+
+    <div class="mt-12">
+      @for (item of included(); track item.title) {
+        <div class="grid gap-4 border-t border-rule py-8 md:grid-cols-12 md:gap-10">
+          <h3 class="ct-title md:col-span-4">{{ item.title }}</h3>
+          <p class="ct-prose md:col-span-8">{{ item.body }}</p>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ═══ Ce que l'option ajoute ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="option-title">
+    <div class="border-t border-rule-strong pt-10">
+      <p class="ct-eyebrow">L’option {{ formula.name }}</p>
+      <h2 id="option-title" class="ct-display-md mt-5">Ce que l’option ajoute</h2>
+    </div>
+
+    <div class="mt-12">
+      @for (item of option(); track item.title) {
+        <div class="grid gap-4 border-t border-rule py-8 md:grid-cols-12 md:gap-10">
+          <h3 class="ct-title md:col-span-4">{{ item.title }}</h3>
+          <p class="ct-prose md:col-span-8">{{ item.body }}</p>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ═══ Mesure ═══ -->
+  <section class="mt-20 border-y border-rule bg-surface py-20" aria-labelledby="mesure-title">
+    <div class="ct-section grid gap-10 md:grid-cols-12">
+      <div class="md:col-span-5">
+        <h2 id="mesure-title" class="ct-display-md max-w-[14ch]">
+          Comment on le mesure
+        </h2>
+      </div>
+      <div class="ct-prose ct-column md:col-span-7">
+        <p>
+          Nous connectons votre site à la Search Console de Google, et le compte
+          reste le vôtre. Vous y voyez les mêmes chiffres que nous : sur quelles
+          requêtes vous apparaissez, à quelle position, combien de gens cliquent.
+        </p>
+        <p>
+          Ce sont des données de Google, pas un tableau de bord que nous fabriquons.
+          C’est la seule façon honnête de vous permettre de juger notre travail,
+          y compris quand il ne donne pas ce que nous espérions.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Ce qu'on ne promet pas ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="limites-title">
+    <div class="grid gap-10 border-t border-rule-strong pt-10 md:grid-cols-12">
+      <div class="md:col-span-5">
+        <h2 id="limites-title" class="ct-display-md max-w-[16ch]">
+          Ce que nous ne promettons pas
+        </h2>
+      </div>
+      <div class="ct-prose ct-column md:col-span-7">
+        <p>
+          <strong>La première place.</strong> Elle ne dépend pas que de nous : elle
+          dépend de vos concurrents, de leur ancienneté, et de décisions de Google
+          sur lesquelles personne n’a la main.
+        </p>
+        <p>
+          <strong>Une date.</strong> Nous pouvons vous dire ce que nous faisons et
+          dans quel ordre. Nous ne pouvons pas vous dire le mois où une requête
+          basculera.
+        </p>
+        <p>
+          <strong>Que le SEO suffise.</strong> Sur votre première année, le
+          bouche-à-oreille et le réseau local vous apporteront probablement plus de
+          clients que Google. Le référencement est ce que vous construisez
+          maintenant pour l’année d’après.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Prix ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="prix-title">
+    <div class="grid gap-10 border-t border-rule-strong pt-10 md:grid-cols-12">
+      <div class="md:col-span-7">
+        <h2 id="prix-title" class="ct-display-md max-w-[16ch]">
+          À partir de {{ formatEuro(formula.from) }}&nbsp;€
+        </h2>
+        <div class="ct-prose ct-column mt-6">
+          <p>
+            Hors taxes, site compris. Le référencement n’est pas vendu seul : il
+            s’applique à un site que nous avons construit, parce que nous ne
+            pouvons pas répondre du socle technique d’un site que nous n’avons pas
+            écrit.
+          </p>
+          <p>
+            Le détail des formules est sur la
+            <a routerLink="/offres-et-tarifs">page des offres</a>.
+          </p>
+        </div>
+      </div>
+      <div class="md:col-span-4 md:col-start-9">
+        <div class="border-t border-rule-strong pt-6">
+          <p class="ct-eyebrow">Aussi</p>
+          <ul class="mt-5 space-y-4 text-sm">
+            <li>
+              <a routerLink="/visibilite-ia-geo" class="ct-link">
+                La visibilité dans les IA
+                <span aria-hidden="true">→</span>
+              </a>
+            </li>
+            <li>
+              <a routerLink="/ce-site" class="ct-link">
+                Le référencement de ce site, vérifiable
+                <span aria-hidden="true">→</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ct-section py-20">
+    <div class="border-t border-rule-strong pt-12">
+      <h2 class="ct-display-lg max-w-[18ch]">Sur quoi voulez-vous être trouvé ?</h2>
+      <p class="ct-lede ct-column mt-6">
+        Dites-nous votre métier et votre secteur. Nous regardons ce qui est
+        atteignable, et nous vous le disons franchement.
+      </p>
+      <a routerLink="/contact" class="ct-btn mt-10">Prendre contact</a>
+    </div>
+  </section>
+</article>

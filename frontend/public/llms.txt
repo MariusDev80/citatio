@@ -37,6 +37,9 @@ garantit pas la première place sur Google.
 
 - [Accueil](https://citatio-geo.com/) : positionnement, métier, déroulé d'un projet en quatre étapes.
 - [Offres et tarifs](https://citatio-geo.com/offres-et-tarifs) : les trois formules, l'abonnement, les options, et ce qui fait varier un devis.
+- [Création de site vitrine](https://citatio-geo.com/creation-site-vitrine) : ce qu'est un site vitrine, ce qui est livré, ce que Citatio refuse de faire, et le prix plancher.
+- [Référencement naturel](https://citatio-geo.com/referencement-seo) : le socle technique inclus partout, ce que l'option ajoute, les délais réalistes et ce qui n'est pas promis.
+- [Visibilité dans les IA](https://citatio-geo.com/visibilite-ia-geo) : definition du GEO, difference avec le SEO, ce qui est mis en place et ce qui echappe au controle.
 - [Ce site](https://citatio-geo.com/ce-site) : le site sert de portfolio : scores Lighthouse mesurés et datés, décisions techniques, et ce que cette preuve ne démontre pas.
 - [Qui sommes-nous](https://citatio-geo.com/qui-sommes-nous) : les trois fondateurs, la manière de travailler, ce que l'agence refuse de faire.
 - [Questions fréquentes](https://citatio-geo.com/faq) : coût, délais, SEO et GEO, hébergement, contenu, mobile.

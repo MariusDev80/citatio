@@ -7,6 +7,9 @@ interface Craft {
   readonly numeral: string;
   readonly title: string;
   readonly body: string;
+  /** Detail page for this trade, when one exists. */
+  readonly path?: string;
+  readonly linkLabel?: string;
 }
 
 interface Step {
@@ -31,6 +34,8 @@ export class HomeComponent {
     {
       numeral: '01',
       title: 'Conception et développement',
+      path: '/creation-site-vitrine',
+      linkLabel: 'La création de site vitrine',
       body:
         'Nous partons de votre métier et de vos clients, pas d’un gabarit à remplir. '
         + 'Maquette, contenu, intégration : le site est écrit à la main, page par page.',
@@ -38,6 +43,8 @@ export class HomeComponent {
     {
       numeral: '02',
       title: 'Référencement, en option',
+      path: '/referencement-seo',
+      linkLabel: 'Le référencement naturel',
       body:
         'Toute création inclut une base SEO technique. Au-delà, le référencement Google '
         + 'et la visibilité dans les réponses des IA sont deux options distinctes, '

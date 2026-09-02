@@ -17,8 +17,8 @@
 
   <div class="ct-hero-stagger mt-10 flex flex-col gap-4 sm:flex-row sm:items-center" style="animation-delay: 240ms">
     <a routerLink="/contact" class="ct-btn">Parlons de votre projet</a>
-    <a routerLink="/offres-et-tarifs" class="ct-link">
-      Voir les offres et les tarifs
+    <a routerLink="/creation-site-vitrine" class="ct-link">
+      Comment nous créons un site vitrine
       <span aria-hidden="true">→</span>
     </a>
   </div>
@@ -35,7 +35,15 @@
       <article class="grid gap-4 border-t border-rule py-10 md:grid-cols-12 md:gap-10">
         <p class="ct-numeral md:col-span-1">{{ item.numeral }}</p>
         <h3 class="ct-title md:col-span-4">{{ item.title }}</h3>
-        <p class="ct-prose md:col-span-7">{{ item.body }}</p>
+        <div class="md:col-span-7">
+          <p class="ct-prose">{{ item.body }}</p>
+          @if (item.path) {
+            <a [routerLink]="item.path" class="ct-link mt-4 inline-block text-sm">
+              {{ item.linkLabel }}
+              <span aria-hidden="true">→</span>
+            </a>
+          }
+        </div>
       </article>
     }
   </div>

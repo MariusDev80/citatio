@@ -36,7 +36,12 @@
             }
           </ul>
 
-          <a routerLink="/contact" class="ct-btn ct-btn--ghost mt-10 self-start">
+          <a [routerLink]="formula.detailPath" class="ct-link mt-8 self-start text-sm">
+            {{ formula.detailLabel }}
+            <span aria-hidden="true">→</span>
+          </a>
+
+          <a routerLink="/contact" class="ct-btn ct-btn--ghost mt-6 self-start">
             Demander un devis
           </a>
         </div>

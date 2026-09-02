@@ -18,6 +18,13 @@ export interface Formula {
   /** Floor price in euros, excl. VAT. Displayed as « à partir de ». */
   readonly from: number;
   readonly features: readonly string[];
+  /**
+   * Route of the page that details this formula. /offres-et-tarifs is the hub
+   * and cannot rank for three intents at once; each spoke carries one.
+   */
+  readonly detailPath: string;
+  /** Link wording, phrased for the destination rather than « en savoir plus ». */
+  readonly detailLabel: string;
 }
 
 export interface Option {
@@ -30,6 +37,8 @@ export interface Option {
 export const FORMULAS: readonly Formula[] = [
   {
     id: 'essentiel',
+    detailPath: '/creation-site-vitrine',
+    detailLabel: 'Comment nous créons un site vitrine',
     name: 'Vitrine Essentiel',
     tagline: 'Une présence web simple et crédible.',
     from: 1200,
@@ -43,6 +52,8 @@ export const FORMULAS: readonly Formula[] = [
   },
   {
     id: 'seo',
+    detailPath: '/referencement-seo',
+    detailLabel: 'Ce que le référencement change',
     name: 'Vitrine + SEO',
     tagline: 'Pour être trouvé sur Google.',
     from: 1900,
@@ -56,6 +67,8 @@ export const FORMULAS: readonly Formula[] = [
   },
   {
     id: 'geo',
+    detailPath: '/visibilite-ia-geo',
+    detailLabel: 'Comment on travaille la visibilité IA',
     name: 'Vitrine + GEO/SEO',
     tagline: 'Pour être trouvé sur Google et dans les IA.',
     from: 2800,

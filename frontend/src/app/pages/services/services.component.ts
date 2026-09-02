@@ -8,6 +8,7 @@ import {
   PRICE_FACTORS,
   SUBSCRIPTION,
 } from '../../config/pricing.config';
+import { formatEuro } from '../../shared/format-euro';
 
 @Component({
   selector: 'app-services',
@@ -25,15 +26,7 @@ export class ServicesComponent {
   protected readonly subscription = SUBSCRIPTION;
   protected readonly priceFactors = PRICE_FACTORS;
 
-  /**
-   * French typography puts a narrow no-break space before the thousands group
-   * and before the currency symbol. `toLocaleString` would depend on the ICU
-   * data present at runtime and could differ between the server render and the
-   * browser, so the separator is inserted explicitly.
-   */
-  protected formatEuro(amount: number): string {
-    return String(amount).replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f');
-  }
+  protected readonly formatEuro = formatEuro;
 
   constructor() {
     const provider = { '@type': 'Organization', name: COMPANY.name };

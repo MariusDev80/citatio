@@ -131,7 +131,8 @@ test.describe('Navigation', () => {
 });
 
 test.describe('Accessibilité de base', () => {
-  const pages = ['/', '/offres-et-tarifs', '/ce-site', '/qui-sommes-nous', '/faq', '/contact', '/legal'];
+  const pages = ['/', '/offres-et-tarifs', '/creation-site-vitrine', '/referencement-seo',
+  '/visibilite-ia-geo', '/ce-site', '/qui-sommes-nous', '/faq', '/contact', '/legal'];
 
   for (const path of pages) {
     test(`${path}, un h1 unique et visible`, async ({ page }) => {
@@ -191,7 +192,8 @@ test.describe('Sitemap', () => {
   // Le vrai risque n'est pas le sitemap d'aujourd'hui, c'est celui de demain :
   // une route ajoutée sans toucher au sitemap reste invisible des crawlers.
   // Ce test verrouille la correspondance dans les deux sens.
-  const prerendered = ['/', '/ce-site', '/offres-et-tarifs', '/qui-sommes-nous', '/faq', '/contact', '/legal'];
+  const prerendered = ['/', '/ce-site', '/offres-et-tarifs', '/creation-site-vitrine',
+    '/referencement-seo', '/visibilite-ia-geo', '/qui-sommes-nous', '/faq', '/contact', '/legal'];
 
   test('le sitemap couvre exactement les routes prérendues', async ({ request }) => {
     const xml = await (await request.get('/sitemap.xml')).text();
