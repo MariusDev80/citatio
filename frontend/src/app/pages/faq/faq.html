@@ -3,33 +3,59 @@
     <p class="ct-eyebrow">Questions fréquentes</p>
     <h1 class="ct-display-lg mt-6 max-w-[16ch]">Ce qu’on nous demande le plus souvent.</h1>
     <p class="ct-lede ct-column mt-8">
-      Si votre question n’y est pas, écrivez-nous : nous répondons à tout le monde,
-      même quand cela ne débouche pas sur un devis.
+      Les prix, les délais, ce que nous refusons de faire. Si votre question n’y est
+      pas, écrivez-nous : nous répondons à tout le monde, même quand cela ne débouche
+      pas sur un devis.
     </p>
   </header>
 
-  <section class="ct-section mt-16">
-    <div class="ct-column border-t border-rule-strong">
-      <p-accordion [multiple]="true" [value]="['0']">
-        @for (item of faqItems(); track item.question; let i = $index) {
-          <p-accordion-panel [value]="i.toString()">
-            <!-- Le <h2> enveloppe l'en-tete plutot que d'etre imbrique dedans :
-                 p-accordion-header porte role="button", et un titre place a
-                 l'interieur d'un bouton n'est pas restitue comme titre par les
-                 lecteurs d'ecran. C'est aussi le motif de l'ARIA APG. Sans lui,
-                 les huit questions de la FAQ n'apparaissaient dans aucun plan de
-                 page : seul le JSON-LD FAQPage les portait. -->
-            <h2 class="ct-faq-question">
-              <p-accordion-header>{{ item.question }}</p-accordion-header>
-            </h2>
-            <p-accordion-content>
-              <p class="ct-prose pb-4">{{ item.answer }}</p>
-            </p-accordion-content>
-          </p-accordion-panel>
-        }
-      </p-accordion>
-    </div>
-  </section>
+  @for (group of groups(); track group.title; let first = $first) {
+    <section class="ct-section" [class.mt-20]="first" [class.mt-16]="!first">
+      <!-- Le titre de rubrique est un h2, les questions des h3 : avec dix-huit
+           entrees, un plan a un seul niveau ne dit plus rien de la structure,
+           ni au lecteur ni aux moteurs. -->
+      <h2 class="ct-display-md border-t border-rule-strong pt-10">{{ group.title }}</h2>
+
+      <div class="ct-column mt-10 border-t border-rule-strong">
+        <!-- Aucun panneau ouvert au chargement. PrimeNG confie le depliage a son
+             composant <p-motion>, qui n'anime qu'au changement d'etat : un
+             panneau declare actif des le rendu reste a grid-template-rows: 0px,
+             et affichait donc un chevron « ouvert » au-dessus de rien. Les
+             reponses restent dans le HTML prerendu, repliees ou non, donc les
+             moteurs et les IA les lisent quoi qu'il arrive. -->
+        <p-accordion [multiple]="true">
+          @for (item of group.items; track item.question; let i = $index) {
+            <p-accordion-panel [value]="i.toString()">
+              <!-- Le <h3> enveloppe l'en-tete plutot que d'etre imbrique dedans :
+                   p-accordion-header porte role="button", et un titre place a
+                   l'interieur d'un bouton n'est pas restitue comme titre par les
+                   lecteurs d'ecran. C'est aussi le motif de l'ARIA APG. -->
+              <h3 class="ct-faq-question">
+                <p-accordion-header>{{ item.question }}</p-accordion-header>
+              </h3>
+              <p-accordion-content>
+                <p class="ct-prose">{{ item.answer }}</p>
+                @if (item.links) {
+                  <ul class="mt-5 flex flex-wrap gap-x-8 gap-y-2 pb-4">
+                    @for (link of item.links; track link.path) {
+                      <li>
+                        <a [routerLink]="link.path" class="ct-link text-sm">
+                          {{ link.label }}
+                          <span aria-hidden="true">→</span>
+                        </a>
+                      </li>
+                    }
+                  </ul>
+                } @else {
+                  <div class="pb-4"></div>
+                }
+              </p-accordion-content>
+            </p-accordion-panel>
+          }
+        </p-accordion>
+      </div>
+    </section>
+  }
 
   <section class="ct-section py-20">
     <div class="border-t border-rule-strong pt-12">
