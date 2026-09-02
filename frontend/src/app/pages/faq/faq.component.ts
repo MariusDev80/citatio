@@ -22,7 +22,7 @@ export class FaqComponent {
   protected readonly faqItems = signal<FaqItem[]>([
     {
       question: 'Que fait Citatio exactement ?',
-      answer: 'Citatio est un studio web qui conçoit des sites vitrines sur mesure pour les TPE, PME, artisans et indépendants. Nous proposons en option le référencement Google (SEO) et la visibilité sur l\'IA (GEO), ainsi que l\'hébergement, le nom de domaine et la maintenance de votre site.',
+      answer: 'Citatio est une agence web qui conçoit des sites vitrines sur mesure pour les TPE, PME, artisans et indépendants. Nous proposons en option le référencement Google (SEO) et la visibilité sur l\'IA (GEO), ainsi que l\'hébergement, le nom de domaine et la maintenance de votre site.',
     },
     {
       question: 'Combien coûte un site vitrine ?',

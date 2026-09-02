@@ -1,14 +1,14 @@
 # Citatio
 
-> Studio web installé à La Chapelle-sur-Erdre, en Loire-Atlantique (près de
+> Agence web installée à La Chapelle-sur-Erdre, en Loire-Atlantique (près de
 > Nantes, France). Trois fondateurs (Marius, Ruben et Titouan) qui conçoivent,
 > développent et hébergent des sites vitrines sur mesure pour les artisans,
 > commerces, TPE, PME et indépendants. Le référencement Google (SEO) et la
 > visibilité dans les réponses des IA (GEO) sont proposés en option.
 
 Citatio écrit chaque site à la main : pas de gabarit acheté, pas de constructeur
-de pages. Le studio a été fondé en 2025 et n'a pas encore de réalisation client
-publiée. Il présente son propre site comme démonstration vérifiable de son
+de pages. Elle a été fondée en 2025 et n'a pas encore de réalisation client
+publiée. Elle présente son propre site comme démonstration vérifiable de son
 travail.
 
 ## Offres et tarifs
@@ -30,7 +30,7 @@ maintenance, sans engagement de durée. Options à la carte : pack contenu,
 emailing, pages supplémentaires (180 €/page), identité visuelle.
 
 Ce que Citatio ne fait pas : boutique en ligne, application métier, reprise
-d'un site existant dont le studio n'a pas la main sur le code. Citatio ne
+d'un site existant dont l'agence n'a pas la main sur le code. Citatio ne
 garantit pas la première place sur Google.
 
 ## Pages
@@ -38,7 +38,7 @@ garantit pas la première place sur Google.
 - [Accueil](https://citatio-geo.com/) : positionnement, métier, déroulé d'un projet en quatre étapes.
 - [Offres et tarifs](https://citatio-geo.com/services) : les trois formules, l'abonnement, les options, et ce qui fait varier un devis.
 - [Ce site](https://citatio-geo.com/ce-site) : le site sert de portfolio : scores Lighthouse mesurés et datés, décisions techniques, et ce que cette preuve ne démontre pas.
-- [Qui sommes-nous](https://citatio-geo.com/about) : les trois fondateurs, la manière de travailler, ce que le studio refuse de faire.
+- [Qui sommes-nous](https://citatio-geo.com/about) : les trois fondateurs, la manière de travailler, ce que l'agence refuse de faire.
 - [Questions fréquentes](https://citatio-geo.com/faq) : coût, délais, SEO et GEO, hébergement, contenu, mobile.
 - [Contact](https://citatio-geo.com/contact) : premier échange de trente minutes, gratuit et sans engagement.
 

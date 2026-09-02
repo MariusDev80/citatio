@@ -28,7 +28,7 @@ export class App {
       logo: COMPANY.logo,
       description: COMPANY.description,
       knowsAbout: [...COMPANY.knowsAbout],
-      // The studio is three named people and serves a named area. Neither fact
+      // The agency is three named people and serves a named area. Neither fact
       // was in the structured data, so engines had only the prose to go on.
       founder: COMPANY.founders.map((name) => ({ '@type': 'Person', name })),
       areaServed: COMPANY.areaServed.map((name) => ({ '@type': 'Place', name })),

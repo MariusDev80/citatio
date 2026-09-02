@@ -7,9 +7,9 @@ export const COMPANY = {
   locale: 'fr_FR',
   lang: 'French',
   description:
-    'Citatio est un studio web qui crée des sites vitrines sur mesure pour les TPE, PME et indépendants, avec le référencement Google (SEO) et la visibilité sur l\'IA (GEO) en option, plus l\'hébergement, le nom de domaine et la maintenance.',
+    'Citatio est une agence web qui crée des sites vitrines sur mesure pour les TPE, PME et indépendants, avec le référencement Google (SEO) et la visibilité sur l\'IA (GEO) en option, plus l\'hébergement, le nom de domaine et la maintenance.',
   shortDescription:
-    'Studio web : sites vitrines sur mesure, avec SEO et visibilité IA (GEO) en option.',
+    'Agence web : sites vitrines sur mesure, avec SEO et visibilité IA (GEO) en option.',
   email: 'contact@citatio-geo.com',
   phone: '+33-7-67-47-83-72',
   phoneRaw: '+33767478372',
@@ -82,7 +82,7 @@ export const COMPANY = {
   ] as const,
   knowsAbout: [
     'Création de site vitrine',
-    'Studio web',
+    'Agence web',
     'Web design',
     'Développement web sur mesure',
     'Accessibilité web',

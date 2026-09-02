@@ -6,9 +6,9 @@ export const routes: Routes = [
     path: '',
     data: {
       seo: {
-        title: 'Citatio, studio web près de Nantes, sites vitrines sur mesure',
+        title: 'Citatio, agence web près de Nantes, sites vitrines sur mesure',
         description:
-          'Studio web à La Chapelle-sur-Erdre : nous concevons, développons et hébergeons des sites vitrines faits à la main pour les artisans, commerces et indépendants de Loire-Atlantique. SEO et visibilité IA en option.',
+          'Agence web à La Chapelle-sur-Erdre : nous concevons, développons et hébergeons des sites vitrines faits à la main pour les artisans, commerces et indépendants de Loire-Atlantique. SEO et visibilité IA en option.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent),
@@ -30,7 +30,7 @@ export const routes: Routes = [
       seo: {
         title: 'Qui sommes-nous : Marius, Ruben et Titouan | Citatio',
         description:
-          'Citatio est un studio web de trois personnes, installé à La Chapelle-sur-Erdre près de Nantes. Nos parcours, notre manière de travailler et ce que nous refusons de faire.',
+          'Citatio est une agence web de trois personnes, installée à La Chapelle-sur-Erdre près de Nantes. Nos parcours, notre manière de travailler et ce que nous refusons de faire.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/about/about.component').then(m => m.AboutComponent),
@@ -52,7 +52,7 @@ export const routes: Routes = [
       seo: {
         title: 'Questions fréquentes sur la création de site vitrine | Citatio',
         description:
-          'Combien coûte un site vitrine, en combien de temps, qu\'est-ce que le SEO et le GEO, qui héberge le site : nos réponses, sans jargon. Studio web en Loire-Atlantique.',
+          'Combien coûte un site vitrine, en combien de temps, qu\'est-ce que le SEO et le GEO, qui héberge le site : nos réponses, sans jargon. Agence web en Loire-Atlantique.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/faq/faq.component').then(m => m.FaqComponent),
@@ -63,7 +63,7 @@ export const routes: Routes = [
       seo: {
         title: 'Contact : parlons de votre projet | Citatio',
         description:
-          'Premier échange de trente minutes, gratuit et sans engagement. Réponse sous deux jours ouvrés. Studio web en Loire-Atlantique.',
+          'Premier échange de trente minutes, gratuit et sans engagement. Réponse sous deux jours ouvrés. Agence web en Loire-Atlantique.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/contact/contact.component').then(m => m.ContactComponent),
