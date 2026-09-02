@@ -9,13 +9,14 @@ import {
   SUBSCRIPTION,
 } from '../../config/pricing.config';
 import { formatEuro } from '../../shared/format-euro';
+import { FlourishComponent } from '../../shared/components/flourish/flourish.component';
 
 @Component({
   selector: 'app-services',
   templateUrl: './services.html',
   styleUrl: './services.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
+  imports: [RouterLink, FlourishComponent],
 })
 export class ServicesComponent {
   private readonly jsonLd = inject(JsonLdService);

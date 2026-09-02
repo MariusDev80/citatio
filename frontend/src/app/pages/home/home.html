@@ -1,26 +1,29 @@
-<!-- ═══ Hero, typographic, no decorative artwork ═══ -->
-<section class="ct-section pt-40 pb-24 md:pt-48 md:pb-32">
-  <p class="ct-hero-stagger ct-eyebrow" style="animation-delay: 60ms">
-    Agence web · La Chapelle-sur-Erdre, Loire-Atlantique
-  </p>
+<!-- ═══ Hero : typographique, avec les rubans en fond ═══ -->
+<section class="ct-flourish-host pt-40 pb-24 md:pt-48 md:pb-32">
+  <app-flourish variant="hero" />
+  <div class="ct-section">
+    <p class="ct-hero-stagger ct-eyebrow" style="animation-delay: 60ms">
+      Agence web · La Chapelle-sur-Erdre, Loire-Atlantique
+    </p>
 
-  <!-- LCP element: no entrance animation, paints immediately. -->
-  <h1 class="ct-display-xl mt-6 max-w-[16ch]">
-    Des sites vitrines faits à la main, près de Nantes.
-  </h1>
+    <!-- LCP element: no entrance animation, paints immediately. -->
+    <h1 class="ct-display-xl mt-6 max-w-[16ch]">
+      Des sites vitrines faits à la main, près de Nantes.
+    </h1>
 
-  <p class="ct-hero-stagger ct-lede ct-column mt-8" style="animation-delay: 160ms">
-    Nous sommes trois. Nous concevons, développons et hébergeons des sites vitrines
-    pour les artisans, commerces et indépendants de Loire-Atlantique. Pas de
-    gabarit acheté, pas de constructeur de pages : du code écrit pour vous.
-  </p>
+    <p class="ct-hero-stagger ct-lede ct-column mt-8" style="animation-delay: 160ms">
+      Nous sommes trois. Nous concevons, développons et hébergeons des sites vitrines
+      pour les artisans, commerces et indépendants de Loire-Atlantique. Pas de
+      gabarit acheté, pas de constructeur de pages : du code écrit pour vous.
+    </p>
 
-  <div class="ct-hero-stagger mt-10 flex flex-col gap-4 sm:flex-row sm:items-center" style="animation-delay: 240ms">
-    <a routerLink="/contact" class="ct-btn">Parlons de votre projet</a>
-    <a routerLink="/creation-site-vitrine" class="ct-link">
-      Comment nous créons un site vitrine
-      <span aria-hidden="true">→</span>
-    </a>
+    <div class="ct-hero-stagger mt-10 flex flex-col gap-4 sm:flex-row sm:items-center" style="animation-delay: 240ms">
+      <a routerLink="/contact" class="ct-btn">Parlons de votre projet</a>
+      <a routerLink="/creation-site-vitrine" class="ct-link">
+        Comment nous créons un site vitrine
+        <span aria-hidden="true">→</span>
+      </a>
+    </div>
   </div>
 </section>
 
@@ -112,8 +115,9 @@
 </section>
 
 <!-- ═══ Closing ═══ -->
-<section class="ct-section py-20">
-  <div ctReveal class="border-t border-rule-strong pt-12">
+<section class="ct-flourish-host py-20">
+  <app-flourish variant="closing" />
+  <div ctReveal class="ct-section border-t border-rule-strong pt-12">
     <h2 class="ct-display-lg max-w-[18ch]">
       Un premier échange, et vous saurez si nous sommes faits pour travailler ensemble.
     </h2>

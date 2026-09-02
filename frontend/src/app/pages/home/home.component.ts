@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RevealDirective } from '../../shared/directives/reveal.directive';
+import { FlourishComponent } from '../../shared/components/flourish/flourish.component';
 import { MEASURED_ON_LABEL, METRICS } from '../../config/site-metrics.config';
 
 interface Craft {
@@ -21,7 +22,7 @@ interface Step {
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, RevealDirective],
+  imports: [RouterLink, RevealDirective, FlourishComponent],
   templateUrl: './home.html',
   styleUrl: './home.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

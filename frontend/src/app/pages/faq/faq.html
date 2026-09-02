@@ -1,12 +1,15 @@
 <article class="pt-36 pb-8 md:pt-44">
-  <header class="ct-section">
-    <p class="ct-eyebrow">Questions fréquentes</p>
-    <h1 class="ct-display-lg mt-6 max-w-[16ch]">Ce qu’on nous demande le plus souvent.</h1>
-    <p class="ct-lede ct-column mt-8">
-      Les prix, les délais, ce que nous refusons de faire. Si votre question n’y est
-      pas, écrivez-nous : nous répondons à tout le monde, même quand cela ne débouche
-      pas sur un devis.
-    </p>
+  <header class="ct-flourish-host">
+    <app-flourish variant="hero" />
+    <div class="ct-section">
+      <p class="ct-eyebrow">Questions fréquentes</p>
+      <h1 class="ct-display-lg mt-6 max-w-[16ch]">Ce qu’on nous demande le plus souvent.</h1>
+      <p class="ct-lede ct-column mt-8">
+        Les prix, les délais, ce que nous refusons de faire. Si votre question n’y est
+        pas, écrivez-nous : nous répondons à tout le monde, même quand cela ne débouche
+        pas sur un devis.
+      </p>
+    </div>
   </header>
 
   @for (group of groups(); track group.title; let first = $first) {
@@ -57,8 +60,9 @@
     </section>
   }
 
-  <section class="ct-section py-20">
-    <div class="border-t border-rule-strong pt-12">
+  <section class="ct-flourish-host py-20">
+    <app-flourish variant="closing" />
+    <div class="ct-section border-t border-rule-strong pt-12">
       <h2 class="ct-display-md max-w-[18ch]">Une question qui n’est pas là ?</h2>
       <a routerLink="/contact" class="ct-btn mt-8">Posez-la nous</a>
     </div>

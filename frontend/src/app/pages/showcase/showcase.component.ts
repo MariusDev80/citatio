@@ -4,6 +4,7 @@ import { JsonLdService } from '../../services/json-ld.service';
 import { COMPANY } from '../../config/company.config';
 import { FORMULAS } from '../../config/pricing.config';
 import { formatEuro } from '../../shared/format-euro';
+import { FlourishComponent } from '../../shared/components/flourish/flourish.component';
 
 interface Deliverable {
   readonly title: string;
@@ -31,7 +32,7 @@ interface Question {
   templateUrl: './showcase.html',
   styleUrl: './showcase.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
+  imports: [RouterLink, FlourishComponent],
 })
 export class ShowcaseComponent {
   private readonly jsonLd = inject(JsonLdService);

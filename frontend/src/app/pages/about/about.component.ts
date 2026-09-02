@@ -3,6 +3,7 @@ import { NgOptimizedImage } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { JsonLdService } from '../../services/json-ld.service';
 import { COMPANY } from '../../config/company.config';
+import { FlourishComponent } from '../../shared/components/flourish/flourish.component';
 
 /**
  * One founder. Every string here describes a real person.
@@ -40,7 +41,7 @@ interface FounderProfile {
 
 @Component({
   selector: 'app-about',
-  imports: [RouterLink, NgOptimizedImage],
+  imports: [RouterLink, NgOptimizedImage, FlourishComponent],
   templateUrl: './about.html',
   styleUrl: './about.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

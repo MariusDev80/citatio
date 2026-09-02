@@ -8,6 +8,7 @@ import {
   METRICS,
   TECH_FACTS,
 } from '../../config/site-metrics.config';
+import { FlourishComponent } from '../../shared/components/flourish/flourish.component';
 
 interface Choice {
   readonly title: string;
@@ -24,7 +25,7 @@ interface Choice {
  */
 @Component({
   selector: 'app-proof',
-  imports: [RouterLink],
+  imports: [RouterLink, FlourishComponent],
   templateUrl: './proof.html',
   styleUrl: './proof.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

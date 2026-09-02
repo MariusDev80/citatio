@@ -5,6 +5,7 @@ import { JsonLdService } from '../../services/json-ld.service';
 import { COMPANY } from '../../config/company.config';
 import { FORMULAS, OPTIONS, PRICE_FACTORS, SUBSCRIPTION } from '../../config/pricing.config';
 import { formatEuro } from '../../shared/format-euro';
+import { FlourishComponent } from '../../shared/components/flourish/flourish.component';
 
 interface FaqLink {
   readonly path: string;
@@ -42,7 +43,7 @@ const euros = (amount: number) => `${formatEuro(amount)} €`;
  */
 @Component({
   selector: 'app-faq',
-  imports: [AccordionModule, RouterLink],
+  imports: [AccordionModule, RouterLink, FlourishComponent],
   templateUrl: './faq.html',
   styleUrl: './faq.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

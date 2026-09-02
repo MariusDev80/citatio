@@ -4,6 +4,7 @@ import { JsonLdService } from '../../services/json-ld.service';
 import { COMPANY } from '../../config/company.config';
 import { FORMULAS } from '../../config/pricing.config';
 import { formatEuro } from '../../shared/format-euro';
+import { FlourishComponent } from '../../shared/components/flourish/flourish.component';
 
 interface Item {
   readonly title: string;
@@ -29,7 +30,7 @@ interface Contrast {
   templateUrl: './geo-offer.html',
   styleUrl: './geo-offer.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink],
+  imports: [RouterLink, FlourishComponent],
 })
 export class GeoOfferComponent {
   private readonly jsonLd = inject(JsonLdService);

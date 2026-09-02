@@ -303,6 +303,16 @@
 
   /* ══ Surfaces, used sparingly: offers and the contact panel only ════ */
 
+  /* Positioning context for <app-flourish>. `isolation` keeps the flourish's
+     negative z-index inside this section, and `overflow: hidden` is what makes
+     the strands look cut off by the edge of the screen rather than scrolling
+     the page sideways. */
+  .ct-flourish-host {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+
   .ct-panel {
     @apply rounded-md bg-surface p-8;
   }
