@@ -21,12 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PingU1Controller {
 
-    private static final String U1_HEALTH_PATH = "/api/u1/health";
-
     private final UpstreamClient u1Client;
 
     @GetMapping("/ping-u1")
     public UpstreamStatus pingU1() {
-        return u1Client.fetchHealth(U1_HEALTH_PATH);
+        return u1Client.fetchHealth();
     }
 }

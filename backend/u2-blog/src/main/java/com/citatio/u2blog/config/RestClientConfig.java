@@ -17,8 +17,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RestClientConfig {
 
+    /** Endpoint de sante expose par u1, cf. son HealthController. */
+    private static final String U1_HEALTH_PATH = "/api/u1/health";
+
     @Bean
     public UpstreamClient u1Client(@Value("${u1.base-url}") String u1BaseUrl) {
-        return new UpstreamClient("u1-communication", RestClientFactory.create(u1BaseUrl));
+        return new UpstreamClient("u1-communication", RestClientFactory.create(u1BaseUrl), U1_HEALTH_PATH);
     }
 }
