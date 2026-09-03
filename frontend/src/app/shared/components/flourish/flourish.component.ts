@@ -43,6 +43,14 @@ export class FlourishComponent {
    * as a signature, several different ones read as decoration. An earlier
    * horizontal-wave variant was dropped for the same reason, it competed with
    * the horizontal rules the whole site is built on.
+   *
+   * Two rules keep the drawing whole whatever the host section measures, since
+   * `.ct-flourish-host` clips at its own edges:
+   *  - every strand starts and ends beyond x=1440, so no endpoint is ever left
+   *    dangling inside the frame;
+   *  - every turn stays inside the viewBox, which is anchored to the bottom
+   *    (`xMaxYMax`) so that the height `slice` has to drop is taken off the
+   *    top, where the strands run off the frame by design.
    */
   readonly variant = input.required<FlourishVariant>();
 }
