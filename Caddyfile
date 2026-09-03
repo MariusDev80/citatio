@@ -9,7 +9,7 @@ www.citatio-geo.com {
 
 citatio-geo.com {
     # zstd avant gzip : Caddy retient le meilleur encodage accepte par le client.
-    # Pas de brotli ici — l'encodeur `br` n'est pas enregistre dans l'image Caddy
+    # Pas de brotli ici : l'encodeur `br` n'est pas enregistre dans l'image Caddy
     # standard, il faudrait un build xcaddy dedie. zstd apporte l'essentiel du
     # gain sur les navigateurs recents, gzip reste le repli universel.
     encode zstd gzip
@@ -28,7 +28,20 @@ citatio-geo.com {
         -Server
     }
 
-    # API microservices — le préfixe /api/uX est conservé (handle, pas handle_path)
+    # Endpoints de diagnostic, hors surface publique. ping-u1 et ping-u2 servent
+    # a verifier le cablage entre microservices : ils nomment les services et
+    # renseignent sur la topologie interne, sans rendre aucun service au visiteur.
+    # Ils restent joignables depuis le reseau Docker, ce qui suffit a l'exploitation :
+    #   docker exec citatio-gateway wget -qO- http://u1-communication:8081/api/u1/ping-u2
+    # On repond 404 et non 403 : un 403 confirmerait que la route existe.
+    # (Les sondes /actuator/** ne sont pas listees ici : rien ne les route vers les
+    # microservices, seuls /api/u1/* et /api/u2/* le sont.)
+    @diagnostics path /api/u1/ping-u2 /api/u2/ping-u1
+    handle @diagnostics {
+        respond 404
+    }
+
+    # API microservices, le préfixe /api/uX est conservé (handle, pas handle_path)
     # car les contrôleurs Spring sont mappés sous /api/u1 et /api/u2.
     handle /api/u1/* {
         reverse_proxy u1-communication:8081
