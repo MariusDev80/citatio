@@ -19,7 +19,7 @@ services:
       timeout: 3s
       retries: 10
 
-  # ── Microservice u1-communication (email / contact / comms) — port 8081 ──
+  # ── Microservice u1-communication (email / contact / comms), port 8081 ──
   u1-communication:
     image: ghcr.io/mariusdev80/citatio/u1-communication:latest
     build:
@@ -41,14 +41,18 @@ services:
     expose:
       - "8081"
     # Sante propre au service : Docker connait l'etat de u1 independamment de u2.
+    # Sonde de LIVENESS et non /api/u1/health : cette derniere repond UP tant que
+    # le serveur web repond, base coupee comprise. La liveness ignore elle aussi la
+    # base, deliberement (une base momentanement absente ne doit pas declencher une
+    # boucle de redemarrage), la readiness est celle qui l'inclut.
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:8081/api/u1/health || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8081/actuator/health/liveness || exit 1"]
       interval: 10s
       timeout: 3s
       retries: 5
       start_period: 40s
 
-  # ── Microservice u2-blog (articles) — port 8082, appelle u1 en REST ──
+  # ── Microservice u2-blog (articles), port 8082, appelle u1 en REST ──
   u2-blog:
     image: ghcr.io/mariusdev80/citatio/u2-blog:latest
     build:
@@ -73,8 +77,12 @@ services:
     expose:
       - "8082"
     # Sante propre au service : Docker connait l'etat de u2 independamment de u1.
+    # Sonde de LIVENESS et non /api/u2/health : cette derniere repond UP tant que
+    # le serveur web repond, base coupee comprise. La liveness ignore elle aussi la
+    # base, deliberement (une base momentanement absente ne doit pas declencher une
+    # boucle de redemarrage), la readiness est celle qui l'inclut.
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:8082/api/u2/health || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8082/actuator/health/liveness || exit 1"]
       interval: 10s
       timeout: 3s
       retries: 5
