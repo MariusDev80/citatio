@@ -1,153 +1,125 @@
-<div class="pt-32 pb-16 max-w-6xl mx-auto px-6">
-  <h1 class="ct-page-title mb-4">Nos offres</h1>
-  <p class="text-center text-lg ct-text-muted max-w-2xl mx-auto mb-14">
-    Citatio crée votre site vitrine sur mesure. Choisissez la formule adaptée à votre
-    ambition, puis composez avec nos options : hébergement, nom de domaine, maintenance et contenu.
-  </p>
-
-  <!-- ═══ Formules ═══ -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch mb-20">
-
-    <!-- Vitrine Essentiel -->
-    <div class="ct-card flex flex-col">
-      <div class="flex items-center gap-3 mb-2">
-        <i class="pi pi-desktop text-xl ct-text-accent"></i>
-        <h2 class="text-xl font-bold ct-text-heading">Vitrine Essentiel</h2>
+<article class="pt-36 pb-8 md:pt-44">
+  <header class="ct-flourish-host">
+    <app-flourish variant="hero" />
+    <div class="ct-section">
+      <p class="ct-eyebrow">Offres et tarifs</p>
+      <h1 class="ct-display-lg mt-6 max-w-[14ch]">Trois formules, un abonnement.</h1>
+      <div class="ct-lede ct-column mt-8">
+        <p>
+          Le prix affiché est un prix plancher, hors taxes. Après notre premier
+          échange, vous recevez un devis ferme : c’est ce montant-là que vous payez,
+          même si le projet nous prend plus de temps que prévu.
+        </p>
       </div>
-      <p class="ct-text-muted text-sm mb-6">Pour une présence web simple et crédible.</p>
-      <ul class="space-y-3 mb-8 grow">
-        <li class="flex items-start gap-3 ct-text-body">
-          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
-          <span>Site vitrine responsive (3 à 5 pages)</span>
-        </li>
-        <li class="flex items-start gap-3 ct-text-body">
-          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
-          <span>Design sur la base de notre design system</span>
-        </li>
-        <li class="flex items-start gap-3 ct-text-body">
-          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
-          <span>Formulaire de contact</span>
-        </li>
-        <li class="flex items-start gap-3 ct-text-body">
-          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
-          <span>Base SEO technique (balises, sitemap, performances)</span>
-        </li>
+    </div>
+  </header>
+
+  <!-- ═══ Formulas ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="formules-title">
+    <h2 id="formules-title" class="sr-only">Les formules</h2>
+
+    <div class="grid border-t border-rule-strong md:grid-cols-3">
+      @for (formula of formulas; track formula.id) {
+        <div class="flex flex-col border-b border-rule py-10 md:border-b-0 md:px-8 md:first:pl-0 md:last:pr-0 md:not-first:border-l md:not-first:border-rule">
+          <h3 class="ct-title">{{ formula.name }}</h3>
+          <p class="ct-prose mt-2 text-sm">{{ formula.tagline }}</p>
+
+          <p class="mt-8">
+            <span class="ct-eyebrow block">À partir de</span>
+            <span class="ct-display-md mt-1 block text-accent">{{ formatEuro(formula.from) }}&nbsp;€</span>
+            <span class="mt-1 block text-xs text-ink-faint">hors taxes, paiement en une fois</span>
+          </p>
+
+          <ul class="mt-8 grow space-y-3">
+            @for (feature of formula.features; track feature) {
+              <li class="ct-prose flex gap-3 text-sm">
+                <span class="mt-2 h-px w-3 shrink-0 bg-rule-strong" aria-hidden="true"></span>
+                <span>{{ feature }}</span>
+              </li>
+            }
+          </ul>
+
+          <a [routerLink]="formula.detailPath" class="ct-link mt-8 self-start text-sm">
+            {{ formula.detailLabel }}
+            <span aria-hidden="true">→</span>
+          </a>
+
+          <a routerLink="/contact" class="ct-btn ct-btn--ghost mt-6 self-start">
+            Demander un devis
+          </a>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ═══ Subscription ═══ -->
+  <section class="mt-20 border-y border-rule bg-surface py-20" aria-labelledby="abo-title">
+    <div class="ct-section grid gap-10 md:grid-cols-12">
+      <div class="md:col-span-7">
+        <p class="ct-eyebrow">Puis, chaque mois</p>
+        <h2 id="abo-title" class="ct-display-md mt-5 max-w-[16ch]">{{ subscription.label }}</h2>
+        <p class="ct-prose ct-column mt-6">{{ subscription.description }}</p>
+        <p class="ct-prose ct-column mt-4 text-sm">
+          Sans engagement de durée. Si vous partez, nous vous remettons votre nom
+          de domaine et l’intégralité du site.
+        </p>
+      </div>
+      <div class="md:col-span-4 md:col-start-9">
+        <div class="border-t border-rule-strong pt-6">
+          <p class="ct-display-lg text-accent">{{ subscription.price }}&nbsp;€</p>
+          <p class="ct-eyebrow mt-2">par {{ subscription.period }}, hors taxes</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Options ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="options-title">
+    <div class="border-t border-rule-strong pt-10">
+      <h2 id="options-title" class="ct-display-md">Options à la carte</h2>
+      <p class="ct-prose ct-column mt-5">
+        À ajouter au moment du devis, ou plus tard, quand le besoin se présente.
+      </p>
+    </div>
+
+    <dl class="mt-12">
+      @for (option of options; track option.name) {
+        <div class="grid gap-2 border-t border-rule py-6 md:grid-cols-12 md:gap-10">
+          <dt class="ct-title md:col-span-3">{{ option.name }}</dt>
+          <dd class="ct-prose text-sm md:col-span-6">{{ option.description }}</dd>
+          <dd class="font-display text-xl text-ink md:col-span-3 md:text-right">{{ option.price }}</dd>
+        </div>
+      }
+    </dl>
+  </section>
+
+  <!-- ═══ What moves the price ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="facteurs-title">
+    <div class="grid gap-10 border-t border-rule-strong pt-10 md:grid-cols-12">
+      <div class="md:col-span-5">
+        <h2 id="facteurs-title" class="ct-display-md">Ce qui fait varier le prix</h2>
+        <p class="ct-prose mt-5">
+          Un site vitrine n’a pas de prix unique. Voici précisément ce que nous
+          regardons pour établir votre devis.
+        </p>
+      </div>
+      <ul class="md:col-span-7">
+        @for (factor of priceFactors; track factor) {
+          <li class="ct-prose border-t border-rule py-4">{{ factor }}</li>
+        }
       </ul>
-      <p class="text-lg font-black ct-text-heading mb-4">Sur devis</p>
-      <a routerLink="/contact" class="block text-center px-6 py-3 rounded-xl font-bold border border-slate-300 dark:border-slate-600 ct-text-heading hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
-        Demander un devis
-      </a>
     </div>
+  </section>
 
-    <!-- Vitrine + SEO (mise en avant) -->
-    <div class="relative bg-white dark:bg-slate-800 border-2 border-blue-600 dark:border-blue-500 rounded-2xl p-8 shadow-xl shadow-blue-200/40 dark:shadow-blue-900/20 flex flex-col md:-mt-4">
-      <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider px-4 py-1 rounded-full shadow">Le plus demandé</span>
-      <div class="flex items-center gap-3 mb-2">
-        <i class="pi pi-search text-xl ct-text-accent"></i>
-        <h2 class="text-xl font-bold ct-text-heading">Vitrine + SEO</h2>
-      </div>
-      <p class="ct-text-muted text-sm mb-6">Pour être trouvé sur Google.</p>
-      <ul class="space-y-3 mb-8 grow">
-        <li class="flex items-start gap-3 ct-text-body">
-          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
-          <span>Tout le pack Vitrine Essentiel</span>
-        </li>
-        <li class="flex items-start gap-3 ct-text-body">
-          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
-          <span>Optimisation SEO on-page</span>
-        </li>
-        <li class="flex items-start gap-3 ct-text-body">
-          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
-          <span>Recherche de mots-clés</span>
-        </li>
-        <li class="flex items-start gap-3 ct-text-body">
-          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
-          <span>Données structurées (schema.org) et recommandations de contenu</span>
-        </li>
-      </ul>
-      <p class="text-lg font-black ct-text-heading mb-4">Sur devis</p>
-      <a routerLink="/contact" class="block text-center px-6 py-3 rounded-xl font-bold bg-blue-600 text-white hover:bg-blue-700 dark:hover:bg-blue-500 transition-colors shadow-lg active:scale-95">
-        Demander un devis
-      </a>
+  <section class="ct-flourish-host py-20">
+    <app-flourish variant="closing" />
+    <div class="ct-section border-t border-rule-strong pt-12">
+      <h2 class="ct-display-lg max-w-[18ch]">Un devis ferme, sous cinq jours.</h2>
+      <p class="ct-lede ct-column mt-6">
+        Décrivez-nous votre projet. Nous revenons vers vous avec un périmètre écrit
+        et un prix qui ne bougera pas.
+      </p>
+      <a routerLink="/contact" class="ct-btn mt-10">Demander un devis</a>
     </div>
-
-    <!-- Vitrine + GEO/SEO -->
-    <div class="ct-card flex flex-col">
-      <div class="flex items-center gap-3 mb-2">
-        <i class="pi pi-sparkles text-xl ct-text-accent"></i>
-        <h2 class="text-xl font-bold ct-text-heading">Vitrine + GEO/SEO</h2>
-      </div>
-      <p class="ct-text-muted text-sm mb-6">Pour être trouvé sur Google <em>et</em> les IA.</p>
-      <ul class="space-y-3 mb-8 grow">
-        <li class="flex items-start gap-3 ct-text-body">
-          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
-          <span>Tout le pack Vitrine + SEO</span>
-        </li>
-        <li class="flex items-start gap-3 ct-text-body">
-          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
-          <span>Optimisation GEO (ChatGPT, Gemini, Google AI Overview)</span>
-        </li>
-        <li class="flex items-start gap-3 ct-text-body">
-          <i class="pi pi-check ct-text-accent text-sm mt-1 shrink-0"></i>
-          <span>Contenu pensé pour la citation par les IA</span>
-        </li>
-      </ul>
-      <p class="text-lg font-black ct-text-heading mb-4">Sur devis</p>
-      <a routerLink="/contact" class="block text-center px-6 py-3 rounded-xl font-bold border border-slate-300 dark:border-slate-600 ct-text-heading hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
-        Demander un devis
-      </a>
-    </div>
-  </div>
-
-  <!-- ═══ Options à la carte ═══ -->
-  <div class="text-center mb-10">
-    <h2 class="text-3xl font-black ct-text-heading mb-3">Options à la carte</h2>
-    <p class="ct-text-muted max-w-2xl mx-auto">Complétez votre formule avec ce dont vous avez besoin, quand vous en avez besoin.</p>
-  </div>
-
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    <div class="ct-card">
-      <div class="flex items-center gap-3 mb-3">
-        <i class="pi pi-server text-xl ct-text-accent"></i>
-        <h3 class="text-lg font-bold ct-text-heading">Hébergement</h3>
-      </div>
-      <p class="ct-text-body">Hébergement géré sur notre stack, en abonnement mensuel ou annuel. Aucune infrastructure à gérer de votre côté.</p>
-    </div>
-
-    <div class="ct-card">
-      <div class="flex items-center gap-3 mb-3">
-        <i class="pi pi-globe text-xl ct-text-accent"></i>
-        <h3 class="text-lg font-bold ct-text-heading">Nom de domaine</h3>
-      </div>
-      <p class="ct-text-body">Achat de votre nom de domaine, configuration DNS et renouvellement annuel pris en charge.</p>
-    </div>
-
-    <div class="ct-card">
-      <div class="flex items-center gap-3 mb-3">
-        <i class="pi pi-wrench text-xl ct-text-accent"></i>
-        <h3 class="text-lg font-bold ct-text-heading">Maintenance</h3>
-      </div>
-      <p class="ct-text-body">Mises à jour, sécurité, sauvegardes et petites évolutions, en abonnement mensuel.</p>
-    </div>
-
-    <div class="ct-card">
-      <div class="flex items-center gap-3 mb-3">
-        <i class="pi pi-file-edit text-xl ct-text-accent"></i>
-        <h3 class="text-lg font-bold ct-text-heading">Pack contenu</h3>
-      </div>
-      <p class="ct-text-body">Rédaction de vos pages et de vos articles de blog, à l'article ou en forfait.</p>
-    </div>
-
-    <div class="ct-card">
-      <div class="flex items-center gap-3 mb-3">
-        <i class="pi pi-envelope text-xl ct-text-accent"></i>
-        <h3 class="text-lg font-bold ct-text-heading">Emailing</h3>
-      </div>
-      <p class="ct-text-body">Mise en place de l'envoi de mails : transactionnel et newsletter.</p>
-    </div>
-  </div>
-
-  <p class="text-center ct-text-muted text-sm mt-12">
-    Tarifs établis sur devis, adaptés à votre projet. <a routerLink="/contact" class="ct-text-accent font-semibold ct-link-nav">Parlons-en →</a>
-  </p>
-</div>
+  </section>
+</article>

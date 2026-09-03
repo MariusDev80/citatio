@@ -1,0 +1,6 @@
+/* Rien de specifique : la page est entierement composee des classes ct- du
+   design system et de Tailwind. Fichier conserve pour la convention des trois
+   fichiers par composant. */
+:host {
+  display: block;
+}

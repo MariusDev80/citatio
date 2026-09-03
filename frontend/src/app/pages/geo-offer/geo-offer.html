@@ -1,0 +1,196 @@
+<article class="pt-36 pb-8 md:pt-44">
+  <header class="ct-flourish-host">
+    <app-flourish variant="hero" />
+    <div class="ct-section">
+      <p class="ct-eyebrow">Visibilité dans les IA · GEO</p>
+      <h1 class="ct-display-lg mt-6 max-w-[17ch]">
+        Exister quand une IA répond à votre place.
+      </h1>
+      <div class="ct-lede ct-column mt-8">
+        <p>
+          De plus en plus de recherches n’aboutissent plus à une liste de liens mais
+          à une réponse rédigée, dans ChatGPT, dans Gemini ou en haut de Google. Le
+          GEO consiste à faire en sorte que votre entreprise soit dans cette réponse.
+        </p>
+      </div>
+      <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+        <a routerLink="/contact" class="ct-btn">Parlons-en</a>
+        <a routerLink="/referencement-seo" class="ct-link">
+          Le référencement Google
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ Definition autonome, ecrite pour etre citee telle quelle ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="definition-title">
+    <div class="grid gap-10 border-t border-rule-strong pt-10 md:grid-cols-12">
+      <div class="md:col-span-5">
+        <h2 id="definition-title" class="ct-display-md max-w-[14ch]">
+          Ce qu’est le GEO
+        </h2>
+      </div>
+      <div class="ct-prose ct-column md:col-span-7">
+        <p>
+          Le GEO, pour <em>Generative Engine Optimization</em>, désigne l’ensemble
+          des pratiques qui visent à faire citer une entreprise par les moteurs de
+          réponse fondés sur l’IA : ChatGPT, Gemini, Perplexity, Copilot, et les
+          AI Overviews affichés au-dessus des résultats de Google.
+        </p>
+        <p>
+          L’enjeu n’est plus d’occuper un rang dans une liste, mais d’être la source
+          sur laquelle s’appuie une réponse déjà écrite. Quand une seule réponse est
+          rendue, il n’y a plus de deuxième page où se rattraper.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SEO / GEO ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="contraste-title">
+    <div class="border-t border-rule-strong pt-10">
+      <h2 id="contraste-title" class="ct-display-md">En quoi ça diffère du SEO</h2>
+      <p class="ct-prose ct-column mt-5">
+        Les deux se nourrissent du même travail de fond, et le GEO ne remplace pas
+        le SEO. Ce qui change, c’est la cible.
+      </p>
+    </div>
+
+    <div class="mt-12 overflow-x-auto">
+      <table class="w-full min-w-[42rem] border-collapse text-left">
+        <thead>
+          <tr class="border-t border-rule-strong">
+            <th scope="col" class="ct-eyebrow py-4 pr-6 align-bottom">&nbsp;</th>
+            <th scope="col" class="ct-eyebrow py-4 pr-6 align-bottom">Référencement</th>
+            <th scope="col" class="ct-eyebrow py-4 align-bottom">Visibilité dans les IA</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of contrasts(); track row.aspect) {
+            <tr class="border-t border-rule">
+              <th scope="row" class="ct-title py-5 pr-6 align-top text-sm font-medium">
+                {{ row.aspect }}
+              </th>
+              <td class="ct-prose py-5 pr-6 align-top text-sm">{{ row.seo }}</td>
+              <td class="ct-prose py-5 align-top text-sm">{{ row.geo }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══ Ce qu'on met en place ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="travail-title">
+    <div class="border-t border-rule-strong pt-10">
+      <p class="ct-eyebrow">L’option {{ formula.name }}</p>
+      <h2 id="travail-title" class="ct-display-md mt-5">Ce que nous mettons en place</h2>
+      <p class="ct-prose ct-column mt-5">
+        Tout ce qui suit est en place sur ce site. Vous pouvez le vérifier avant de
+        nous croire.
+      </p>
+    </div>
+
+    <div class="mt-12">
+      @for (item of work(); track item.title) {
+        <div class="grid gap-4 border-t border-rule py-8 md:grid-cols-12 md:gap-10">
+          <h3 class="ct-title md:col-span-4">{{ item.title }}</h3>
+          <p class="ct-prose md:col-span-8">{{ item.body }}</p>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ═══ Limites ═══ -->
+  <section class="mt-20 border-y border-rule bg-surface py-20" aria-labelledby="limites-title">
+    <div class="ct-section grid gap-10 md:grid-cols-12">
+      <div class="md:col-span-5">
+        <h2 id="limites-title" class="ct-display-md max-w-[16ch]">
+          Ce qui ne se contrôle pas
+        </h2>
+      </div>
+      <div class="ct-prose ct-column md:col-span-7">
+        <p>
+          <strong>Ce qu’un modèle répond.</strong> Personne ne décide du contenu
+          d’une réponse générée, et la même question peut donner deux réponses
+          différentes à dix minutes d’intervalle. Nous préparons le terrain, nous ne
+          tenons pas la plume.
+        </p>
+        <p>
+          <strong>Ce qui se dit ailleurs.</strong> Un modèle s’appuie largement sur
+          ce qu’il a lu à votre sujet sur d’autres sites : annuaires, comparatifs,
+          articles, avis. C’est la partie la plus déterminante, et c’est celle qui
+          se construit hors de votre site, avec le temps.
+        </p>
+        <p>
+          <strong>La durée.</strong> Ce domaine bouge vite. Ce que nous mettons en
+          place aujourd’hui repose sur des conventions récentes, dont certaines
+          n’existeront peut-être plus dans deux ans. Nous vous le disons plutôt que
+          de vendre une méthode définitive.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Prix ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="prix-title">
+    <div class="grid gap-10 border-t border-rule-strong pt-10 md:grid-cols-12">
+      <div class="md:col-span-7">
+        <h2 id="prix-title" class="ct-display-md max-w-[16ch]">
+          À partir de {{ formatEuro(formula.from) }}&nbsp;€
+        </h2>
+        <div class="ct-prose ct-column mt-6">
+          <p>
+            Hors taxes, site et option SEO compris. Le GEO ne se vend pas séparément :
+            il s’appuie sur les données structurées et sur la qualité de contenu que
+            l’option SEO met en place. Vendu seul, il n’aurait pas de socle.
+          </p>
+          <p>
+            Le détail des formules est sur la
+            <a routerLink="/offres-et-tarifs">page des offres</a>.
+          </p>
+        </div>
+      </div>
+      <div class="md:col-span-4 md:col-start-9">
+        <div class="border-t border-rule-strong pt-6">
+          <p class="ct-eyebrow">Vérifier par vous-même</p>
+          <ul class="mt-5 space-y-4 text-sm">
+            <li>
+              <a href="/llms.txt" class="ct-link">
+                Le llms.txt de ce site
+                <span aria-hidden="true">→</span>
+              </a>
+            </li>
+            <li>
+              <a href="/robots.txt" class="ct-link">
+                Son robots.txt
+                <span aria-hidden="true">→</span>
+              </a>
+            </li>
+            <li>
+              <a routerLink="/ce-site" class="ct-link">
+                Les mesures de ce site
+                <span aria-hidden="true">→</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ct-flourish-host py-20">
+    <app-flourish variant="closing" />
+    <div class="ct-section border-t border-rule-strong pt-12">
+      <h2 class="ct-display-lg max-w-[20ch]">
+        Demandez à une IA ce qu’elle sait de votre entreprise.
+      </h2>
+      <p class="ct-lede ct-column mt-6">
+        La réponse vous dira où vous en êtes mieux que nous. Ensuite, parlons de
+        ce qu’il y a à corriger.
+      </p>
+      <a routerLink="/contact" class="ct-btn mt-10">Prendre contact</a>
+    </div>
+  </section>
+</article>

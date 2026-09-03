@@ -1,63 +1,205 @@
-<div class="pt-32 pb-16 max-w-5xl mx-auto px-6">
-  <h1 class="ct-page-title mb-12">Nous contacter</h1>
-
-  <div class="grid grid-cols-1 md:grid-cols-5 gap-8 items-start">
-
-    <!-- Coordonnées -->
-    <div class="md:col-span-2 ct-card">
-      <h3 class="text-xl font-bold ct-text-accent mb-6">Coordonnées</h3>
-
-      <div class="flex items-center gap-3 mb-6">
-        <i class="pi pi-envelope ct-text-accent text-lg shrink-0"></i>
-        <p class="ct-text-secondary">Email : <a [href]="'mailto:' + company.email" class="ct-text-accent hover:underline">{{ company.email }}</a></p>
-      </div>
-      <div class="flex items-center gap-3 mb-6">
-        <i class="pi pi-phone ct-text-accent text-lg shrink-0"></i>
-        <p class="ct-text-secondary">Tél : <a [href]="'tel:' + company.phoneRaw" class="ct-text-accent hover:underline">{{ company.phoneDisplay }}</a></p>
-      </div>
-      <div class="flex items-center gap-3">
-        <i class="pi pi-map-marker ct-text-accent text-lg shrink-0"></i>
-        <p class="ct-text-secondary">{{ company.address.street }}, {{ company.address.postalCode }} {{ company.address.city }}</p>
-      </div>
+<article class="pt-36 pb-8 md:pt-44">
+  <header class="ct-section">
+    <p class="ct-eyebrow">Contact</p>
+    <h1 class="ct-display-lg mt-6 max-w-[15ch]">Parlons de votre projet.</h1>
+    <div class="ct-lede ct-column mt-8">
+      <p>
+        Premier échange de trente minutes, gratuit et sans engagement. Nous
+        répondons sous deux jours ouvrés.
+      </p>
     </div>
+  </header>
 
-    <!-- Formulaire -->
-    <div class="md:col-span-3 ct-card">
-      <h3 class="text-xl font-bold ct-text-accent mb-6">Formulaire de Contact</h3>
+  <div class="ct-section mt-20 grid gap-14 md:grid-cols-12">
 
-      @if (submitSuccess()) {
-        <div class="flex items-center gap-2 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 p-4 rounded-xl mb-6">
-          <i class="pi pi-check-circle"></i> Votre message a été envoyé avec succès !
-        </div>
-      }
+    <!-- ═══ Direct contact, always available, no form required ═══ -->
+    <aside class="md:col-span-4">
+      <div class="border-t border-rule-strong pt-8">
+        <h2 class="ct-title">Nous joindre directement</h2>
+        <dl class="mt-6 space-y-5 text-sm">
+          <div>
+            <dt class="ct-eyebrow">Email</dt>
+            <dd class="mt-1">
+              <a [href]="'mailto:' + company.email" class="ct-link break-all">{{ company.email }}</a>
+            </dd>
+          </div>
+          <div>
+            <dt class="ct-eyebrow">Téléphone</dt>
+            <dd class="mt-1">
+              <a [href]="'tel:' + company.phoneRaw" class="ct-link">{{ company.phoneDisplay }}</a>
+            </dd>
+          </div>
+          <div>
+            <dt class="ct-eyebrow">Adresse</dt>
+            <dd class="ct-prose mt-1">
+              {{ company.address.street }}<br />
+              {{ company.address.postalCode }} {{ company.address.city }}
+            </dd>
+            <dd class="mt-2">
+              <a
+                [href]="company.googleBusinessProfile"
+                target="_blank"
+                rel="noopener"
+                class="ct-link">
+                Ouvrir dans Google Maps
+                <span aria-hidden="true">→</span>
+              </a>
+            </dd>
+          </div>
+          <div>
+            <dt class="ct-eyebrow">Horaires</dt>
+            <dd class="ct-prose mt-1">
+              Du lundi au dimanche, de 9 h à 18 h.
+            </dd>
+          </div>
+        </dl>
+      </div>
 
-      <form [formGroup]="contactForm" (ngSubmit)="submitForm()" class="space-y-5">
+      <div class="mt-10 border-t border-rule pt-6">
+        <p class="ct-prose text-sm">
+          Nous intervenons principalement en Loire-Atlantique et autour de Nantes.
+          Ailleurs en France, c’est possible, mais nous vous le dirons franchement
+          si le projet gagnerait à être suivi sur place.
+        </p>
+      </div>
+    </aside>
+
+    <!-- ═══ Qualifying form ═══ -->
+    <div class="md:col-span-7 md:col-start-6">
+      <div class="border-t border-rule-strong pt-8">
+        <h2 class="ct-title">Décrivez votre projet</h2>
+        <p class="ct-prose mt-3 text-sm">
+          Plus vous nous en dites, plus notre première réponse sera utile. Les
+          champs marqués d’un astérisque sont nécessaires.
+        </p>
+      </div>
+
+      <form [formGroup]="contactForm" (ngSubmit)="submitForm()" novalidate class="mt-8 space-y-6">
+
         <div class="flex flex-col gap-2">
-          <label for="name" class="font-semibold ct-text-secondary">Nom</label>
-          <input pInputText id="name" formControlName="name" placeholder="Votre nom" class="w-full" />
+          <label for="name" class="ct-eyebrow">Nom *</label>
+          <input
+            pInputText
+            id="name"
+            formControlName="name"
+            autocomplete="name"
+            class="w-full"
+            [attr.aria-invalid]="showError('name')"
+            [attr.aria-describedby]="showError('name') ? 'name-error' : null" />
+          @if (showError('name')) {
+            <p id="name-error" class="text-sm text-accent" role="alert">
+              Indiquez votre nom (2 caractères minimum).
+            </p>
+          }
         </div>
 
         <div class="flex flex-col gap-2">
-          <label for="email" class="font-semibold ct-text-secondary">Email</label>
-          <input pInputText id="email" type="email" formControlName="email" placeholder="Votre email" class="w-full" />
+          <label for="email" class="ct-eyebrow">Email *</label>
+          <input
+            pInputText
+            id="email"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            class="w-full"
+            [attr.aria-invalid]="showError('email')"
+            [attr.aria-describedby]="showError('email') ? 'email-error' : null" />
+          @if (showError('email')) {
+            <p id="email-error" class="text-sm text-accent" role="alert">
+              Indiquez une adresse email valide, pour que nous puissions vous répondre.
+            </p>
+          }
         </div>
 
         <div class="flex flex-col gap-2">
-          <label for="subject" class="font-semibold ct-text-secondary">Sujet</label>
-          <input pInputText id="subject" formControlName="subject" placeholder="Sujet" class="w-full" />
+          <label for="company" class="ct-eyebrow">Entreprise</label>
+          <input
+            pInputText
+            id="company"
+            formControlName="company"
+            autocomplete="organization"
+            class="w-full" />
         </div>
 
         <div class="flex flex-col gap-2">
-          <label for="message" class="font-semibold ct-text-secondary">Message</label>
-          <textarea pTextarea id="message" formControlName="message" rows="5" placeholder="Votre message" class="w-full"></textarea>
+          <label for="projectType" class="ct-eyebrow">Type de projet *</label>
+          <select
+            id="projectType"
+            formControlName="projectType"
+            class="w-full rounded-sm border border-rule-strong bg-paper px-4 py-3 text-ink"
+            [attr.aria-invalid]="showError('projectType')"
+            [attr.aria-describedby]="showError('projectType') ? 'projectType-error' : null">
+            <option value="">Choisissez…</option>
+            @for (type of projectTypes; track type) {
+              <option [value]="type">{{ type }}</option>
+            }
+          </select>
+          @if (showError('projectType')) {
+            <p id="projectType-error" class="text-sm text-accent" role="alert">
+              Choisissez le type de projet qui s’en rapproche le plus.
+            </p>
+          }
         </div>
 
-        <p-button
-          type="submit"
-          label="Envoyer"
-          icon="pi pi-send"
-          [disabled]="contactForm.invalid && submitted()" />
+        <div class="grid gap-6 sm:grid-cols-2">
+          <div class="flex flex-col gap-2">
+            <label for="budget" class="ct-eyebrow">Budget envisagé</label>
+            <select
+              id="budget"
+              formControlName="budget"
+              class="w-full rounded-sm border border-rule-strong bg-paper px-4 py-3 text-ink">
+              <option value="">Sans avis</option>
+              @for (bracket of budgets; track bracket) {
+                <option [value]="bracket">{{ bracket }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label for="deadline" class="ct-eyebrow">Échéance</label>
+            <select
+              id="deadline"
+              formControlName="deadline"
+              class="w-full rounded-sm border border-rule-strong bg-paper px-4 py-3 text-ink">
+              <option value="">Sans avis</option>
+              @for (deadline of deadlines; track deadline) {
+                <option [value]="deadline">{{ deadline }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label for="message" class="ct-eyebrow">Votre projet *</label>
+          <textarea
+            pTextarea
+            id="message"
+            formControlName="message"
+            rows="6"
+            class="w-full"
+            placeholder="Votre activité, ce que le site doit vous apporter, ce qui vous bloque aujourd’hui…"
+            [attr.aria-invalid]="showError('message')"
+            [attr.aria-describedby]="showError('message') ? 'message-error' : null"></textarea>
+          @if (showError('message')) {
+            <p id="message-error" class="text-sm text-accent" role="alert">
+              Décrivez votre projet en quelques phrases (20 caractères minimum).
+            </p>
+          }
+        </div>
+
+        <!-- Honest about what submitting does: the backend mail service
+             (u1-communication) is not wired up yet, so we compose the message
+             in the visitor's own mail client rather than claiming it was sent. -->
+        <div class="border-t border-rule pt-6">
+          <button type="submit" class="ct-btn">Préparer mon message</button>
+          <p class="ct-prose mt-4 text-sm">
+            Ce bouton ouvre votre logiciel de messagerie avec le message déjà
+            rempli, vous gardez la main sur ce qui part. Vous préférez écrire
+            vous-même&nbsp;?
+            <a [href]="'mailto:' + company.email">{{ company.email }}</a>
+          </p>
+        </div>
       </form>
     </div>
   </div>
-</div>
+</article>

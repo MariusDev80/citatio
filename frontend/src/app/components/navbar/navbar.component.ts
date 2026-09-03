@@ -31,8 +31,9 @@ export class NavbarComponent {
 
   protected readonly navItems = signal<NavItem[]>([
     { label: 'Accueil', path: '/', exact: true },
-    { label: 'Offres', path: '/services' },
-    { label: 'Qui sommes nous', path: '/about' },
+    { label: 'Offres', path: '/offres-et-tarifs' },
+    { label: 'Ce site', path: '/ce-site' },
+    { label: 'Qui sommes-nous', path: '/qui-sommes-nous' },
     { label: 'FAQ', path: '/faq' },
   ]);
 

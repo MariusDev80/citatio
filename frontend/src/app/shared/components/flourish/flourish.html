@@ -1,0 +1,41 @@
+@switch (variant()) {
+  @case ('hero') {
+    <!-- Bottom-anchored on purpose (`YMax`). The host section clips at its own
+         edges, and a section is always wider than this viewBox is tall, so
+         `slice` has to drop some height: anchoring the box to the bottom sends
+         that loss to the top, where the strands are meant to run off the frame,
+         instead of the middle, where it used to shear the bottom of the loop
+         flat. The turn itself stays above y=720, so it is drawn whole whatever
+         the section height. -->
+    <svg viewBox="0 0 1440 760" preserveAspectRatio="xMaxYMax slice" focusable="false">
+      <g class="ct-strand-bundle">
+        <path d="M 1530 -83 C 1300 43 1360 214 1130 268 C 900 322 790 430 915 547 C 1020 646 1300 664 1540 574" />
+        <path d="M 1560 -47 C 1330 79 1390 250 1160 304 C 930 358 820 466 945 583 C 1050 682 1330 700 1570 610" />
+        <path d="M 1590 -11 C 1360 115 1420 286 1190 340 C 960 394 850 502 975 619 C 1080 718 1360 736 1600 646" />
+      </g>
+      <g class="ct-strand-bundle ct-strand-bundle--faint">
+        <path d="M 1560 277 C 1360 250 1265 362 1350 448 C 1425 524 1590 506 1600 426" />
+        <path d="M 1585 308 C 1385 282 1290 394 1375 480 C 1450 556 1615 538 1625 457" />
+      </g>
+    </svg>
+  }
+  @case ('closing') {
+    <!-- Low, wide box, sized on the real height of a closing section: too tall a
+         viewBox would be cropped through its middle by `slice` and the curves
+         would read as plain diagonals. Bottom-anchored for the same reason as
+         the hero. The strands stay in the right third, where the closing title
+         (max-w-[18ch]) never goes. Every turn sits above y=290; only the faint
+         strand crosses the bottom edge, and it crosses it heading straight
+         down, so the cut reads as an exit rather than a severed loop. -->
+    <svg viewBox="0 0 1440 320" preserveAspectRatio="xMaxYMax slice" focusable="false">
+      <g class="ct-strand-bundle">
+        <path d="M 1560 20 C 1310 42 1175 118 1290 178 C 1385 227 1565 209 1605 152" />
+        <path d="M 1585 51 C 1335 72 1200 149 1315 208 C 1410 258 1590 240 1630 183" />
+        <path d="M 1610 82 C 1360 103 1225 179 1340 239 C 1435 288 1615 270 1655 213" />
+      </g>
+      <g class="ct-strand-bundle ct-strand-bundle--faint">
+        <path d="M 1600 -30 C 1290 12 1090 76 1010 165 C 950 233 1010 318 1140 385" />
+      </g>
+    </svg>
+  }
+}

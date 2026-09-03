@@ -28,6 +28,16 @@ export class App {
       logo: COMPANY.logo,
       description: COMPANY.description,
       knowsAbout: [...COMPANY.knowsAbout],
+      // The agency is three named people and serves a named area. Neither fact
+      // was in the structured data, so engines had only the prose to go on.
+      founder: COMPANY.founders.map((f) => ({
+        '@type': 'Person',
+        name: f.fullName,
+        jobTitle: f.office,
+        sameAs: [...f.sameAs],
+      })),
+      areaServed: COMPANY.areaServed.map((name) => ({ '@type': 'Place', name })),
+      foundingDate: String(COMPANY.foundingYear),
       contactPoint: {
         '@type': 'ContactPoint',
         telephone: COMPANY.phone,

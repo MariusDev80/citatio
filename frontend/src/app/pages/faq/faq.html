@@ -1,14 +1,72 @@
-<div class="pt-32 pb-16 max-w-3xl mx-auto px-6">
-  <h1 class="ct-page-title mb-12">Questions Fréquemment Posées</h1>
+<article class="pt-36 pb-8 md:pt-44">
+  <header class="ct-flourish-host">
+    <app-flourish variant="hero" />
+    <div class="ct-section">
+      <p class="ct-eyebrow">Questions fréquentes</p>
+      <h1 class="ct-display-lg mt-6 max-w-[16ch]">Ce qu’on nous demande le plus souvent.</h1>
+      <p class="ct-lede ct-column mt-8">
+        Les prix, les délais, ce que nous refusons de faire. Si votre question n’y est
+        pas, écrivez-nous : nous répondons à tout le monde, même quand cela ne débouche
+        pas sur un devis.
+      </p>
+    </div>
+  </header>
 
-  <p-accordion [multiple]="true" [value]="['0']">
-    @for (item of faqItems(); track item.question; let i = $index) {
-      <p-accordion-panel [value]="i.toString()">
-        <p-accordion-header>{{ item.question }}</p-accordion-header>
-        <p-accordion-content>
-          <p class="ct-text-body py-2">{{ item.answer }}</p>
-        </p-accordion-content>
-      </p-accordion-panel>
-    }
-  </p-accordion>
-</div>
+  @for (group of groups(); track group.title; let first = $first) {
+    <section class="ct-section" [class.mt-20]="first" [class.mt-16]="!first">
+      <!-- Le titre de rubrique est un h2, les questions des h3 : avec dix-huit
+           entrees, un plan a un seul niveau ne dit plus rien de la structure,
+           ni au lecteur ni aux moteurs. -->
+      <h2 class="ct-display-md border-t border-rule-strong pt-10">{{ group.title }}</h2>
+
+      <div class="ct-column mt-10 border-t border-rule-strong">
+        @for (item of group.items; track item.question) {
+          <!-- <details> natif plutot que l'accordeon PrimeNG : celui-ci ne
+               survivait pas a l'hydratation. Son composant <p-motion> memorise
+               les styles d'origine dans une WeakMap au moment ou il masque un
+               element ; sur une page prerendue l'element arrive deja masque,
+               la WeakMap est vide, et resetStyles retombe sur element.style,
+               donc il « restaure » visibility:hidden et max-height:0. Aucune
+               reponse ne s'ouvrait sur le site en ligne.
+
+               Le <details> natif n'a pas d'etat a hydrater, fonctionne sans
+               JavaScript, et le titre dans <summary> est explicitement prevu
+               par la specification HTML. -->
+          <details class="ct-faq-item">
+            <summary class="ct-faq-summary">
+              <h3 class="ct-faq-question">{{ item.question }}</h3>
+              <svg class="ct-faq-chevron" viewBox="0 0 14 14" width="14" height="14"
+                   aria-hidden="true" focusable="false">
+                <path d="M 2 5 L 7 10 L 12 5" fill="none" stroke="currentColor"
+                      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </summary>
+            <div class="ct-faq-answer">
+              <p class="ct-prose">{{ item.answer }}</p>
+              @if (item.links) {
+                <ul class="mt-5 flex flex-wrap gap-x-8 gap-y-2">
+                  @for (link of item.links; track link.path) {
+                    <li>
+                      <a [routerLink]="link.path" class="ct-link text-sm">
+                        {{ link.label }}
+                        <span aria-hidden="true">→</span>
+                      </a>
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+          </details>
+        }
+      </div>
+    </section>
+  }
+
+  <section class="ct-flourish-host py-20">
+    <app-flourish variant="closing" />
+    <div class="ct-section border-t border-rule-strong pt-12">
+      <h2 class="ct-display-md max-w-[18ch]">Une question qui n’est pas là ?</h2>
+      <a routerLink="/contact" class="ct-btn mt-8">Posez-la nous</a>
+    </div>
+  </section>
+</article>

@@ -1,6 +1,32 @@
-citatio-geo.com, www.citatio-geo.com {
-    # Compresse les réponses (JS, CSS, HTML)
-    encode gzip
+# Redirection du www vers le domaine nu, en 301.
+# Les deux hotes servaient jusqu'ici la meme page en 200 : les balises
+# <link rel="canonical"> pointent toutes vers l'apex, donc Google finissait par
+# choisir la bonne URL, mais chaque page etait crawlee deux fois. Sur un domaine
+# jeune au budget de crawl reduit, c'est du gaspillage evitable.
+www.citatio-geo.com {
+    redir https://citatio-geo.com{uri} permanent
+}
+
+citatio-geo.com {
+    # zstd avant gzip : Caddy retient le meilleur encodage accepte par le client.
+    # Pas de brotli ici — l'encodeur `br` n'est pas enregistre dans l'image Caddy
+    # standard, il faudrait un build xcaddy dedie. zstd apporte l'essentiel du
+    # gain sur les navigateurs recents, gzip reste le repli universel.
+    encode zstd gzip
+
+    # En-tetes de securite. L'effet sur le classement est marginal, mais l'agence
+    # vend la rigueur technique : un prospect qui passe le site sur
+    # securityheaders.com doit y trouver ce qu'on lui promet.
+    header {
+        # 2 ans, sous-domaines inclus. A ne preloader qu'une fois la valeur stable.
+        Strict-Transport-Security "max-age=63072000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        X-Frame-Options "SAMEORIGIN"
+        Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+        # Caddy annonce sa presence par defaut ; inutile de le publier.
+        -Server
+    }
 
     # API microservices — le préfixe /api/uX est conservé (handle, pas handle_path)
     # car les contrôleurs Spring sont mappés sous /api/u1 et /api/u2.

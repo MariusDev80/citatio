@@ -8,7 +8,10 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "e2e": "ng build && playwright test",
-    "e2e:ui": "playwright test --ui"
+    "e2e:ui": "playwright test --ui",
+    "check:contrast": "node tools/check-dark-contrast.mjs",
+    "build:portraits": "node tools/build-portraits.mjs",
+    "build:og": "node tools/build-og-image.mjs"
   },
   "prettier": {
     "printWidth": 100,
