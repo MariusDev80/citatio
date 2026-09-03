@@ -1,177 +1,582 @@
-# CLAUDE.md — Citatio
+# CLAUDE.md, Citatio
 
-> **Source of truth** for this repository. Every agent and every contributor reads this first.
-> The old `.github/copilot-instructions.md` has been migrated here.
-
----
-
-## 1. Product positioning (READ THIS — the business is pivoting)
-
-Citatio **was** a pure **GEO** (Generative Engine Optimization) shop — making businesses
-visible inside AI answers (ChatGPT, Gemini, Google AI Overview).
-
-Citatio **is becoming** a **web studio that builds showcase websites ("sites vitrines")**,
-with **SEO and GEO sold as options on top**, plus operational add-ons:
-
-- **Core offer:** showcase website design & development.
-- **Options:** SEO package, GEO package, **hosting included**, **domain name**, ongoing maintenance.
-- **Beyond the showcase (this is why a backend exists):** the platform is **not vitrine-only long
-  term**. Planned product surface includes:
-  - a **blog** with published articles on various topics → backend module **`u2-blog`**.
-  - **email sending** (contact, transactional, later marketing) → backend module **`u1-communication`**.
-
-The detailed offer matrix, pricing placeholders and **business diversification ideas** live in
-[`docs/product/offres.md`](docs/product/offres.md). The `product-owner` agent owns that document.
-
-### ⚠️ 1.1 Critical distinction — the Citatio site vs. the service we sell to clients
-
-These two are **easy to confuse**. On every task, be explicit about which one it concerns, and ask if
-it is unclear:
-
-- **The Citatio website itself** → *the owner's own site* (this repo). When a request says "build a
-  page", "improve SEO", "add a blog", the **default subject is Citatio's own marketing site**, owned by
-  the owner (Marius).
-- **The service we sell to clients** → building showcase sites + SEO/GEO options, hosting, domain,
-  maintenance, etc. **for other businesses** (Citatio's clients). These are the **commercial offers** in
-  `docs/product/offres.md`; they are *not* features of this codebase.
-
-Always name the concerned party — **owner (le site Citatio)** vs **clients (les offres)** — in plans,
-stories, and code comments where relevant.
-
-### 1.2 Branding & domain (decided)
-
-- **Name: `Citatio`** (validé) — drop the "GEO" suffix to match the broader positioning. `legalName`
-  is already `Citatio`.
-- **Domain: keep `citatio-geo.com`** — `citatio.fr` / `citatio.com` are owned by third parties and not
-  available; the exact domain string matters little (visual/content quality matters more). No domain
-  change for now.
-- Code still carries the old `Citatio GEO` name in `frontend/src/app/config/company.config.ts`,
-  `frontend/src/app/app.routes.ts` (SEO titles), the footer, and GEO-centric copy. The
-  **rebrand + repositioning of the site copy is a P0 task** (see `docs/product/offres.md`), to be done
-  deliberately by `frontend-angular` — not as scattered unilateral renames.
+> Document de référence du dépôt. Toute personne et tout agent qui touche à ce code le lit d'abord.
+> **Il se suffit à lui-même** : il n'y a ni persona, ni skill, ni document annexe à charger. Ce qui
+> compte pour livrer ici est écrit ci-dessous, y compris les vérifications à faire et les erreurs à
+> ne pas commettre, avec la raison de chacune.
+>
+> En cas de contradiction entre ce fichier et le code, le code gagne : signale l'écart et corrige le
+> document dans la foulée.
 
 ---
 
-## 2. Repository map
+## 1. Le projet en une page
+
+Citatio est une **agence web de trois personnes installée à La Chapelle-sur-Erdre (44), près de
+Nantes**. Elle conçoit, développe et héberge des **sites vitrines sur mesure** pour artisans,
+commerces, TPE, PME et indépendants. Le **référencement Google (SEO)** et la **visibilité dans les
+réponses des IA (GEO)** sont vendus en options, avec un abonnement couvrant hébergement, nom de
+domaine et maintenance.
+
+L'entreprise vient d'un positionnement **100 % GEO** et a pivoté vers le studio de sites vitrines.
+Des traces de l'ancien positionnement peuvent subsister ; le nom de domaine `citatio-geo.com` en est
+une, assumée et conservée (`citatio.fr` et `citatio.com` appartiennent à des tiers). **La marque est
+`Citatio`, sans suffixe GEO.**
+
+### 1.1 La question à poser avant toute tâche : notre site, ou celui d'un client ?
+
+C'est la confusion la plus coûteuse du projet, et la seule qui fasse perdre une journée entière.
+Deux objets portent les mêmes mots (« le site », « la page d'accueil », « le SEO ») :
+
+- **🏠 Le site Citatio, le nôtre.** Ce dépôt. Notre vitrine, notre outil de vente, et la seule preuve
+  de savoir-faire dont l'agence dispose aujourd'hui. C'est **la cible par défaut** de toute demande.
+- **👥 Les sites de nos clients.** Ce que nous construisons **pour d'autres entreprises**, vendu sous
+  forme de formules et d'options (vitrine, SEO, GEO, hébergement, nom de domaine, maintenance).
+  Ce sont des **prestations commerciales**. **Elles ne vivent pas dans ce dépôt**, et rien de ce qui
+  est décrit ici ne doit être livré tel quel à un client sans décision explicite.
+
+**Protocole, à appliquer systématiquement :**
+
+1. Si la demande nomme un client, une entreprise tierce, un autre domaine, ou parle de « livrer »,
+   « le site du client », « son SEO », alors **arrête-toi et demande confirmation avant d'écrire une
+   ligne**. Formulation suggérée :
+
+   > « Avant de commencer, je confirme la cible : cette demande concerne bien **notre site Citatio**
+   > (ce dépôt), ou bien **le site d'un client** ? »
+
+2. Si rien ne l'indique, considère qu'il s'agit du **site Citatio**, et **dis-le explicitement** dans
+   ta réponse pour que l'hypothèse soit visible et corrigeable en une phrase.
+3. Dans les plans, les messages de commit et les commentaires, **nomme la cible** quand une
+   ambiguïté est possible : « sur notre site », « pour un site client ».
+4. Le code de ce dépôt ne contient aucune notion de client. Si une demande implique d'en créer une
+   (multi-tenant, thème par client, gabarit vendu), c'est une **décision produit** : elle revient au
+   propriétaire, pas à toi.
+
+### 1.2 État réel du projet, au 3 septembre 2026
+
+Ce que le dépôt contient vraiment, pour éviter de raisonner sur un système imaginaire :
+
+| Brique | État |
+|--------|------|
+| Site vitrine Angular, 10 routes, entièrement pré-rendu | **En production**, sur `citatio-geo.com` |
+| Design system éditorial (tokens, typo, filets, thème sombre) | **En production** |
+| SEO / GEO on-page (meta, JSON-LD, sitemap, llms.txt, robots) | **En production** |
+| CI GitHub Actions (Vitest + Playwright + build/push GHCR + déploiement VPS) | **Opérationnelle** |
+| Gateway Caddy, TLS, en-têtes de sécurité, routage `/api/uX` | **Opérationnelle** |
+| `u1-communication`, `u2-blog` (Spring Boot) | **Squelettes** : `/health` et un `ping-u1` de démonstration, aucune entité métier, aucun envoi de mail |
+| Consommation du backend par le frontend | **Inexistante** : aucun `HttpClient` dans `frontend/src`, le site est 100 % statique |
+| Formulaire de contact | Compose un **`mailto:` pré-rempli**, aucun envoi serveur (voir §6.2) |
+| Blog | **Pas commencé**, prévu sur `u2-blog` |
+
+Conséquence pratique : **une modification du frontend n'a besoin d'aucun backend démarré**, et le
+backend n'a aujourd'hui aucun consommateur. Ne raisonne jamais comme si une API était déjà branchée.
+
+---
+
+## 2. Protocole de travail
+
+### 2.1 Avant d'écrire une ligne
+
+1. **Confirmer la cible** (§1.1) : notre site ou un site client.
+2. **Vérifier l'état réel** (§1.2). La moitié des mauvaises implémentations viennent de l'hypothèse
+   qu'un backend, une API ou un blog existe déjà.
+3. **Ouvrir la source de vérité** du sujet touché (§11). Un prix, une adresse, un chiffre mesuré, un
+   token de couleur ont chacun **un seul** fichier propriétaire.
+4. **Lire le code voisin.** Ce dépôt a un style : commentaires qui expliquent la décision, pas la
+   ligne suivante. Écris dans ce style, pas dans le tien.
+5. Si la demande contredit une règle de ce document, **dis-le en une phrase, propose l'alternative,
+   et attends l'arbitrage** plutôt que de contourner en silence.
+
+### 2.2 Pendant
+
+- Respecter les règles de la couche touchée : §4.1 frontend, §4.2 backend, §4.3 infra, §5 design.
+- Toute nouvelle dépendance se justifie. Le site tient à 100/100 en partie parce qu'il en a peu.
+- Chaque garde-fou retiré emporte le commentaire qui l'explique ; chaque garde-fou ajouté vient avec
+  la raison de son existence.
+- Ne « corrige » pas un test qui échoue en modifiant le test. Plusieurs tests e2e sont des garde-fous
+  de doctrine (§8.2) : leur échec signale presque toujours une régression réelle.
+
+### 2.3 Avant de dire que c'est fini
+
+Les commandes sont détaillées en §8. Selon ce que tu as touché :
+
+**Changement visuel, de copie ou de composant (frontend)**
+
+1. `npm test` (Vitest) au vert.
+2. `npm run build`, puis les e2e contre le dist pré-rendu : `npm run e2e`.
+3. Si une couleur, un token ou le thème sont touchés : `npm run check:contrast` (thème sombre).
+4. **Ouvrir la page dans les deux thèmes.** Le thème sombre n'est pas une variante secondaire.
+5. Balayage de largeurs 320 / 768 / 1024 / 1440 / 2560 px : aucun débordement horizontal.
+6. Si la structure, une police ou un asset changent : Lighthouse sur les routes touchées, profil
+   ordinateur. Le site publie 100/100/100/100, une baisse doit être vue avant la mise en ligne.
+7. Relecture contre les marqueurs interdits (§6.1) et le ton éditorial (§6.3), tirets cadratins
+   compris.
+
+**Nouvelle route**
+
+La liste complète des sept points est en §7. En oublier un (typiquement le `sitemap.xml` ou le
+`llms.txt`) est la régression la plus fréquente du projet.
+
+**Chiffre, score ou promesse affichés sur le site**
+
+1. La mesure a été **refaite**, pas recopiée.
+2. `site-metrics.config.ts` porte le `howToVerify` et la date `MEASURED_ON` mise à jour.
+3. Si tu ne peux pas mesurer, **tu n'affiches pas**. Voir la règle de preuve (§6.2).
+
+**Endpoint ou entité backend**
+
+1. `./mvnw -pl <module> -am test` au vert.
+2. DTO en records, aucune entité JPA exposée, validation `@Valid`, erreurs en Problem Details.
+3. Contrôleur mappé sous `/api/u1` ou `/api/u2`, préfixe conservé.
+4. Aucune jointure vers la base d'un autre module.
+5. Si le contrat change : `docker compose up --build` et appel réel de l'endpoint.
+6. **Si le frontend doit le consommer** : il n'y a aujourd'hui aucun `HttpClient`. Il faut ajouter
+   `provideHttpClient(withFetch())` **et trancher le mode de rendu de la route concernée** : une page
+   qui dépend d'une API ne peut plus être pré-rendue au build comme les autres (§4.1).
+
+**Infrastructure**
+
+1. `docker compose up --build` en local, la pile complète démarre.
+2. Le fichier modifié est-il **synchronisé vers le VPS** par l'étape `scp` du workflow ? Sinon le
+   changement n'aura aucun effet en production.
+3. Aucun `ports:` sur `u1-communication` ni `u2-blog`.
+4. Après déploiement, vérifier en une passe : `https://www.citatio-geo.com` répond 301,
+   une route pré-rendue répond 200 **sans redirection**, une URL inconnue répond **404** et non 200.
+
+### 2.4 Les interdits, et pourquoi
+
+| Ne fais pas ça | Parce que |
+|---|---|
+| Une paire `dark:` de couleur dans un gabarit | Le thème sombre est une permutation de tokens (§5.1). La paire mécanique réintroduit le marqueur générique et double la maintenance. |
+| Une couleur Tailwind brute (`indigo-600`, `slate-900`) | Elle échappe au thème, donc au thème sombre et au contrôle de contraste. |
+| Coder en dur un prix, une adresse, un SIRET, un score | Trois fichiers de configuration font autorité (§11). Un doublon dérive, et ici une dérive est un mensonge affiché. |
+| Afficher un chiffre non mesuré, un faux avis, un logo client | Le site est notre seule preuve. Une preuve fausse détruit l'argument commercial entier (§6.2). |
+| Écrire un tiret cadratin | C'est le marqueur d'écriture par IA le plus reconnaissable. Le dépôt en a été purgé volontairement (§6.3). |
+| `standalone: true`, `@Input()`, `ngClass`, injection par constructeur | Conventions Angular 21 du projet (§4.1). L'uniformité rend le code relisible en un coup d'œil. |
+| Toucher au DOM, à `window` ou à `localStorage` hors `afterNextRender` | Le prerendering plante, et l'hydratation avec lui. Les 10 routes sont pré-rendues. |
+| Cacher du contenu derrière une animation sans garde `html.ct-js` | Sans JavaScript et pour un crawler, le contenu resterait invisible. |
+| Exposer une entité JPA dans une réponse | Le schéma de base devient un contrat public, impossible à faire évoluer. |
+| Une jointure vers la base d'un autre module | Le découpage en microservices ne tiendrait plus, et les deux bases se verrouilleraient mutuellement. |
+| `ports:` sur `u1` ou `u2` dans `docker-compose.yml` | Cela publie les microservices sur Internet. Déjà corrigé une fois (§10). |
+| `handle_path` à la place de `handle` dans le `Caddyfile` | Le préfixe `/api/uX` serait retiré, alors que les contrôleurs Spring sont mappés dessus. |
+| Retirer l'étape `scp` du workflow de déploiement | `docker-compose.yml` et `Caddyfile` ne seraient plus déployés : le VPS resterait sur l'ancienne configuration, en silence. |
+| Pousser sur `develop` ou `master` sans demande explicite | **Un push sur `develop` déploie en production.** |
+| Annoncer une vérification qui n'a pas tourné | Voir §2.5. |
+
+### 2.5 Rendre compte
+
+- Dis ce que tu as **réellement** vérifié, et nomme ce que tu n'as pas pu vérifier. « Lighthouse non
+  relancé » est une information utile ; « tout est vert » quand rien n'a tourné est une faute.
+- Si un test échoue, montre la sortie. Si une partie du périmètre est bloquée, termine le reste et
+  dis précisément ce qui manque et pourquoi.
+- Le même standard s'applique au site lui-même : ce document et le produit partagent une seule
+  exigence, **ne rien affirmer qui ne soit vérifiable**.
+
+---
+
+## 3. Carte du dépôt
 
 ```
 citatio/
-├── CLAUDE.md                 ← you are here (source of truth)
-├── docs/product/offres.md    ← offers, pricing, diversification (product-owner owns)
-├── .claude/agents/           ← expert agent personas (see §6)
-├── docker-compose.yml        ← full stack orchestration
-├── Caddyfile                 ← reverse-proxy / gateway (API routing + TLS)
-├── frontend/                 ← Angular 21 app (SSR enabled)
-└── backend/                  ← Maven multi-module Spring Boot microservices
-    ├── pom.xml               ← parent POM (aggregator, packaging=pom — no app code here)
-    ├── common-libs/          ← shared DTOs / config (NO cross-module DB joins)
-    ├── u1-communication/     ← email / contact / comms microservice (port 8081, own DB: citatio_u1_db)
-    └── u2-blog/              ← blog microservice (port 8082, own DB: citatio_u2_db)
+├── CLAUDE.md                     ← ce fichier, seul document de référence
+├── docker-compose.yml            ← orchestration complète (db, u1, u2, front, gateway)
+├── Caddyfile                     ← gateway : TLS, redirection www, en-têtes, routage /api/uX
+├── .github/workflows/main.yml    ← CI/CD
+├── data/                         ← volumes Docker locaux, ignoré par git
+├── frontend/                     ← Angular 21, SSR + prerendering
+│   ├── src/app/config/           ← identité, tarifs, mesures : sources de vérité uniques
+│   ├── src/app/pages/            ← une route = un dossier (ts + html + css)
+│   ├── src/app/services/         ← SeoService, JsonLdService, ThemeService
+│   ├── src/app/shared/           ← FlourishComponent, RevealDirective, format-euro
+│   ├── src/app/theme/            ← preset PrimeNG dérivé de la palette
+│   ├── src/styles.css            ← design system complet (tokens, base, composants ct-*)
+│   ├── public/                   ← robots.txt, sitemap.xml, llms.txt, polices, images
+│   ├── tools/                    ← scripts de vérification et de génération d'assets
+│   ├── e2e/                      ← Playwright, tourne contre le dist pré-rendu
+│   └── nginx.conf                ← cache, redirections 301, vraies 404
+└── backend/                      ← Maven multi-modules, Spring Boot 4
+    ├── pom.xml                   ← POM parent agrégateur (packaging pom, aucun code applicatif)
+    ├── common-libs/              ← DTO et config partagés
+    ├── u1-communication/         ← mails, contact (port 8081, base citatio_u1_db)
+    ├── u2-blog/                  ← blog (port 8082, base citatio_u2_db)
+    └── docker/postgres/init.sql  ← crée les deux bases au premier démarrage du volume
 ```
 
-**Ports:** each microservice listens on its own port — `u1-communication:8081`, `u2-blog:8082`.
-Inter-module calls go through the Docker service name (Spring `RestClient`), e.g. u2 → `http://u1-communication:8081`.
+---
 
-**Service routing (Caddy):** `/api/u1/*` → `u1-communication:8081`, `/api/u2/*` → `u2-blog:8082`,
-everything else → Angular frontend. The `/api/uX` prefix is **preserved** (Caddy `handle`, not
-`handle_path`) — Spring controllers are mapped under `/api/u1` and `/api/u2`.
+## 4. Stack et architecture
+
+### 4.1 Frontend, Angular 21
+
+**Stack** : Angular 21.1.2 (`@angular/build:application`, esbuild) · **SSR + prerendering**
+(`@angular/ssr`) · **Tailwind CSS v4** via `@tailwindcss/postcss` (configuré dans
+`postcss.config.json`, **jamais** en `.js`, aucun `tailwind.config`) · PrimeNG 21 thémé par
+`@primeuix/themes` (preset Aura dérivé dans `src/app/theme/citatio-preset.ts`) · PrimeIcons ·
+**CSS pur** (jamais de SCSS) · **Vitest** (unitaire) · **Playwright** (e2e) · TypeScript strict.
+
+**Rendu** : les 10 routes sont **pré-rendues** (`app.routes.server.ts`, `RenderMode.Prerender`),
+la 404 seule est rendue côté client. Le build produit du HTML statique servi par nginx. C'est un
+**argument commercial affiché sur `/ce-site`** : le contenu doit être dans le HTML source, jamais
+injecté par JavaScript. Un test e2e verrouille cette propriété. Toute page future qui dépendra d'une
+API (le blog en premier) devra **choisir explicitement** son mode de rendu, prerender au build ou
+rendu serveur, et ce choix se justifie dans le code.
+
+**Règles non négociables :**
+
+- Composants **standalone** uniquement. Ne jamais écrire `standalone: true`, c'est le défaut.
+- `ChangeDetectionStrategy.OnPush` dans **tous** les composants.
+- **Signals** pour l'état réactif, `computed()` pour le dérivé. Jamais `mutate`, utiliser `set` / `update`.
+- `inject()` pour l'injection de dépendances. **Jamais d'injection par constructeur.**
+- `input()`, `input.required()`, `output()`. **Jamais** `@Input()` / `@Output()`.
+- Flux de contrôle natif `@if` / `@for` / `@switch`. **Aucune fonction fléchée dans un template.**
+- **Trois fichiers par composant** : `.ts`, `templateUrl` `.html`, `styleUrl` `.css` (singulier, `.css`).
+- Objet `host: {}`. **Jamais** `@HostBinding` / `@HostListener`.
+- `NgOptimizedImage` pour les images statiques. Chargement paresseux de chaque route (`loadComponent`).
+- **Ni `ngClass` ni `ngStyle`** : bindings `[class.x]` ou classes Tailwind statiques.
+  (Un `[class]` global avait cassé l'hydratation en fusionnant `pi-moon` et `pi-sun`, voir §10.)
+- Formulaires **réactifs**, jamais template-driven.
+- TypeScript strict, `strictTemplates` actif. Jamais `any`, utiliser `unknown`.
+- **Compatibilité SSR obligatoire** : aucun accès au DOM, à `window`, `localStorage` ou
+  `IntersectionObserver` hors `afterNextRender()` et hors garde `isPlatformBrowser`.
+
+### 4.2 Backend, Java 21 et Spring Boot 4
+
+**Stack** : Java 21 (records, pattern matching, threads virtuels) · Spring Boot 4.0.2 · Spring Data
+JPA · PostgreSQL 15 · Lombok · Maven multi-modules · JUnit 5 + Mockito (H2 en test).
+
+**Architecture microservices :**
+
+- **Une base par module.** `citatio_u1_db` et `citatio_u2_db`. Les **jointures inter-modules sont
+  interdites**, sans exception.
+- Les modules ne se parlent **qu'en REST**, via `RestClient` (jamais `RestTemplate`), avec des
+  timeouts explicites : voir `u2-blog/config/RestClientConfig.java` (2 s connexion, 2 s lecture,
+  pour qu'un `u1` injoignable ne bloque pas `u2`).
+- L'URL de base vient d'une variable d'environnement (`U1_BASE_URL`), qui vaut le **nom de service
+  Docker** en production et `localhost` en développement.
+- Chaque module se construit et se teste **indépendamment** : `./mvnw -pl u2-blog -am package`.
+- Les DTO et configurations partagés vivent dans `common-libs`, importés explicitement
+  (`@Import(CommonWebConfig.class)`). Jamais de fuite d'interne de module.
+
+**Règles Java :**
+
+- **Records** pour tous les DTO, requêtes, réponses, projections.
+- Injection par constructeur : champs `final` + `@RequiredArgsConstructor`. **Jamais `@Autowired`
+  sur un champ.**
+- `jakarta.validation` sur les DTO d'entrée, activée par `@Valid`.
+- Style fonctionnel : `Optional`, streams, lambdas plutôt que boucles et tests de nullité.
+- Contrôleurs mappés sous **`/api/u1`** et **`/api/u2`** : le préfixe est **conservé** par la
+  gateway (`handle`, pas `handle_path`).
+- Ressources au pluriel (`/articles`, `/messages`), sémantique HTTP stricte,
+  `@RestControllerAdvice` renvoyant du **Problem Details (RFC 7807)**, 201 à la création,
+  204 à la suppression, 400 en validation, 404 en absence.
+- Pagination (`Page<T>` / `Slice<T>`) sur toute liste, suppressions logiques plutôt que physiques.
+- **Interdits** : injection par champ, logique métier dans un contrôleur (elle va en `@Service`),
+  exposition d'entités JPA (toujours mapper vers un record), `System.out.println` (SLF4J `@Slf4j`),
+  types bruts.
+- **Dette connue** : `spring.jpa.hibernate.ddl-auto=update` sur les deux modules. Dès qu'une entité
+  réelle apparaît, passer à **Flyway** avant la première mise en production de schéma.
+- **Dette connue** : `CommonWebConfig` autorise `allowedOrigins("*")`. À restreindre à l'URL de
+  production avant qu'une API soit réellement consommée.
+
+### 4.3 Infrastructure
+
+**Chaîne complète** : GitHub Actions → images `ghcr.io` → VPS Hostinger → `docker compose` →
+Caddy (TLS, gateway) → nginx (statique) ou microservices Spring.
+
+- **Caddy** (`Caddyfile`) : certificats automatiques, `www` redirigé en **301** vers l'apex,
+  compression `zstd gzip`, en-têtes de sécurité (HSTS 2 ans, `nosniff`, `Referrer-Policy`,
+  `X-Frame-Options`, `Permissions-Policy`, suppression de l'en-tête `Server`).
+  Routage : `/api/u1/*` → `u1-communication:8081`, `/api/u2/*` → `u2-blog:8082`, tout le reste →
+  `frontend:80`.
+- **Exposition réseau** : les microservices utilisent `expose`, **jamais `ports`**. Ils ne sont
+  joignables que depuis le réseau Docker interne.
+- **nginx** (`frontend/nginx.conf`) : cache immuable d'un an sur les assets hachés, `no-cache` sur
+  le HTML, 301 des anciennes URL anglaises (`/about`, `/services`), résolution
+  `try_files $uri $uri/index.html` pour servir les routes pré-rendues **sans slash final**
+  (le slash contredirait les balises canoniques), et `error_page 404` renvoyant le corps du SPA avec
+  un **vrai statut 404** (un « soft 404 » se fait désindexer).
+- **CI/CD** (`.github/workflows/main.yml`) : tests unitaires puis e2e sur **tout push et toute PR**
+  vers `develop` et `master`. Build et push des trois images, puis déploiement VPS, **uniquement sur
+  push `develop`**. Le déploiement synchronise d'abord `docker-compose.yml`, `Caddyfile` et
+  `init.sql` vers le VPS, puis `docker compose pull && up -d`.
+- **Secrets** : `VPS_IP`, `VPS_USER`, `SSH_PRIVATE_KEY`, `GHCR_PAT`, côté GitHub. Jamais de secret
+  dans le dépôt. Les identifiants Postgres de `docker-compose.yml` sont des valeurs de
+  développement, à remplacer par des variables d'environnement le jour où la base porte des données
+  réelles.
 
 ---
 
-## 3. Frontend stack & conventions (Angular 21)
+## 5. Le design system
 
-**Stack:** Angular 21+ (`@angular/build:application`, esbuild) · **SSR** (`@angular/ssr`) ·
-PrimeNG 21+ themed via `@primeuix/themes` (**Aura** preset customized in
-`frontend/src/app/theme/citatio-preset.ts`, `darkModeSelector: '.dark'`) · **Tailwind CSS v4**
-(`@tailwindcss/postcss`, configured in `postcss.config.json` — **never** `.js`) · PrimeIcons ·
-**Vitest** (unit) · **Playwright** (e2e) · **plain CSS** (no SCSS) · dark mode via signal-based
-`ThemeService` toggling `.dark` on `<html>`.
+Tout tient dans **`frontend/src/styles.css`**. C'est la source de vérité, il est commenté ligne à
+ligne, et il faut le lire avant de styler quoi que ce soit.
 
-**Hard rules (these are non-negotiable):**
-- Standalone components only. **Do not** set `standalone: true` (redundant in v19+).
-- `ChangeDetectionStrategy.OnPush` in **every** component.
-- Signals for all reactive state · `computed()` for derived state · **never** `mutate` (use `set`/`update`).
-- `inject()` for DI — **never** constructor injection.
-- `input()` / `input.required()` / `output()` — **never** `@Input()` / `@Output()` decorators.
-- Native control flow `@if` / `@for` / `@switch` only. **No** arrow functions in templates.
-- Three separate files per component: logic `.ts`, template `templateUrl` `.html`, styles `styleUrl` `.css` (singular `styleUrl`, `.css` extension).
-- `host: {}` object — **never** `@HostBinding` / `@HostListener`.
-- `NgOptimizedImage` for static images. Lazy-load every feature route.
-- **No** `ngClass` / `ngStyle` — use `[class.x]` bindings or static Tailwind classes.
-- Reactive forms, not template-driven.
+### 5.1 Les partis pris
 
-**Styling:**
-- Tailwind utilities in templates for layout/spacing/typography/color/responsive. Always ship `dark:` variants.
-- Component `.css` minimal — only `:host`, animations, or what Tailwind can't express.
-- Global base styles → `@layer base` in `styles.css`. Reusable component classes → `@layer components`
-  with the **`ct-`** prefix and `@apply` (e.g. `.ct-card`, `.ct-page-title`).
-- PrimeNG design tokens only for PrimeNG component theming.
+- **Palette papier / encre / outremer, en tokens sémantiques.** `--color-paper`, `--color-surface`,
+  `--color-ink`, `--color-ink-soft`, `--color-ink-faint`, `--color-rule`, `--color-accent`.
+  Les gabarits n'utilisent **jamais** une couleur Tailwind brute.
+- **Le thème sombre est une permutation de tokens, pas un second jeu d'utilitaires.** Les valeurs
+  sont redéfinies sous `html.dark` dans `@layer base`. Conséquence, et c'est **la règle qui surprend
+  le plus** : on écrit `bg-paper text-ink`, et **jamais de paire `dark:` de couleur** dans un
+  gabarit. Le jumeau `dark:` mécanique sur chaque utilitaire était l'un des marqueurs génériques que
+  la refonte a supprimés.
+- **Deux polices, auto-hébergées, 72 ko en tout.** *Instrument Serif* pour l'affichage
+  (`ct-display-xl/lg/md` seulement, c'est une graisse 400 unique qui paraît frêle en petit) et
+  *Geist* variable pour tout le reste. Sous-ensemble latin, `font-display: swap`, les deux faces
+  du LCP sont préchargées dans `index.html`. **Aucun appel à Google Fonts**, vérifiable depuis
+  l'onglet Réseau, donc affiché comme preuve sur `/ce-site`.
+- **Deux rayons seulement** (`--radius-sm: 2px`, `--radius-md: 6px`). L'ancienne feuille en avait six.
+- **Des filets 1px plutôt que des cartes.** `.ct-rule` et `.ct-rule-strong` structurent les pages.
+  Les surfaces (`.ct-panel`) sont réservées aux offres et au bloc de contact.
+- **Numérotation éditoriale** (`.ct-numeral`, 01 / 02 / 03) à la place des pastilles à icônes.
+- **Mouvement minimal, deux dispositifs.** Une entrée de héros jouée une fois au premier rendu
+  (`.ct-hero-stagger`), et un `ctReveal` au défilement, **trois fois par page au maximum**.
+  Tout est conditionné à `html.ct-js` : sans JavaScript, ou avant hydratation, le contenu est
+  **entièrement visible**. Rien ne doit jamais être caché à un crawler par une animation.
+  `prefers-reduced-motion` est neutralisé globalement, animations **et délais** compris.
+- **Le motif `<app-flourish>`** : rubans SVG en ligne, entrant tous par le bord droit (un geste qui
+  revient se lit comme une signature, plusieurs gestes se lisent comme de la décoration). Aucune
+  requête réseau, `aria-hidden`, `pointer-events: none`, aucune animation, opacité très en dessous
+  du texte. La section hôte prend `.ct-flourish-host`.
+- **Mesure de lecture** : `.ct-column` plafonne la prose à 68 caractères.
+- **PrimeNG est réduit au strict minimum.** Il n'habille plus que les champs du formulaire de
+  contact. `citatio-preset.ts` existe uniquement pour que ces champs ne sortent pas en bleu Aura.
+  Avant d'ajouter un composant PrimeNG, demande-toi si trois lignes de Tailwind ne suffisent pas :
+  l'accordéon PrimeNG de la FAQ ne survivait pas au prerendering et a été remplacé par un
+  `<details>` natif.
 
-**TypeScript:** strict mode · prefer inference when obvious · never `any` (use `unknown`).
+### 5.2 Comment styler
 
-**Accessibility (MUST):** pass all AXE checks · WCAG **AA** minimums (focus management, color
-contrast, ARIA via PrimeNG a11y).
-
----
-
-## 4. Backend stack & architecture (Java 21 / Spring Boot 4)
-
-**Stack:** Java 21 (virtual threads, records, pattern matching) · Spring Boot 4.0.2 · Spring Data JPA
-· PostgreSQL · Lombok · Maven (multi-module, parent POM) · JUnit 5 + Mockito.
-
-**Modular microservices architecture:**
-- **One DB per module.** Cross-module DB joins are **FORBIDDEN**.
-- Modules talk to each other **only via REST** — use Spring **`RestClient`** (not `RestTemplate`),
-  with proper resilience (timeouts, 4xx/5xx handling).
-- Each module runs and is tested **independently**.
-- Shared DTOs / utilities live in **`common-libs`** — never duplicate, never leak module internals.
-
-**Java & Spring rules:**
-- **Records** for all DTOs / request / response / projection types.
-- Constructor injection via `final` fields + `@RequiredArgsConstructor`. **No `@Autowired` on fields.**
-- Leverage virtual threads for I/O-bound work.
-- Functional style: `Optional`, Streams, lambdas over imperative null-checks / loops.
-- `jakarta.validation` (`@NotNull`, `@Size`, …) on request DTOs, validated with `@Valid`.
-
-**Data & persistence:** soft deletes (flag/status, avoid hard deletes) · paginate list endpoints
-(`Page<T>` / `Slice<T>`) · **Flyway/Liquibase** migrations over `ddl-auto: update` · snake_case columns.
-
-**API design:** plural noun resources (`/articles`, `/messages`) · strict HTTP semantics ·
-`@RestControllerAdvice` returning **RFC 7807 Problem Details** · status codes: 201 create / 204 delete /
-400 validation / 404 missing.
-
-**Prohibitions:** no field injection · no business logic in controllers (logic → `@Service`) ·
-**never expose JPA entities** (map to record DTOs) · no `System.out.println` (use SLF4J `@Slf4j`) ·
-no raw types.
-
-**Lombok:** prefer `@Getter`/`@Setter`/`@ToString` over `@Data`; on entities scope `@EqualsAndHashCode`
-to the business key/ID; `@Builder` for complex instantiation.
+- Utilitaires Tailwind dans les gabarits pour la mise en page, l'espacement, la typographie,
+  le responsive. Couleurs **par tokens sémantiques**, jamais de `dark:` de couleur.
+- Classes réutilisables dans `@layer components` de `styles.css`, **préfixe `ct-`**, avec `@apply`.
+- En Tailwind v4, seul un bloc `@utility` peut être consommé par `@apply` : c'est pourquoi
+  `ct-focus-ring` est déclaré ainsi.
+- Le `.css` d'un composant reste minimal : `:host`, ou ce que Tailwind ne sait pas exprimer.
+- Les tokens de design PrimeNG ne servent qu'au thème PrimeNG.
 
 ---
 
-## 5. Conventions & workflow
+## 6. Doctrine : un site authentique, pas un site vibe-codé
 
-- **Commits:** Conventional Commits in **French** (matches history): `feat:`, `fix:`, `chore:`, `docs:`…
-  Co-author trailer is added automatically by the harness.
-- **Branches:** feature branches off `master` (e.g. `Modules-Blog/Communication-init`,
-  `seo-geo-optimisation`). Never commit straight to `master`.
-- **Commit / push only when the user asks.**
-- **Code comments & symbols in English; UI copy in French (`fr_FR`).**
+C'est la raison d'être du projet. **Nous vendons des sites faits à la main ; notre propre site est
+la seule preuve dont nous disposons.** Une page qui ressemble à une sortie de générateur détruit
+l'argument commercial avant même qu'il soit lu. La refonte du 1er septembre 2026 a été menée après
+avoir constaté que le site cochait **18 des 22 marqueurs du site vibe-codé**.
+
+### 6.1 Les marqueurs interdits
+
+Aucun de ces éléments ne doit réapparaître, quelle qu'en soit la justification :
+
+- Dégradé bleu-indigo (ou violet-rose) sur un titre, texte en `bg-clip-text`.
+- Police système par défaut, `font-black` ou `font-extrabold` partout.
+- Palette Tailwind brute (`indigo-600`, `slate-900`) au lieu des tokens.
+- Formes décoratives flottantes : blobs, halos, orbes, radars, grilles en fond.
+- Grille de cartes identiques à icône ronde, pour dire trois choses différentes.
+- `hover:scale`, effets de brillance, ombres portées empilées.
+- Animation à chaque section, apparition au défilement sur tous les blocs.
+- Emoji en guise d'icône, badge « Le plus demandé », faux compteurs, faux avis.
+- Copie interchangeable : « solutions innovantes », « propulsé par l'IA »,
+  « nous transformons votre vision », superlatifs sans objet.
+- Mockups génériques, captures de tableaux de bord inventés, logos de clients fictifs.
+- Sections « 500+ clients satisfaits » quand l'entreprise n'a pas encore de client.
+- **Tirets cadratins** (voir §6.3).
+
+### 6.2 La règle de preuve
+
+**Rien ne s'affiche sur le site qui ne soit vérifiable par le visiteur.** L'agence n'a pas encore de
+réalisation client : le site est donc lui-même le portfolio, ce qui ne fonctionne que si chaque
+chiffre est réel.
+
+- Les mesures vivent dans `site-metrics.config.ts`, avec pour chacune un champ **`howToVerify`**
+  et une **date de mesure** (`MEASURED_ON`). Ne jamais arrondir vers le haut, ne jamais estimer, et
+  toujours republier la date pour qu'un chiffre périmé se voie.
+- Refaire une mesure avant de la modifier. La procédure est en tête du fichier.
+- La page `/ce-site` assume explicitement **ce qu'elle ne prouve pas**. Cette section reste.
+- Le formulaire de contact **n'est pas branché** : il compose un `mailto:` pré-rempli. Il affichait
+  auparavant « message envoyé avec succès » alors que rien ne partait ; c'est exactement le genre de
+  mensonge que ce projet refuse. Tant que `u1-communication` n'envoie pas réellement, le
+  comportement `mailto:` reste, et rien ne prétend le contraire.
+- Aucune promesse de position sur Google, sur le site comme dans les offres.
+
+### 6.3 Le ton éditorial
+
+- **Copie en français (`fr_FR`)**, à la première personne du pluriel, concrète, sans jargon.
+  On dit combien ça coûte, en combien de temps, et ce qu'on ne fait pas.
+- **Aucun tiret cadratin, nulle part** : ni dans la copie, ni dans les commentaires, ni dans les
+  messages de commit. C'est le marqueur d'écriture par IA le plus reconnaissable. Un commit entier
+  (`chore: retirer tous les tirets cadratins du frontend`) a servi à les éliminer.
+- Pas de superlatif, pas d'exclamation, pas de « n'hésitez pas ».
+- Les URL sont **en français** et descriptives (`/creation-site-vitrine`, `/qui-sommes-nous`).
+- Les prix affichés sortent de `pricing.config.ts`, jamais codés en dur dans un gabarit.
+
+### 6.4 Les commentaires expliquent le pourquoi
+
+Le dépôt est écrit pour être relu dans six mois. Le style attendu, visible partout dans le code :
+un commentaire ne paraphrase pas la ligne suivante, il **documente la décision, l'alternative
+écartée et la contrainte tenue**. Voir `flourish.component.ts`, `reveal.directive.ts`, `nginx.conf`
+ou `tools/serve-dist.mjs` comme références de ton.
+
+**Langue des commentaires : français**, dans tout le dépôt. Le code existant en contient encore en
+anglais côté frontend ; ils migrent au fil des modifications, sans campagne de renommage dédiée.
+Les identifiants (variables, fonctions, classes, clés) restent **en anglais**.
 
 ---
 
-## 6. Expert agents
+## 7. Accessibilité, SEO et GEO : les invariants
 
-Specialized personas live in `.claude/agents/`. Delegate to the matching one:
+Ce sont des arguments de vente affichés. Les casser en silence est la pire régression possible.
 
-| Agent | Use it for |
-|-------|-----------|
-| `frontend-angular` | Angular 21 components, signals, PrimeNG, Tailwind, SSR, a11y |
-| `backend-spring` | Spring Boot 4 microservices, JPA, REST APIs, inter-module calls |
-| `product-owner` | Offers, pricing, user stories, roadmap, `docs/product/offres.md` |
-| `tech-lead` | Cross-stack architecture, code review, technical arbitration, orchestration |
-| `devops-infra` | Docker, Caddy, CI/CD, deployment, environments |
-| `qa-testing` | Vitest, Playwright e2e, JUnit/Mockito, test strategy & coverage |
-| `ux-ui-design` | Design system, accessibility, conversion-oriented UI/UX |
+**Accessibilité, minimum WCAG AA :**
 
-When in doubt about scope or priorities, **ask the owner** — this project tolerates **no ambiguity**.
+- Contraste AA en thème clair **et sombre**. `npm run check:contrast` balaie chaque nœud de texte de
+  chaque route en thème sombre, ce que Lighthouse ne fait jamais. Le pire rapport actuel est 5,1:1.
+- Hiérarchie de titres correcte, un seul `h1` par page.
+- Focus visible partout (`ct-focus-ring`), navigation clavier complète.
+- Décoratif signifie `aria-hidden` et `pointer-events: none`.
+- Aucun débordement horizontal, de 320 px à 2560 px.
+
+**SEO et GEO :**
+
+- `SeoService` met à jour titre, description, Open Graph, Twitter Card et **canonique** à chaque
+  navigation, depuis les `data.seo` des routes. Toute nouvelle route porte son bloc `seo`.
+- `JsonLdService` injecte les schémas par clé, compatible prerendering. `Organization` et `WebSite`
+  sont posés dans `app.ts` ; les pages ajoutent leurs propres schémas (`FAQPage`, fil d'Ariane).
+- `company.config.ts` est la **source unique** de l'identité : adresse, SIRET, TVA, fondateurs avec
+  leurs `sameAs`, zone desservie, fiche Google Business Profile. Un `sameAs` doit être un profil que
+  la personne contrôle réellement et qui la nomme : une URL fausse est une affirmation fausse sur
+  une personne réelle.
+- `public/llms.txt` résume l'offre pour les moteurs génératifs, `robots.txt` autorise explicitement
+  GPTBot, Google-Extended, anthropic-ai, PerplexityBot et Bytespider.
+- Les canoniques pointent vers l'apex **sans slash final**, ce que nginx et Caddy respectent.
+
+**Ajouter une route, la liste complète** (en oublier un élément est la régression classique) :
+
+1. `app.routes.ts` : chemin, `loadComponent`, bloc `data.seo` (titre et description rédigés).
+2. `app.routes.server.ts` : `RenderMode.Prerender`.
+3. `frontend/public/sitemap.xml` : nouvelle `<url>`.
+4. `frontend/public/llms.txt` : la page dans la liste, avec sa phrase de résumé.
+5. Liens depuis la navigation, le pied de page ou les pages parentes.
+6. Le JSON-LD spécifique s'il y en a un.
+7. Un test e2e minimal (titre, canonique, contenu présent dans le HTML pré-rendu).
+
+---
+
+## 8. Outillage de test
+
+### 8.1 Commandes
+
+```bash
+# Frontend, depuis frontend/
+npm start                       # serveur de développement
+npm test                        # Vitest (npm test -- --configuration=ci en CI)
+npm run build                   # build de production + prerendering
+npm run e2e                     # build puis Playwright contre le dist pré-rendu
+npm run check:contrast          # balayage de contraste en thème sombre, après un build
+npm run build:og                # régénère public/og-citatio.png depuis tools/og-image.html
+
+# Backend, depuis backend/
+./mvnw clean package            # les trois modules
+./mvnw -pl u2-blog -am package  # un module et ses dépendances
+
+# Pile complète
+docker compose up --build
+```
+
+Pour Lighthouse, servir le dist et mesurer, comme documenté en tête de `site-metrics.config.ts` :
+
+```bash
+npm run build
+node tools/serve-dist.mjs dist/citatio-front/browser 4173
+npx lighthouse http://localhost:4173 --preset=desktop --view
+```
+
+### 8.2 Ce qu'il faut savoir sur cette suite
+
+- Les tests e2e tournent contre le **dist statique**, servi par `tools/serve-dist.mjs`, qui rejoue
+  les règles de `nginx.conf`. Ne les fais jamais tourner derrière `serve --single` : cette commande
+  renvoie l'accueil pour toutes les routes, et la suite entière testerait dix fois la même page.
+- Plusieurs tests e2e sont des **garde-fous de doctrine** et non des tests fonctionnels : présence
+  des prix, absence de fausse preuve sociale, polices auto-hébergées, contenu présent dans le HTML
+  pré-rendu, bascule de thème. S'ils tombent, la bonne réaction est presque toujours de corriger le
+  code, pas le test.
+- Côté backend, les tests actuels se limitent au chargement de contexte (H2 en mémoire, aucune base
+  externe requise). La première entité métier doit arriver avec ses tests.
+
+---
+
+## 9. Conventions de travail
+
+- **Commits conventionnels, en français** : `feat:`, `fix:`, `chore:`, `docs:`, `perf:`, avec portée
+  optionnelle (`feat(seo):`). Le corps du message explique **le problème, la décision et les
+  vérifications faites** ; voir `9cb9acb` et `d4401ed` comme modèles. Sans tiret cadratin.
+- **Branches** : travail sur des branches thématiques, PR vers `develop`. **Un push sur `develop`
+  déploie en production.** Ne pousse jamais directement sur `develop` ou `master` sans demande
+  explicite.
+- **Ne commit et ne push que si le propriétaire le demande.**
+- `data/` (volumes Postgres et Caddy) est ignoré par git et ne doit jamais y entrer.
+- Interface en français, identifiants de code en anglais, commentaires en français.
+
+---
+
+## 10. Pièges connus, déjà payés une fois
+
+Chacun de ces points a coûté un correctif. Ne les réintroduis pas.
+
+- **`[class]` sur un hôte fusionne les classes** et casse l'hydratation (les icônes `pi-moon` et
+  `pi-sun` s'additionnaient). Utiliser `[class.x]`.
+- **L'accordéon PrimeNG ne s'ouvrait pas en production** après prerendering. Remplacé par
+  `<details>` natif.
+- **`try_files $uri/` provoquait un 301 vers l'URL avec slash final**, en contradiction avec les
+  canoniques. Résolu par `try_files $uri $uri/index.html`.
+- **Servir l'accueil en 200 sur une URL inconnue** est un soft 404 que Google désindexe.
+  `error_page 404 /index.html` rend la page d'erreur avec le bon statut.
+- **`serve --single` faussait toute la suite e2e** (voir §8.2).
+- **Publier 8081 et 8082 sur l'hôte** exposait les microservices à Internet. `expose` seulement.
+- **Le déploiement ne synchronisait pas la configuration d'infra** : modifier `Caddyfile` ou
+  `docker-compose.yml` n'avait aucun effet sur le VPS. L'étape `scp` du workflow le règle,
+  ne la retire pas.
+- **`--color-ink-faint` échouait au contraste** à 3,59:1 en thème sombre. Toute nouvelle valeur de
+  couleur passe par `npm run check:contrast`.
+- **Le `.ct-reveal` caché sans garde `html.ct-js`** cachait le contenu aux crawlers et sans
+  JavaScript.
+
+---
+
+## 11. Sources de vérité, un sujet un fichier
+
+Ne duplique jamais ces informations ailleurs, ne les code jamais en dur dans un gabarit.
+
+| Sujet | Fichier |
+|-------|---------|
+| Identité, mentions légales, fondateurs, zone desservie | `frontend/src/app/config/company.config.ts` |
+| Formules, options, prix | `frontend/src/app/config/pricing.config.ts` |
+| Chiffres mesurés et leur date | `frontend/src/app/config/site-metrics.config.ts` |
+| Design system complet | `frontend/src/styles.css` |
+| Thème PrimeNG | `frontend/src/app/theme/citatio-preset.ts` |
+| Routes, titres et descriptions SEO | `frontend/src/app/app.routes.ts` |
+| Routage API, TLS, en-têtes | `Caddyfile` |
+| Cache, redirections, 404 | `frontend/nginx.conf` |
+
+---
+
+## 12. Chantiers ouverts
+
+Non priorisés ici : la priorisation appartient au propriétaire.
+
+- Brancher le formulaire de contact sur `u1-communication` (envoi réel, validation, anti-spam),
+  puis retirer la solution `mailto:`.
+- Premières entités métier de `u2-blog` et pages blog côté Angular, avec Flyway au lieu de
+  `ddl-auto: update`.
+- Restreindre le CORS de `CommonWebConfig` à l'URL de production.
+- Sortir les identifiants Postgres de `docker-compose.yml`.
+- Figer les tarifs de `pricing.config.ts` (aujourd'hui provisoires, marqués comme tels) une fois
+  validés par le propriétaire.
+- Migrer progressivement les commentaires anglais du frontend vers le français.
+
+---
+
+**En cas de doute sur le périmètre ou la priorité, demande au propriétaire. En cas de doute sur la
+cible, applique §1.1 : notre site ou celui d'un client, la question se pose avant d'écrire du code,
+jamais après.**
