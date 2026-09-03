@@ -63,7 +63,8 @@ Ce que le dépôt contient vraiment, pour éviter de raisonner sur un système i
 | SEO / GEO on-page (meta, JSON-LD, sitemap, llms.txt, robots) | **En production** |
 | CI GitHub Actions (Vitest + Playwright + build/push GHCR + déploiement VPS) | **Opérationnelle** |
 | Gateway Caddy, TLS, en-têtes de sécurité, routage `/api/uX` | **Opérationnelle** |
-| `u1-communication`, `u2-blog` (Spring Boot) | **Squelettes** : `/health` et un `ping-u1` de démonstration, aucune entité métier, aucun envoi de mail |
+| `u1-communication`, `u2-blog` (Spring Boot) | **Squelettes** : `/health`, sondes Actuator et un ping croisé `ping-u1` / `ping-u2`, aucune entité métier, aucun envoi de mail |
+| Indépendance des deux microservices | **Acquise** : aucun `depends_on` croisé, appels absorbés par `UpstreamClient` (timeouts, disjoncteur, dégradation gracieuse) |
 | Consommation du backend par le frontend | **Inexistante** : aucun `HttpClient` dans `frontend/src`, le site est 100 % statique |
 | Formulaire de contact | Compose un **`mailto:` pré-rempli**, aucun envoi serveur (voir §6.2) |
 | Blog | **Pas commencé**, prévu sur `u2-blog` |
@@ -248,9 +249,15 @@ JPA · PostgreSQL 15 · Lombok · Maven multi-modules · JUnit 5 + Mockito (H2 e
 
 - **Une base par module.** `citatio_u1_db` et `citatio_u2_db`. Les **jointures inter-modules sont
   interdites**, sans exception.
-- Les modules ne se parlent **qu'en REST**, via `RestClient` (jamais `RestTemplate`), avec des
-  timeouts explicites : voir `u2-blog/config/RestClientConfig.java` (2 s connexion, 2 s lecture,
-  pour qu'un `u1` injoignable ne bloque pas `u2`).
+- Les modules ne se parlent **qu'en REST**, et **jamais en direct** : tout appel inter-modules passe
+  par `common-libs/client/UpstreamClient`, qui absorbe la panne et la rend en `UpstreamStatus`
+  (`REACHABLE` / `UNREACHABLE` + motif fermé). L'appelant n'a donc **aucune exception à gérer** et
+  reste disponible quand son voisin est coupé. Trois pièces derrière : `RestClientFactory`
+  (transport JDK avec pool, 2 s de connexion, 2 s de lecture), `UpstreamCircuitBreakers` (Resilience4j
+  nu, pas le starter, incompatible Boot 4) et le motif d'échec, volontairement grossier pour ne rien
+  dire de l'infrastructure.
+- **Un motif d'échec ne contient jamais le message d'exception.** Il a déjà publié
+  `http://u2-blog:8082/...` sur un endpoint accessible depuis Internet. Le détail va dans les logs.
 - L'URL de base vient d'une variable d'environnement (`U1_BASE_URL`), qui vaut le **nom de service
   Docker** en production et `localhost` en développement.
 - Chaque module se construit et se teste **indépendamment** : `./mvnw -pl u2-blog -am package`.
@@ -267,16 +274,18 @@ JPA · PostgreSQL 15 · Lombok · Maven multi-modules · JUnit 5 + Mockito (H2 e
 - Contrôleurs mappés sous **`/api/u1`** et **`/api/u2`** : le préfixe est **conservé** par la
   gateway (`handle`, pas `handle_path`).
 - Ressources au pluriel (`/articles`, `/messages`), sémantique HTTP stricte,
-  `@RestControllerAdvice` renvoyant du **Problem Details (RFC 7807)**, 201 à la création,
+  **Problem Details (RFC 7807)** via l'`ApiExceptionHandler` partagé, 201 à la création,
   204 à la suppression, 400 en validation, 404 en absence.
+- Un `@RestControllerAdvice` qui attrape `Exception` **hérite de `ResponseEntityExceptionHandler`**,
+  sinon il avale les exceptions de Spring MVC qui portaient déjà le bon statut (§10).
 - Pagination (`Page<T>` / `Slice<T>`) sur toute liste, suppressions logiques plutôt que physiques.
 - **Interdits** : injection par champ, logique métier dans un contrôleur (elle va en `@Service`),
   exposition d'entités JPA (toujours mapper vers un record), `System.out.println` (SLF4J `@Slf4j`),
   types bruts.
 - **Dette connue** : `spring.jpa.hibernate.ddl-auto=update` sur les deux modules. Dès qu'une entité
   réelle apparaît, passer à **Flyway** avant la première mise en production de schéma.
-- **Dette connue** : `CommonWebConfig` autorise `allowedOrigins("*")`. À restreindre à l'URL de
-  production avant qu'une API soit réellement consommée.
+- Les origines CORS sont **fermées** (`citatio.cors.allowed-origins`, la production par défaut).
+  En dev avec `ng serve` : `CORS_ALLOWED_ORIGINS=http://localhost:4200`.
 
 ### 4.3 Infrastructure
 
@@ -287,7 +296,19 @@ Caddy (TLS, gateway) → nginx (statique) ou microservices Spring.
   compression `zstd gzip`, en-têtes de sécurité (HSTS 2 ans, `nosniff`, `Referrer-Policy`,
   `X-Frame-Options`, `Permissions-Policy`, suppression de l'en-tête `Server`).
   Routage : `/api/u1/*` → `u1-communication:8081`, `/api/u2/*` → `u2-blog:8082`, tout le reste →
-  `frontend:80`.
+  `frontend:80`. Les endpoints de diagnostic `/api/u1/ping-u2` et `/api/u2/ping-u1` sont
+  **coupés de la surface publique** (404 avant les règles de proxy, un 403 confirmerait la route) :
+  ils nomment les services internes sans rien rendre au visiteur. Ils restent joignables depuis le
+  réseau Docker, ce qui suffit à l'exploitation :
+  `docker exec citatio-gateway wget -qO- http://u1-communication:8081/api/u1/ping-u2`.
+  Les sondes `/actuator/**` ne sont routées vers aucun microservice, donc inaccessibles de l'extérieur.
+- **Sondes de santé** : le `healthcheck` Docker de `u1` et `u2` interroge
+  `/actuator/health/liveness`, et non `/api/uX/health` qui répond `UP` tant que le serveur web
+  répond, base coupée comprise. La liveness ignore délibérément la base (une base momentanément
+  absente ne doit pas déclencher une boucle de redémarrage) ; la readiness, elle, l'inclut.
+  À savoir : `restart: always` ne redémarre **pas** un conteneur `unhealthy`, et plus aucun
+  `depends_on` ne consomme ces sondes. Elles sont **informatives, pas correctives** : ne compte pas
+  dessus pour de l'auto-guérison.
 - **Exposition réseau** : les microservices utilisent `expose`, **jamais `ports`**. Ils ne sont
   joignables que depuis le réseau Docker interne.
 - **nginx** (`frontend/nginx.conf`) : cache immuable d'un an sur les assets hachés, `no-cache` sur
@@ -295,10 +316,12 @@ Caddy (TLS, gateway) → nginx (statique) ou microservices Spring.
   `try_files $uri $uri/index.html` pour servir les routes pré-rendues **sans slash final**
   (le slash contredirait les balises canoniques), et `error_page 404` renvoyant le corps du SPA avec
   un **vrai statut 404** (un « soft 404 » se fait désindexer).
-- **CI/CD** (`.github/workflows/main.yml`) : tests unitaires puis e2e sur **tout push et toute PR**
-  vers `develop` et `master`. Build et push des trois images, puis déploiement VPS, **uniquement sur
-  push `develop`**. Le déploiement synchronise d'abord `docker-compose.yml`, `Caddyfile` et
-  `init.sql` vers le VPS, puis `docker compose pull && up -d`.
+- **CI/CD** (`.github/workflows/main.yml`) : tests unitaires, e2e et **tests backend** (`./mvnw -B
+  test`) sur **tout push et toute PR** vers `develop` et `master`. Les images se construisant avec
+  `-DskipTests`, sans ce job les tests backend ne tourneraient nulle part. Build et push des trois
+  images, puis déploiement VPS, **uniquement sur push `develop`**. Le déploiement synchronise
+  d'abord `docker-compose.yml`, `Caddyfile` et `init.sql` vers le VPS, puis
+  `docker compose pull && up -d`.
 - **Secrets** : `VPS_IP`, `VPS_USER`, `SSH_PRIVATE_KEY`, `GHCR_PAT`, côté GitHub. Jamais de secret
   dans le dépôt. Les identifiants Postgres de `docker-compose.yml` sont des valeurs de
   développement, à remplacer par des variables d'environnement le jour où la base porte des données
@@ -477,6 +500,7 @@ npm run check:contrast          # balayage de contraste en thème sombre, après
 npm run build:og                # régénère public/og-citatio.png depuis tools/og-image.html
 
 # Backend, depuis backend/
+./mvnw -B test                  # les 21 tests des trois modules (ce que lance la CI)
 ./mvnw clean package            # les trois modules
 ./mvnw -pl u2-blog -am package  # un module et ses dépendances
 
@@ -501,8 +525,11 @@ npx lighthouse http://localhost:4173 --preset=desktop --view
   des prix, absence de fausse preuve sociale, polices auto-hébergées, contenu présent dans le HTML
   pré-rendu, bascule de thème. S'ils tombent, la bonne réaction est presque toujours de corriger le
   code, pas le test.
-- Côté backend, les tests actuels se limitent au chargement de contexte (H2 en mémoire, aucune base
-  externe requise). La première entité métier doit arriver avec ses tests.
+- Côté backend, 21 tests tournent sur H2 en mémoire, **sans aucune base externe**, et la CI les
+  lance sur tout push et toute PR (job `backend-test`). Deux familles sont des garde-fous et non des
+  tests fonctionnels : `UpstreamClientTest` (aucune exception ne remonte d'un voisin coupé, le motif
+  ne fuit pas, le circuit s'ouvre) et `ApiExceptionHandlerTest` (une URL inconnue rend 404 et non
+  500). S'ils tombent, corrige le code. La première entité métier doit arriver avec ses tests.
 
 ---
 
@@ -541,6 +568,15 @@ Chacun de ces points a coûté un correctif. Ne les réintroduis pas.
   couleur passe par `npm run check:contrast`.
 - **Le `.ct-reveal` caché sans garde `html.ct-js`** cachait le contenu aux crawlers et sans
   JavaScript.
+- **Un `@ExceptionHandler(Exception.class)` seul rendait 500 sur toute URL inconnue** : il attrapait
+  aussi `NoResourceFoundException` et `HttpRequestMethodNotSupportedException`, qui portaient déjà
+  404 et 405, et écrivait une stack trace en ERROR à chaque passage de robot. Le handler partagé
+  hérite désormais de `ResponseEntityExceptionHandler` ; deux tests le verrouillent.
+- **Renvoyer `e.getMessage()` d'un appel inter-modules** publiait la topologie interne
+  (`http://u2-blog:8082/api/u2/health`) sur un endpoint public. Le motif d'échec est maintenant une
+  enum fermée, le message reste dans les logs.
+- **`backend/mvnw` était versionné sans `.mvn/wrapper/maven-wrapper.properties`** : la commande
+  documentée `./mvnw` échouait. Le fichier est là, ne le supprime pas.
 
 ---
 
@@ -569,7 +605,6 @@ Non priorisés ici : la priorisation appartient au propriétaire.
   puis retirer la solution `mailto:`.
 - Premières entités métier de `u2-blog` et pages blog côté Angular, avec Flyway au lieu de
   `ddl-auto: update`.
-- Restreindre le CORS de `CommonWebConfig` à l'URL de production.
 - Sortir les identifiants Postgres de `docker-compose.yml`.
 - Figer les tarifs de `pricing.config.ts` (aujourd'hui provisoires, marqués comme tels) une fois
   validés par le propriétaire.
