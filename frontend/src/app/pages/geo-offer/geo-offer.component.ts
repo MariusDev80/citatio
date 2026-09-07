@@ -67,7 +67,7 @@ export class GeoOfferComponent {
       title: 'Des faits que la machine n’a pas à deviner',
       body:
         'Votre activité, votre adresse, vos horaires, votre zone d’intervention et '
-        + 'vos tarifs, écrits dans un format normalisé que les moteurs et les '
+        + 'vos tarifs, écrits dans un <strong>format normalisé</strong> que les moteurs et les '
         + 'modèles lisent directement, au lieu de les extraire à peu près d’un '
         + 'paragraphe.',
     },
@@ -76,13 +76,13 @@ export class GeoOfferComponent {
       body:
         'Un résumé de votre entreprise placé à la racine du site, écrit pour être lu '
         + 'par un modèle : ce que vous faites, ce que vous ne faites pas, vos prix, '
-        + 'et les précautions à prendre en vous citant. Ce site en a un, vous pouvez '
+        + 'et les précautions à prendre en vous citant. <strong>Ce site en a un</strong>, vous pouvez '
         + 'aller le lire.',
     },
     {
       title: 'Un accès explicite pour les robots des IA',
       body:
-        'GPTBot, Google-Extended, PerplexityBot et les autres sont nommés un par un '
+        '<strong>GPTBot, Google-Extended, PerplexityBot</strong> et les autres sont nommés un par un '
         + 'dans le fichier robots.txt. Beaucoup de sites les bloquent sans le savoir, '
         + 'par un réglage par défaut de leur hébergeur.',
     },
@@ -97,7 +97,7 @@ export class GeoOfferComponent {
     {
       title: 'Une identité cohérente partout',
       body:
-        'Même nom, même adresse, même téléphone sur le site, sur votre fiche Google '
+        '<strong>Même nom, même adresse, même téléphone</strong> sur le site, sur votre fiche Google '
         + 'et sur vos profils, tous reliés entre eux. C’est ce qui permet à un modèle '
         + 'de comprendre que ces mentions désignent une seule entreprise, et pas '
         + 'trois qui se ressemblent.',

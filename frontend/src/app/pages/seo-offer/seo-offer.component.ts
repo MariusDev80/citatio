@@ -40,7 +40,7 @@ export class SeoOfferComponent {
     {
       title: 'Un site que les robots lisent sans effort',
       body:
-        'Les pages sont rendues côté serveur : le texte est dans le HTML, pas '
+        'Les pages sont <strong>rendues côté serveur</strong> : le texte est dans le HTML, pas '
         + 'derrière du JavaScript à exécuter. C’est la condition d’entrée, et '
         + 'beaucoup de sites la ratent sans le savoir.',
     },
@@ -53,8 +53,8 @@ export class SeoOfferComponent {
     {
       title: 'La vitesse',
       body:
-        'Google mesure l’expérience réelle de vos visiteurs. Un site lent est '
-        + 'pénalisé deux fois : au classement, et par les gens qui repartent avant '
+        'Google mesure l’expérience réelle de vos visiteurs. <strong>Un site lent est '
+        + 'pénalisé deux fois</strong> : au classement, et par les gens qui repartent avant '
         + 'de vous avoir lu.',
     },
     {
@@ -70,7 +70,7 @@ export class SeoOfferComponent {
     {
       title: 'La recherche de mots-clés sur votre marché',
       body:
-        'Nous regardons ce que vos clients tapent réellement, pas ce que le métier '
+        'Nous regardons <strong>ce que vos clients tapent réellement</strong>, pas ce que le métier '
         + 'croit qu’ils tapent, et à quel point chaque requête est disputée. '
         + 'Certaines ne valent pas la peine d’être visées, et c’est une information '
         + 'utile.',
@@ -79,8 +79,8 @@ export class SeoOfferComponent {
       title: 'Une page, une intention',
       body:
         'Une page qui traite trois sujets n’est la meilleure réponse à aucun. Nous '
-        + 'construisons l’arborescence pour qu’à chaque question de vos clients '
-        + 'corresponde une page, avec le vocabulaire de la question dans son titre '
+        + 'construisons l’arborescence pour qu’à <strong>chaque question de vos clients '
+        + 'corresponde une page</strong>, avec le vocabulaire de la question dans son titre '
         + 'et son adresse.',
     },
     {
@@ -94,8 +94,8 @@ export class SeoOfferComponent {
       title: 'Des recommandations de contenu',
       body:
         'Quelles pages écrire, dans quel ordre, et pourquoi. Vous les rédigez, ou '
-        + 'vous nous les confiez avec le pack contenu. Sans contenu, l’optimisation '
-        + 'technique atteint vite son plafond.',
+        + 'vous nous les confiez avec le pack contenu. <strong>Sans contenu, l’optimisation '
+        + 'technique atteint vite son plafond.</strong>',
     },
   ]);
 

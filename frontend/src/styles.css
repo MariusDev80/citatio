@@ -130,6 +130,15 @@
     @apply bg-accent text-on-accent;
   }
 
+  /* Geist's variable file only covers weight 400-600 (see the @font-face
+     above): the browser's default bold (700) falls outside that range and
+     gets synthesized, which looks noticeably off on a self-hosted variable
+     face. Emphasis stays at 600, the top of what the file actually has. */
+  strong,
+  b {
+    font-weight: 600;
+  }
+
   /* Anchor targets sit below the fixed masthead. */
   :where([id]) {
     scroll-margin-top: 6rem;

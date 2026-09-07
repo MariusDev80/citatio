@@ -41,7 +41,7 @@ export const FORMULAS: readonly Formula[] = [
     detailLabel: 'Comment nous créons un site vitrine',
     name: 'Vitrine Essentiel',
     tagline: 'Une présence web simple et crédible.',
-    from: 1200,
+    from: 1000,
     features: [
       'Site vitrine responsive, 3 à 5 pages',
       'Design sur mesure à partir de notre design system',
@@ -56,7 +56,7 @@ export const FORMULAS: readonly Formula[] = [
     detailLabel: 'Ce que le référencement change',
     name: 'Vitrine + SEO',
     tagline: 'Pour être trouvé sur Google.',
-    from: 1900,
+    from: 1750,
     features: [
       'Tout le pack Vitrine Essentiel',
       'Optimisation SEO on-page',
@@ -71,7 +71,7 @@ export const FORMULAS: readonly Formula[] = [
     detailLabel: 'Comment on travaille la visibilité IA',
     name: 'Vitrine + GEO/SEO',
     tagline: 'Pour être trouvé sur Google et dans les IA.',
-    from: 2800,
+    from: 2500,
     features: [
       'Tout le pack Vitrine + SEO',
       'Optimisation GEO : ChatGPT, Gemini, AI Overviews',

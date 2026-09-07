@@ -38,8 +38,8 @@ export class HomeComponent {
       path: '/creation-site-vitrine',
       linkLabel: 'La création de site vitrine',
       body:
-        'Nous partons de votre métier et de vos clients, pas d’un gabarit à remplir. '
-        + 'Maquette, contenu, intégration : le site est écrit à la main, page par page.',
+        'Nous partons de <strong>votre métier et de vos clients</strong>, pas d’un gabarit à remplir. '
+        + 'Maquette, contenu, intégration : le site est <strong>écrit à la main</strong>, page par page.',
     },
     {
       numeral: '02',
@@ -47,17 +47,17 @@ export class HomeComponent {
       path: '/referencement-seo',
       linkLabel: 'Le référencement naturel',
       body:
-        'Toute création inclut une base SEO technique. Au-delà, le référencement Google '
-        + 'et la visibilité dans les réponses des IA sont deux options distinctes, '
+        'Toute création inclut une <strong>base SEO technique</strong>. Au-delà, le <strong>référencement Google</strong> '
+        + 'et la <strong>visibilité dans les réponses des IA</strong> sont deux options distinctes, '
         + 'que l’on active seulement si votre marché le justifie.',
     },
     {
       numeral: '03',
       title: 'Hébergement et maintenance',
       body:
-        'Nous hébergeons votre site sur notre propre infrastructure, gérons votre nom '
-        + 'de domaine et assurons mises à jour, sécurité et sauvegardes. Un seul '
-        + 'interlocuteur, une seule facture.',
+        'Nous hébergeons votre site sur <strong>notre propre infrastructure</strong>, gérons votre nom '
+        + 'de domaine et assurons mises à jour, sécurité et sauvegardes. <strong>Un seul '
+        + 'interlocuteur, une seule facture.</strong>',
     },
   ]);
 
@@ -66,25 +66,25 @@ export class HomeComponent {
       numeral: '01',
       title: 'Premier échange',
       duration: '30 minutes, gratuit',
-      body: 'On comprend votre activité et ce que le site doit vous apporter. Sans engagement.',
+      body: 'On comprend votre activité et ce que le site doit vous apporter. <strong>Sans engagement.</strong>',
     },
     {
       numeral: '02',
       title: 'Cadrage et devis',
       duration: 'Sous 5 jours ouvrés',
-      body: 'Périmètre, arborescence, contenu à produire et prix ferme. Vous décidez ensuite.',
+      body: 'Périmètre, arborescence, contenu à produire et <strong>prix ferme</strong>. Vous décidez ensuite.',
     },
     {
       numeral: '03',
       title: 'Design et développement',
       duration: '3 à 5 semaines',
-      body: 'Maquette validée avant la moindre ligne de code, puis intégration et relectures.',
+      body: '<strong>Maquette validée avant la moindre ligne de code</strong>, puis intégration et relectures.',
     },
     {
       numeral: '04',
       title: 'Mise en ligne',
       duration: 'Puis suivi mensuel',
-      body: 'Nom de domaine, hébergement, indexation. Le site vit, nous le maintenons.',
+      body: 'Nom de domaine, hébergement, indexation. <strong>Le site vit, nous le maintenons.</strong>',
     },
   ]);
 }

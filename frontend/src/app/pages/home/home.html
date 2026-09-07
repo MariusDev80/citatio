@@ -12,9 +12,9 @@
     </h1>
 
     <p class="ct-hero-stagger ct-lede ct-column mt-8" style="animation-delay: 160ms">
-      Nous sommes trois. Nous concevons, développons et hébergeons des sites vitrines
+      Nous sommes trois. Nous concevons, développons et hébergeons des <strong>sites vitrines</strong>
       pour les artisans, commerces et indépendants de Loire-Atlantique. Pas de
-      gabarit acheté, pas de constructeur de pages : du code écrit pour vous.
+      gabarit acheté, pas de constructeur de pages : <strong>du code écrit pour vous</strong>.
     </p>
 
     <div class="ct-hero-stagger mt-10 flex flex-col gap-4 sm:flex-row sm:items-center" style="animation-delay: 240ms">
@@ -39,7 +39,7 @@
         <p class="ct-numeral md:col-span-1">{{ item.numeral }}</p>
         <h3 class="ct-title md:col-span-4">{{ item.title }}</h3>
         <div class="md:col-span-7">
-          <p class="ct-prose">{{ item.body }}</p>
+          <p class="ct-prose" [innerHTML]="item.body"></p>
           @if (item.path) {
             <a [routerLink]="item.path" class="ct-link mt-4 inline-block text-sm">
               {{ item.linkLabel }}
@@ -70,7 +70,7 @@
             Alors nous montrons le seul site dont nous sommes entièrement
             responsables : <strong>celui-ci</strong>. Sa vitesse, son accessibilité,
             son référencement et son hébergement sont exactement ce que nous vendons.
-            Tout est mesurable, tout de suite, par vous.
+            <strong>Tout est mesurable, tout de suite, par vous.</strong>
           </p>
         </div>
         <a routerLink="/ce-site" class="ct-link mt-8">
@@ -108,7 +108,7 @@
           <h3 class="ct-title">{{ step.title }}</h3>
         </div>
         <p class="ct-eyebrow mt-3">{{ step.duration }}</p>
-        <p class="ct-prose mt-3 text-sm">{{ step.body }}</p>
+        <p class="ct-prose mt-3 text-sm" [innerHTML]="step.body"></p>
       </li>
     }
   </ol>
@@ -122,7 +122,7 @@
       Un premier échange, et vous saurez si nous sommes faits pour travailler ensemble.
     </h2>
     <p class="ct-lede ct-column mt-6">
-      Trente minutes, gratuit, sans engagement. Si votre projet ne relève pas de
+      <strong>Trente minutes, gratuit, sans engagement.</strong> Si votre projet ne relève pas de
       notre métier, nous vous le dirons.
     </p>
     <a routerLink="/contact" class="ct-btn mt-10">Prendre contact</a>

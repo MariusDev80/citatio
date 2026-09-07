@@ -61,7 +61,7 @@ test.describe('Page Offres : tarifs et données structurées', () => {
 
   test('des prix sont affichés, pas « sur devis » partout', async ({ page }) => {
     // Garde-fou de la refonte : trois « Sur devis » bloquaient toute décision.
-    await expect(page.getByText(/1\s*200\s*€/).first()).toBeVisible();
+    await expect(page.getByText(/1\s*000\s*€/).first()).toBeVisible();
     await expect(page.getByText(/39\s*€/).first()).toBeVisible();
   });
 

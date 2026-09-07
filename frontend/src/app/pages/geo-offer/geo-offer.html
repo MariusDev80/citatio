@@ -10,7 +10,7 @@
         <p>
           De plus en plus de recherches n’aboutissent plus à une liste de liens mais
           à une réponse rédigée, dans ChatGPT, dans Gemini ou en haut de Google. Le
-          GEO consiste à faire en sorte que votre entreprise soit dans cette réponse.
+          GEO consiste à <strong>faire en sorte que votre entreprise soit dans cette réponse</strong>.
         </p>
       </div>
       <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -39,8 +39,8 @@
           AI Overviews affichés au-dessus des résultats de Google.
         </p>
         <p>
-          L’enjeu n’est plus d’occuper un rang dans une liste, mais d’être la source
-          sur laquelle s’appuie une réponse déjà écrite. Quand une seule réponse est
+          L’enjeu n’est plus d’occuper un rang dans une liste, mais <strong>d’être la source
+          sur laquelle s’appuie une réponse déjà écrite</strong>. Quand une seule réponse est
           rendue, il n’y a plus de deuxième page où se rattraper.
         </p>
       </div>
@@ -52,8 +52,8 @@
     <div class="border-t border-rule-strong pt-10">
       <h2 id="contraste-title" class="ct-display-md">En quoi ça diffère du SEO</h2>
       <p class="ct-prose ct-column mt-5">
-        Les deux se nourrissent du même travail de fond, et le GEO ne remplace pas
-        le SEO. Ce qui change, c’est la cible.
+        Les deux se nourrissent du même travail de fond, et <strong>le GEO ne remplace pas
+        le SEO</strong>. Ce qui change, c’est la cible.
       </p>
     </div>
 
@@ -87,7 +87,7 @@
       <p class="ct-eyebrow">L’option {{ formula.name }}</p>
       <h2 id="travail-title" class="ct-display-md mt-5">Ce que nous mettons en place</h2>
       <p class="ct-prose ct-column mt-5">
-        Tout ce qui suit est en place sur ce site. Vous pouvez le vérifier avant de
+        <strong>Tout ce qui suit est en place sur ce site.</strong> Vous pouvez le vérifier avant de
         nous croire.
       </p>
     </div>
@@ -96,7 +96,7 @@
       @for (item of work(); track item.title) {
         <div class="grid gap-4 border-t border-rule py-8 md:grid-cols-12 md:gap-10">
           <h3 class="ct-title md:col-span-4">{{ item.title }}</h3>
-          <p class="ct-prose md:col-span-8">{{ item.body }}</p>
+          <p class="ct-prose md:col-span-8" [innerHTML]="item.body"></p>
         </div>
       }
     </div>
@@ -142,7 +142,7 @@
         </h2>
         <div class="ct-prose ct-column mt-6">
           <p>
-            Hors taxes, site et option SEO compris. Le GEO ne se vend pas séparément :
+            Hors taxes, site et option SEO compris. <strong>Le GEO ne se vend pas séparément</strong> :
             il s’appuie sur les données structurées et sur la qualité de contenu que
             l’option SEO met en place. Vendu seul, il n’aurait pas de socle.
           </p>
@@ -187,7 +187,7 @@
         Demandez à une IA ce qu’elle sait de votre entreprise.
       </h2>
       <p class="ct-lede ct-column mt-6">
-        La réponse vous dira où vous en êtes mieux que nous. Ensuite, parlons de
+        <strong>La réponse vous dira où vous en êtes mieux que nous.</strong> Ensuite, parlons de
         ce qu’il y a à corriger.
       </p>
       <a routerLink="/contact" class="ct-btn mt-10">Prendre contact</a>

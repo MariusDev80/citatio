@@ -45,7 +45,7 @@ export class ShowcaseComponent {
     {
       title: 'Un design qui n’existe que pour vous',
       body:
-        'Pas de thème acheté, pas de gabarit rempli. Nous partons de votre métier, '
+        '<strong>Pas de thème acheté, pas de gabarit rempli.</strong> Nous partons de votre métier, '
         + 'de vos clients et de ce que vous avez à montrer. La maquette est validée '
         + 'avant la première ligne de code.',
     },
@@ -59,7 +59,7 @@ export class ShowcaseComponent {
     {
       title: 'Des pages qui s’affichent avant le JavaScript',
       body:
-        'Le site est rendu côté serveur : le texte est déjà là quand la page arrive. '
+        '<strong>Le site est rendu côté serveur</strong> : le texte est déjà là quand la page arrive. '
         + 'C’est ce qui le rend rapide sur un mobile en 4G, et lisible par les '
         + 'moteurs de recherche sans qu’ils aient à exécuter quoi que ce soit.',
     },
@@ -80,13 +80,13 @@ export class ShowcaseComponent {
     {
       title: 'Un formulaire de contact qui arrive vraiment',
       body:
-        'Les messages tombent dans votre boîte mail. Pas de service tiers intercalé, '
-        + 'pas de traceur, pas de revente de ce que vos visiteurs écrivent.',
+        'Les messages tombent dans votre boîte mail. <strong>Pas de service tiers intercalé, '
+        + 'pas de traceur</strong>, pas de revente de ce que vos visiteurs écrivent.',
     },
     {
       title: 'Le domaine et le code sont à vous',
       body:
-        'Le nom de domaine est déposé à votre nom. Si vous décidez de partir, nous '
+        '<strong>Le nom de domaine est déposé à votre nom.</strong> Si vous décidez de partir, nous '
         + 'vous remettons le site entier et le domaine, sans discussion.',
     },
   ]);
@@ -97,8 +97,8 @@ export class ShowcaseComponent {
       answer:
         'Pour beaucoup de projets, si. Monter un site avec un constructeur de pages '
         + 'prend un après-midi, et si votre besoin est de simplement exister quelque '
-        + 'part, c’est la bonne réponse et nous vous le dirons. La différence se '
-        + 'joue sur la durée : un site fait à la main reste rapide, se corrige '
+        + 'part, c’est la bonne réponse et nous vous le dirons. <strong>La différence se '
+        + 'joue sur la durée</strong> : un site fait à la main reste rapide, se corrige '
         + 'précisément, et ne dépend pas d’un abonnement dont le prix et les '
         + 'fonctions changent sans vous demander votre avis.',
     },
@@ -121,7 +121,7 @@ export class ShowcaseComponent {
     {
       question: 'Et si je veux modifier le site moi-même ?',
       answer:
-        'Nous ne livrons pas d’interface d’édition. C’est un choix : c’est ce qui '
+        '<strong>Nous ne livrons pas d’interface d’édition.</strong> C’est un choix : c’est ce qui '
         + 'garantit que le site reste rapide et accessible, et cela vous évite '
         + 'd’entretenir un outil de plus. Les modifications passent par nous. '
         + 'Dites-nous à quelle fréquence vous comptez faire évoluer vos pages, nous '

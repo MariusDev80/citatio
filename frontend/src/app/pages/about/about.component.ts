@@ -57,7 +57,7 @@ export class AboutComponent {
       name: 'Titouan',
       role: 'Commerce et direction',
       background:
-        'Diplômé du Bachelor management des entreprises d’Audencia, j’ai appris l’innovation et l’automatisation des process chez The Links, puis le développement commercial chez Nepsio Conseil. Je consacre aujourd’hui tout cela à Citatio, l’entreprise que j’ai cofondée : des sites internet pensés pour l’activité de ceux qui les portent.',
+        'Diplômé du Bachelor management des entreprises d’Audencia, j’ai appris l’innovation et l’automatisation des process chez The Links, puis le développement commercial chez Nepsio Conseil. Je consacre aujourd’hui tout cela à <strong>Citatio, l’entreprise que j’ai cofondée</strong> : des sites internet pensés pour l’activité de ceux qui les portent.',
       conviction:
         'La plupart des gens qui nous appellent n’ont pas besoin d’un site. Ils ont besoin qu’on comprenne comment ils gagnent leur vie. Le site vient après, s’il sert à quelque chose.',
       portrait: '/team/titouan.webp',
@@ -66,7 +66,7 @@ export class AboutComponent {
       name: 'Marius',
       role: 'Conception et développement',
       background:
-        'BTS SIO, puis licence MIAGE en alternance à La Poste, comme développeur full stack. Assez longtemps dans une grande structure pour savoir ce que coûte un logiciel mal fait, et pour préférer l’artisanat au volume.',
+        'BTS SIO, puis licence MIAGE en alternance à La Poste, comme développeur full stack. Assez longtemps dans une grande structure pour savoir ce que coûte un logiciel mal fait, et pour <strong>préférer l’artisanat au volume</strong>.',
       conviction:
         'On peut monter un site en deux heures avec un outil en ligne. Le difficile n’est pas de le monter, c’est de vivre avec pendant cinq ans.',
       portrait: '/team/marius.webp',
@@ -75,7 +75,7 @@ export class AboutComponent {
       name: 'Ruben',
       role: 'Commerce et administration',
       background:
-        'Bac pro en climatisation et chambres froides, un an comme agent de sûreté à la douane de l’aéroport de Nantes, puis neuf mois en plomberie, à poser des salles de bains. Je connais de l’intérieur les métiers pour lesquels nous travaillons, j’en viens.',
+        'Bac pro en climatisation et chambres froides, un an comme agent de sûreté à la douane de l’aéroport de Nantes, puis neuf mois en plomberie, à poser des salles de bains. <strong>Je connais de l’intérieur les métiers pour lesquels nous travaillons</strong>, j’en viens.',
       conviction:
         'J’ai posé des salles de bains. Quand un artisan me dit qu’il n’a pas le temps de s’occuper de son site, je sais que ce n’est pas une excuse.',
       portrait: '/team/ruben.webp',

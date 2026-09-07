@@ -42,7 +42,7 @@ export class ProofComponent {
     {
       title: 'Rendu côté serveur',
       body:
-        'Les pages sont générées à l’avance et servies en HTML complet. Google et '
+        'Les pages sont générées à l’avance et servies en <strong>HTML complet</strong>. Google et '
         + 'les moteurs IA lisent le contenu sans exécuter de JavaScript, et la '
         + 'première image de la page s’affiche immédiatement.',
     },
@@ -50,20 +50,20 @@ export class ProofComponent {
       title: 'Deux polices, auto-hébergées',
       body:
         'Instrument Serif pour les titres, Geist pour le texte, servies depuis '
-        + 'notre serveur. Aucune requête vers Google Fonts : rien de ce que vous '
+        + 'notre serveur. <strong>Aucune requête vers Google Fonts</strong> : rien de ce que vous '
         + 'lisez ici n’informe un tiers de votre visite.',
     },
     {
       title: 'Aucun traceur',
       body:
-        'Pas d’analytics tiers, pas de pixel publicitaire, pas de bannière de '
+        '<strong>Pas d’analytics tiers, pas de pixel publicitaire</strong>, pas de bannière de '
         + 'consentement, parce qu’il n’y a rien à consentir. Le site ne dépose '
         + 'qu’une préférence de thème, dans votre navigateur.',
     },
     {
       title: 'Accessible au clavier et au lecteur d’écran',
       body:
-        'Contrastes conformes AA en thème clair comme en thème sombre, structure '
+        '<strong>Contrastes conformes AA</strong> en thème clair comme en thème sombre, structure '
         + 'de titres cohérente, focus visible partout, et toute animation coupée '
         + 'si votre système demande à réduire les animations.',
     },
@@ -71,15 +71,15 @@ export class ProofComponent {
       title: 'Hébergé par nous',
       body:
         'Le site tourne dans des conteneurs Docker derrière Caddy, sur un serveur '
-        + 'que nous administrons. C’est la même infrastructure que celle proposée '
-        + 'à nos clients : nous en sommes les premiers utilisateurs.',
+        + 'que nous administrons. <strong>C’est la même infrastructure que celle proposée '
+        + 'à nos clients</strong> : nous en sommes les premiers utilisateurs.',
     },
     {
       title: 'Déployé automatiquement',
       body:
         'Chaque modification passe par une intégration continue qui construit, '
-        + 'teste et déploie. Une correction demandée le matin peut être en ligne '
-        + 'l’après-midi, sans intervention manuelle sur le serveur.',
+        + 'teste et déploie. <strong>Une correction demandée le matin peut être en ligne '
+        + 'l’après-midi</strong>, sans intervention manuelle sur le serveur.',
     },
   ]);
 

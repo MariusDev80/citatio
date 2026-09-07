@@ -7,7 +7,7 @@
       <div class="ct-lede ct-column mt-8">
         <p>
           Nous démarrons. Nous n’avons pas encore de site client à vous montrer, et
-          nous ne mettrons pas en ligne des réalisations que nous n’avons pas faites.
+          <strong>nous ne mettrons pas en ligne des réalisations que nous n’avons pas faites</strong>.
         </p>
       </div>
       <div class="ct-prose ct-column mt-6">
@@ -15,8 +15,8 @@
           Ce que nous pouvons vous montrer, en revanche, c’est le seul site dont nous
           sommes entièrement responsables : celui que vous lisez. Il a été conçu,
           développé, déployé et hébergé par nous, avec les mêmes méthodes et sur la
-          même infrastructure que ce que nous vendons. Tout ce qui suit est
-          vérifiable depuis votre navigateur, maintenant.
+          même infrastructure que ce que nous vendons. <strong>Tout ce qui suit est
+          vérifiable depuis votre navigateur, maintenant.</strong>
         </p>
       </div>
     </div>
@@ -71,7 +71,7 @@
     <div class="ct-section">
       <h2 id="choix-title" class="ct-display-md max-w-[16ch]">Les décisions derrière ces chiffres</h2>
       <p class="ct-prose ct-column mt-5">
-        Un bon score n’est pas un hasard de fin de projet. Il vient d’une poignée
+        <strong>Un bon score n’est pas un hasard de fin de projet.</strong> Il vient d’une poignée
         de décisions prises au début, et tenues jusqu’au bout.
       </p>
 
@@ -79,7 +79,7 @@
         @for (choice of choices(); track choice.title) {
           <div class="border-t border-rule py-8">
             <h3 class="ct-title">{{ choice.title }}</h3>
-            <p class="ct-prose mt-3 text-sm">{{ choice.body }}</p>
+            <p class="ct-prose mt-3 text-sm" [innerHTML]="choice.body"></p>
           </div>
         }
       </div>
@@ -94,8 +94,8 @@
         <p>
           Qu’un site soit rapide et accessible ne dit rien de notre capacité à
           tenir un délai, à encaisser une demande qui change en cours de route, ou
-          à travailler avec vous sur la durée. Cela, seuls de vrais clients
-          pourront l’attester. Le jour où nous en aurons, cette page laissera
+          à travailler avec vous sur la durée. <strong>Cela, seuls de vrais clients
+          pourront l’attester.</strong> Le jour où nous en aurons, cette page laissera
           la place à leurs projets.
         </p>
         <p>

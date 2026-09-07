@@ -56,9 +56,9 @@ test.describe('Questions de la FAQ', () => {
       .locator('.ct-faq-answer');
     // Espace fine insecable (U+202F) entre le millier et le symbole, comme
     // partout ailleurs sur le site.
-    await expect(answer).toContainText('1\u202f200 €');
-    await expect(answer).toContainText('1\u202f900 €');
-    await expect(answer).toContainText('2\u202f800 €');
+    await expect(answer).toContainText('1\u202f000 €');
+    await expect(answer).toContainText('1\u202f750 €');
+    await expect(answer).toContainText('2\u202f500 €');
   });
 
   test('les reponses sont dans le HTML prerendu, meme fermees', () => {

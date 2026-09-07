@@ -10,8 +10,8 @@
         <p>
           Le référencement naturel consiste à faire apparaître votre site dans les
           résultats de Google quand quelqu’un cherche ce que vous faites, sans payer
-          la place. C’est lent, c’est mesurable, et personne ne peut vous en garantir
-          le résultat. Nous non plus.
+          la place. <strong>C’est lent, c’est mesurable, et personne ne peut vous en garantir
+          le résultat.</strong> Nous non plus.
         </p>
       </div>
       <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -34,7 +34,7 @@
       </div>
       <div class="ct-prose ct-column md:col-span-7">
         <p>
-          Le référencement ne produit rien le mois de la mise en ligne. Un domaine
+          <strong>Le référencement ne produit rien le mois de la mise en ligne.</strong> Un domaine
           récent doit d’abord être exploré, indexé, puis gagner la confiance qui ne
           s’obtient qu’avec le temps et avec ce que d’autres sites disent de vous.
         </p>
@@ -60,8 +60,8 @@
       <p class="ct-eyebrow">Sans option, dans toutes les formules</p>
       <h2 id="socle-title" class="ct-display-md mt-5">Le socle technique</h2>
       <p class="ct-prose ct-column mt-5">
-        Ces quatre points ne sont pas une option, parce qu’un site qui les rate ne
-        se rattrape pas ensuite : il faut le refaire.
+        Ces quatre points ne sont pas une option, parce qu’<strong>un site qui les rate ne
+        se rattrape pas ensuite</strong> : il faut le refaire.
       </p>
     </div>
 
@@ -69,7 +69,7 @@
       @for (item of included(); track item.title) {
         <div class="grid gap-4 border-t border-rule py-8 md:grid-cols-12 md:gap-10">
           <h3 class="ct-title md:col-span-4">{{ item.title }}</h3>
-          <p class="ct-prose md:col-span-8">{{ item.body }}</p>
+          <p class="ct-prose md:col-span-8" [innerHTML]="item.body"></p>
         </div>
       }
     </div>
@@ -86,7 +86,7 @@
       @for (item of option(); track item.title) {
         <div class="grid gap-4 border-t border-rule py-8 md:grid-cols-12 md:gap-10">
           <h3 class="ct-title md:col-span-4">{{ item.title }}</h3>
-          <p class="ct-prose md:col-span-8">{{ item.body }}</p>
+          <p class="ct-prose md:col-span-8" [innerHTML]="item.body"></p>
         </div>
       }
     </div>
@@ -102,7 +102,7 @@
       </div>
       <div class="ct-prose ct-column md:col-span-7">
         <p>
-          Nous connectons votre site à la Search Console de Google, et le compte
+          Nous connectons votre site à la <strong>Search Console de Google</strong>, et le compte
           reste le vôtre. Vous y voyez les mêmes chiffres que nous : sur quelles
           requêtes vous apparaissez, à quelle position, combien de gens cliquent.
         </p>
@@ -153,7 +153,7 @@
         </h2>
         <div class="ct-prose ct-column mt-6">
           <p>
-            Hors taxes, site compris. Le référencement n’est pas vendu seul : il
+            Hors taxes, site compris. <strong>Le référencement n’est pas vendu seul</strong> : il
             s’applique à un site que nous avons construit, parce que nous ne
             pouvons pas répondre du socle technique d’un site que nous n’avons pas
             écrit.
@@ -191,8 +191,8 @@
     <div class="ct-section border-t border-rule-strong pt-12">
       <h2 class="ct-display-lg max-w-[18ch]">Sur quoi voulez-vous être trouvé ?</h2>
       <p class="ct-lede ct-column mt-6">
-        Dites-nous votre métier et votre secteur. Nous regardons ce qui est
-        atteignable, et nous vous le disons franchement.
+        Dites-nous votre métier et votre secteur. <strong>Nous regardons ce qui est
+        atteignable</strong>, et nous vous le disons franchement.
       </p>
       <a routerLink="/contact" class="ct-btn mt-10">Prendre contact</a>
     </div>
