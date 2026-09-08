@@ -19,10 +19,10 @@ jobs:
         working-directory: frontend
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v7
         with:
           node-version: '24'
           cache: 'npm'
@@ -47,10 +47,10 @@ jobs:
         working-directory: frontend
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v7
         with:
           node-version: '24'
           cache: 'npm'
@@ -70,7 +70,7 @@ jobs:
 
       - name: Upload Playwright report
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report
           path: frontend/playwright-report/
@@ -90,27 +90,27 @@ jobs:
       packages: write
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Lowercase repo name
         run: echo "REPO_LC=$(echo "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
 
       - name: Log in to GHCR
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build & Push Front
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./frontend
           push: true
           tags: ghcr.io/${{ env.REPO_LC }}/frontend:latest
 
       - name: Build & Push u1-communication
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./backend
           file: ./backend/u1-communication/Dockerfile
@@ -118,7 +118,7 @@ jobs:
           tags: ghcr.io/${{ env.REPO_LC }}/u1-communication:latest
 
       - name: Build & Push u2-blog
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./backend
           file: ./backend/u2-blog/Dockerfile
@@ -134,13 +134,13 @@ jobs:
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       # Synchronise la conf d'infra vers le VPS AVANT de (re)démarrer la stack.
       # Sans ça, modifier docker-compose.yml / Caddyfile / init.sql dans le repo
       # n'a AUCUN effet sur le VPS (le déploiement ne faisait que tirer les images).
       - name: Sync infra config to VPS
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
@@ -150,14 +150,17 @@ jobs:
           overwrite: true
 
       - name: SSH Deploy
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          # Tout échec d'une commande fait échouer le job (fini les déploiements "verts" qui ne déploient rien)
-          script_stop: true
+          # `set -e` tient le rôle de l'option `script_stop`, que l'action a
+          # supprimée en v1.2.5 (son README renvoie explicitement vers `set -e`).
+          # Sans lui, une commande qui échoue laisse le job au vert et on
+          # retrouve les déploiements "réussis" qui ne déploient rien.
           script: |
+            set -e
             cd /opt/citatio
             # Authentification au registre privé GHCR depuis le pipeline,
             # pour ne plus dépendre d'un login manuel sur le VPS qui expire silencieusement.
