@@ -6,7 +6,7 @@ import {
   FORMULAS,
   OPTIONS,
   PRICE_FACTORS,
-  SUBSCRIPTION,
+  SUBSCRIPTIONS,
 } from '../../config/pricing.config';
 import { formatEuro } from '../../shared/format-euro';
 import { FlourishComponent } from '../../shared/components/flourish/flourish.component';
@@ -24,7 +24,7 @@ export class ServicesComponent {
 
   protected readonly formulas = FORMULAS;
   protected readonly options = OPTIONS;
-  protected readonly subscription = SUBSCRIPTION;
+  protected readonly subscriptions = SUBSCRIPTIONS;
   protected readonly priceFactors = PRICE_FACTORS;
 
   protected readonly formatEuro = formatEuro;

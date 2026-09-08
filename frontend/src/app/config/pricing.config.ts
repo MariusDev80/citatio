@@ -81,16 +81,58 @@ export const FORMULAS: readonly Formula[] = [
   },
 ] as const;
 
-/** Bundled recurring subscription, hosting + domain + maintenance. */
-export const SUBSCRIPTION = {
-  price: 39,
-  period: 'mois',
-  label: 'Hébergement, nom de domaine et maintenance',
-  description:
-    'Un abonnement unique qui couvre l’hébergement sur notre infrastructure, '
-    + 'le renouvellement de votre nom de domaine, les mises à jour de sécurité '
-    + 'et les sauvegardes.',
-} as const;
+export interface Subscription {
+  readonly id: string;
+  readonly name: string;
+  readonly tagline: string;
+  /** Monthly price in euros, excl. VAT. */
+  readonly price: number;
+  readonly period: string;
+  readonly features: readonly string[];
+}
+
+/**
+ * Les deux abonnements mensuels, dont le client choisit l'un ou l'autre.
+ *
+ * Il y en avait un seul, à 39 €, qui mélangeait l'infrastructure et le travail
+ * humain. Les séparer permet de dire ce que chacun paye : le palier bas ne
+ * couvre que ce qui tourne tout seul, le palier haut y ajoute du temps passé.
+ *
+ * Le nom de domaine reste dans les deux, alors que le guide d'infrastructure en
+ * fait une ligne de facturation distincte : il coûte une quinzaine d'euros par
+ * an, et l'en sortir obligerait à démentir la promesse « le domaine est à vous,
+ * déposé à votre nom » que portent l'accueil, la FAQ et /creation-site-vitrine.
+ */
+export const SUBSCRIPTIONS: readonly Subscription[] = [
+  {
+    id: 'hebergement',
+    name: 'Hébergement',
+    tagline: 'Le strict nécessaire pour que le site soit en ligne, et le reste.',
+    price: 29,
+    period: 'mois',
+    features: [
+      'Votre site sur nos serveurs, en France',
+      'Nom de domaine déposé à votre nom, et renouvelé chaque année',
+      'Certificat HTTPS, renouvelé automatiquement',
+      'Sauvegardes quotidiennes, conservées ailleurs que sur le serveur',
+      'Surveillance de la disponibilité et mises à jour de sécurité',
+    ],
+  },
+  {
+    id: 'maintenance',
+    name: 'Hébergement et maintenance',
+    tagline: 'Le même hébergement, plus nous pour tenir le site à jour.',
+    price: 59,
+    period: 'mois',
+    features: [
+      'Tout le pack Hébergement',
+      'Vos modifications de contenu : textes, photos, horaires, tarifs',
+      'Corrections des anomalies que vous nous signalez',
+      'Support par mail et par téléphone, réponse sous deux jours ouvrés',
+      'Un point une fois par an sur l’état du site',
+    ],
+  },
+] as const;
 
 export const OPTIONS: readonly Option[] = [
   {

@@ -41,7 +41,7 @@ export const routes: Routes = [
       seo: {
         title: 'Offres et tarifs des sites vitrines | Citatio',
         description:
-          'Trois formules à partir de 1 200 € HT, plus un abonnement de 39 €/mois couvrant hébergement, nom de domaine et maintenance. Devis ferme sous cinq jours.',
+          'Trois formules à partir de 1 000 € HT, plus un abonnement à partir de 29 €/mois couvrant hébergement, nom de domaine et maintenance. Devis ferme sous cinq jours.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/services/services.component').then(m => m.ServicesComponent),
@@ -52,7 +52,7 @@ export const routes: Routes = [
       seo: {
         title: 'Création de site vitrine sur mesure près de Nantes | Citatio',
         description:
-          'Nous concevons et développons votre site vitrine à la main, sans gabarit ni constructeur de pages : 3 à 5 pages, rendu serveur, accessibilité AA, hébergement inclus. À partir de 1 200 € HT, devis ferme sous cinq jours.',
+          'Nous concevons et développons votre site vitrine à la main, sans gabarit ni constructeur de pages : 3 à 5 pages, rendu serveur, accessibilité AA, hébergement inclus. À partir de 1 000 € HT, devis ferme sous cinq jours.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/showcase/showcase.component').then(m => m.ShowcaseComponent),
@@ -63,7 +63,7 @@ export const routes: Routes = [
       seo: {
         title: 'Référencement naturel SEO pour site vitrine | Citatio',
         description:
-          'Recherche de mots-clés sur votre marché, optimisation on-page, données structurées et recommandations de contenu. Ce que le SEO change, en combien de temps, et ce que nous ne promettons pas. À partir de 1 900 € HT.',
+          'Recherche de mots-clés sur votre marché, optimisation on-page, données structurées et recommandations de contenu. Ce que le SEO change, en combien de temps, et ce que nous ne promettons pas. À partir de 1 750 € HT.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/seo-offer/seo-offer.component').then(m => m.SeoOfferComponent),
@@ -74,10 +74,21 @@ export const routes: Routes = [
       seo: {
         title: 'GEO : être cité par ChatGPT, Gemini et les AI Overviews | Citatio',
         description:
-          'Le GEO travaille la présence de votre entreprise dans les réponses des IA : données structurées, llms.txt, accès des crawlers, contenu citable, identité cohérente. Tout est en place sur ce site, vérifiable. À partir de 2 800 € HT.',
+          'Le GEO travaille la présence de votre entreprise dans les réponses des IA : données structurées, llms.txt, accès des crawlers, contenu citable, identité cohérente. Tout est en place sur ce site, vérifiable. À partir de 2 500 € HT.',
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/geo-offer/geo-offer.component').then(m => m.GeoOfferComponent),
+  },
+  {
+    path: 'hebergement-et-maintenance',
+    data: {
+      seo: {
+        title: 'Hébergement et maintenance de votre site | Citatio',
+        description:
+          'Ce que veut dire héberger un site, et ce que couvre l\'abonnement mensuel : serveurs en France, nom de domaine à votre nom, HTTPS, sauvegardes hors du serveur, surveillance. Deux formules, 29 ou 59 € HT par mois, sans engagement.',
+      } satisfies SeoData,
+    },
+    loadComponent: () => import('./pages/hosting/hosting.component').then(m => m.HostingComponent),
   },
   {
     path: 'faq',

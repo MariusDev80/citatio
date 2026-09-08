@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '
 import { RouterLink } from '@angular/router';
 import { JsonLdService } from '../../services/json-ld.service';
 import { COMPANY } from '../../config/company.config';
-import { FORMULAS } from '../../config/pricing.config';
+import { FORMULAS, SUBSCRIPTIONS } from '../../config/pricing.config';
 import { formatEuro } from '../../shared/format-euro';
 import { FlourishComponent } from '../../shared/components/flourish/flourish.component';
 
@@ -39,6 +39,8 @@ export class ShowcaseComponent {
 
   /** The floor price shown on this page is the one from the Essentiel formula. */
   protected readonly essentiel = FORMULAS[0];
+  /** Le moins cher des deux abonnements, cité comme ticket d'entrée récurrent. */
+  protected readonly hostingFrom = SUBSCRIPTIONS[0].price;
   protected readonly formatEuro = formatEuro;
 
   protected readonly deliverables = signal<readonly Deliverable[]>([

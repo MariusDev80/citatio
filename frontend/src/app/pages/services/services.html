@@ -3,7 +3,7 @@
     <app-flourish variant="hero" />
     <div class="ct-section">
       <p class="ct-eyebrow">Offres et tarifs</p>
-      <h1 class="ct-display-lg mt-6 max-w-[14ch]">Trois formules, un abonnement.</h1>
+      <h1 class="ct-display-lg mt-6 max-w-[16ch]">Trois formules, deux abonnements.</h1>
       <div class="ct-lede ct-column mt-8">
         <p>
           Le prix affiché est un <strong>prix plancher</strong>, hors taxes. Après notre premier
@@ -52,24 +52,49 @@
     </div>
   </section>
 
-  <!-- ═══ Subscription ═══ -->
+  <!-- ═══ Subscriptions ═══ -->
   <section class="mt-20 border-y border-rule bg-surface py-20" aria-labelledby="abo-title">
-    <div class="ct-section grid gap-10 md:grid-cols-12">
-      <div class="md:col-span-7">
-        <p class="ct-eyebrow">Puis, chaque mois</p>
-        <h2 id="abo-title" class="ct-display-md mt-5 max-w-[16ch]">{{ subscription.label }}</h2>
-        <p class="ct-prose ct-column mt-6">{{ subscription.description }}</p>
-        <p class="ct-prose ct-column mt-4 text-sm">
-          <strong>Sans engagement de durée.</strong> Si vous partez, nous vous remettons votre nom
-          de domaine et l’intégralité du site.
-        </p>
+    <div class="ct-section">
+      <p class="ct-eyebrow">Puis, chaque mois</p>
+      <h2 id="abo-title" class="ct-display-md mt-5 max-w-[16ch]">Deux abonnements, au choix</h2>
+      <p class="ct-prose ct-column mt-6">
+        <strong>L’un des deux est nécessaire pour que le site reste en ligne.</strong> Les deux
+        couvrent le même hébergement, le même nom de domaine et les mêmes
+        sauvegardes ; le second y ajoute le temps que nous passons sur votre site.
+      </p>
+
+      <div class="mt-12 grid border-t border-rule-strong md:grid-cols-2">
+        @for (subscription of subscriptions; track subscription.id) {
+          <div class="flex flex-col border-b border-rule py-10 md:border-b-0 md:px-10 md:first:pl-0 md:last:pr-0 md:not-first:border-l md:not-first:border-rule">
+            <h3 class="ct-title">{{ subscription.name }}</h3>
+            <p class="ct-prose mt-2 text-sm">{{ subscription.tagline }}</p>
+
+            <p class="mt-8">
+              <span class="ct-display-md block text-accent">{{ formatEuro(subscription.price) }}&nbsp;€</span>
+              <span class="ct-eyebrow mt-1 block">par {{ subscription.period }}, hors taxes</span>
+            </p>
+
+            <ul class="mt-8 grow space-y-3">
+              @for (feature of subscription.features; track feature) {
+                <li class="ct-prose flex gap-3 text-sm">
+                  <span class="mt-2 h-px w-3 shrink-0 bg-rule-strong" aria-hidden="true"></span>
+                  <span>{{ feature }}</span>
+                </li>
+              }
+            </ul>
+          </div>
+        }
       </div>
-      <div class="md:col-span-4 md:col-start-9">
-        <div class="border-t border-rule-strong pt-6">
-          <p class="ct-display-lg text-accent">{{ subscription.price }}&nbsp;€</p>
-          <p class="ct-eyebrow mt-2">par {{ subscription.period }}, hors taxes</p>
-        </div>
-      </div>
+
+      <p class="ct-prose ct-column mt-10 text-sm">
+        <strong>Sans engagement de durée.</strong> Si vous partez, nous vous remettons votre nom
+        de domaine et l’intégralité du site.
+      </p>
+
+      <a routerLink="/hebergement-et-maintenance" class="ct-link mt-8">
+        Ce que couvre exactement chaque abonnement
+        <span aria-hidden="true">→</span>
+      </a>
     </div>
   </section>
 

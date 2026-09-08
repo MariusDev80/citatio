@@ -62,7 +62,10 @@ test.describe('Page Offres : tarifs et données structurées', () => {
   test('des prix sont affichés, pas « sur devis » partout', async ({ page }) => {
     // Garde-fou de la refonte : trois « Sur devis » bloquaient toute décision.
     await expect(page.getByText(/1\s*000\s*€/).first()).toBeVisible();
-    await expect(page.getByText(/39\s*€/).first()).toBeVisible();
+    // Les deux abonnements, depuis que l'hébergement seul et la maintenance
+    // sont facturés séparément.
+    await expect(page.getByText(/29\s*€/).first()).toBeVisible();
+    await expect(page.getByText(/59\s*€/).first()).toBeVisible();
   });
 
   test('les offres portent un prix dans le JSON-LD', async ({ page }) => {
@@ -76,6 +79,42 @@ test.describe('Page Offres : tarifs et données structurées', () => {
 
   test('aucun badge de fausse preuve sociale', async ({ page }) => {
     await expect(page.getByText(/le plus demandé|le plus populaire/i)).toHaveCount(0);
+  });
+});
+
+test.describe('Page Hébergement et maintenance', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/hebergement-et-maintenance');
+  });
+
+  test('la page est pré-rendue, avec son h1 et sa canonique', async ({ page }) => {
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      'https://citatio-geo.com/hebergement-et-maintenance',
+    );
+  });
+
+  test('les deux abonnements viennent de pricing.config, pas d’une copie', async ({ page }) => {
+    await expect(page.getByText(/29\s*€/).first()).toBeVisible();
+    await expect(page.getByText(/59\s*€/).first()).toBeVisible();
+  });
+
+  test('le JSON-LD décrit un abonnement mensuel, pas un prix unique', async ({ page }) => {
+    const jsonLd = page.locator('script[type="application/ld+json"][data-jsonld="service-hosting"]');
+    await expect(jsonLd).toHaveCount(1);
+    const schema = JSON.parse((await jsonLd.textContent())!);
+    expect(schema['@type']).toBe('Service');
+    // Sans referenceQuantity, un moteur lit « 29 € » comme un paiement unique.
+    for (const offer of schema.offers) {
+      expect(offer.priceSpecification['@type']).toBe('UnitPriceSpecification');
+      expect(offer.priceSpecification.referenceQuantity.unitCode).toBe('MON');
+    }
+  });
+
+  test('la page dit ce que l’abonnement ne couvre pas', async ({ page }) => {
+    // Garde-fou de doctrine : la frontière est écrite avant la signature.
+    await expect(page.getByRole('heading', { name: /ne couvre pas/i })).toBeVisible();
   });
 });
 
@@ -193,7 +232,8 @@ test.describe('Sitemap', () => {
   // une route ajoutée sans toucher au sitemap reste invisible des crawlers.
   // Ce test verrouille la correspondance dans les deux sens.
   const prerendered = ['/', '/ce-site', '/offres-et-tarifs', '/creation-site-vitrine',
-    '/referencement-seo', '/visibilite-ia-geo', '/qui-sommes-nous', '/faq', '/contact', '/legal'];
+    '/referencement-seo', '/visibilite-ia-geo', '/hebergement-et-maintenance',
+    '/qui-sommes-nous', '/faq', '/contact', '/legal'];
 
   test('le sitemap couvre exactement les routes prérendues', async ({ request }) => {
     const xml = await (await request.get('/sitemap.xml')).text();

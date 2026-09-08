@@ -54,6 +54,8 @@ export class HomeComponent {
     {
       numeral: '03',
       title: 'Hébergement et maintenance',
+      path: '/hebergement-et-maintenance',
+      linkLabel: 'Ce que couvre l’abonnement',
       body:
         'Nous hébergeons votre site sur <strong>notre propre infrastructure</strong>, gérons votre nom '
         + 'de domaine et assurons mises à jour, sécurité et sauvegardes. <strong>Un seul '

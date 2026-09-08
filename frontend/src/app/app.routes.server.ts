@@ -9,6 +9,7 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'creation-site-vitrine', renderMode: RenderMode.Prerender },
   { path: 'referencement-seo', renderMode: RenderMode.Prerender },
   { path: 'visibilite-ia-geo', renderMode: RenderMode.Prerender },
+  { path: 'hebergement-et-maintenance', renderMode: RenderMode.Prerender },
   { path: 'faq', renderMode: RenderMode.Prerender },
   { path: 'contact', renderMode: RenderMode.Prerender },
   { path: 'legal', renderMode: RenderMode.Prerender },

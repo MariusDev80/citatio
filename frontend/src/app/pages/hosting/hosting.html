@@ -1,0 +1,220 @@
+<article class="pt-36 pb-8 md:pt-44">
+  <header class="ct-flourish-host">
+    <app-flourish variant="hero" />
+    <div class="ct-section">
+      <p class="ct-eyebrow">Hébergement et maintenance</p>
+      <h1 class="ct-display-lg mt-6 max-w-[15ch]">
+        Un site en ligne, et qui le reste.
+      </h1>
+      <div class="ct-lede ct-column mt-8">
+        <p>
+          Un site livré n’est pas un site terminé. Il doit rester allumé, gardé et
+          à jour, tous les jours, sinon il disparaît des recherches et devient une
+          porte fermée. <strong>C’est ce que couvre l’abonnement mensuel</strong>, à partir de
+          {{ formatEuro(entryPrice) }}&nbsp;€ hors taxes.
+        </p>
+      </div>
+      <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+        <a routerLink="/contact" class="ct-btn">Parlons de votre projet</a>
+        <a routerLink="/offres-et-tarifs" class="ct-link">
+          Voir les trois formules de création
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ Definition autonome, ecrite pour etre citee telle quelle ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="definition-title">
+    <div class="grid gap-10 border-t border-rule-strong pt-10 md:grid-cols-12">
+      <div class="md:col-span-5">
+        <h2 id="definition-title" class="ct-display-md max-w-[14ch]">
+          Ce que veut dire héberger un site
+        </h2>
+      </div>
+      <div class="ct-prose ct-column md:col-span-7">
+        <p>
+          Un site web est un ensemble de fichiers qui doivent être posés sur un
+          ordinateur allumé en permanence et relié à internet, pour que n’importe
+          qui puisse les demander à n’importe quelle heure. <strong>Héberger un site,
+          c’est fournir cet ordinateur et le tenir en état.</strong>
+        </p>
+        <p>
+          S’y ajoute le nom de domaine, l’adresse que vos clients tapent, qui se
+          loue à l’année et qu’il faut renouveler. <strong>Un domaine oublié, et le site
+          s’éteint du jour au lendemain</strong>, quel que soit l’argent dépensé pour le
+          construire.
+        </p>
+        <p>
+          C’est un travail continu et sans événement visible : on ne le remarque
+          que le jour où il n’a pas été fait.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Ce qui tourne, pour les deux abonnements ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="infra-title">
+    <div class="border-t border-rule-strong pt-10">
+      <p class="ct-eyebrow">Dans les deux abonnements</p>
+      <h2 id="infra-title" class="ct-display-md mt-5">Ce que nous faisons tourner</h2>
+      <p class="ct-prose ct-column mt-5">
+        <strong>Rien de ce qui suit n’est une option.</strong> Ce sont les six points qui
+        séparent un site tenu d’un site laissé à lui-même.
+      </p>
+    </div>
+
+    <div class="mt-12">
+      @for (item of infrastructure(); track item.title) {
+        <div class="grid gap-4 border-t border-rule py-8 md:grid-cols-12 md:gap-10">
+          <h3 class="ct-title md:col-span-4">{{ item.title }}</h3>
+          <p class="ct-prose md:col-span-8" [innerHTML]="item.body"></p>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ═══ Les deux abonnements ═══ -->
+  <section class="mt-20 border-y border-rule bg-surface py-20" aria-labelledby="abos-title">
+    <div class="ct-section">
+      <div class="border-t border-rule-strong pt-10">
+        <h2 id="abos-title" class="ct-display-md">Deux abonnements, au choix</h2>
+        <p class="ct-prose ct-column mt-5">
+          <strong>L’un des deux est nécessaire pour que le site reste en ligne.</strong> La
+          différence entre les deux n’est pas la qualité de l’hébergement, qui est
+          la même : c’est le temps que nous passons ensuite sur votre site.
+        </p>
+      </div>
+
+      <div class="mt-12 grid border-t border-rule-strong md:grid-cols-2">
+        @for (subscription of subscriptions; track subscription.id) {
+          <div class="flex flex-col border-b border-rule py-10 md:border-b-0 md:px-10 md:first:pl-0 md:last:pr-0 md:not-first:border-l md:not-first:border-rule">
+            <h3 class="ct-title">{{ subscription.name }}</h3>
+            <p class="ct-prose mt-2 text-sm">{{ subscription.tagline }}</p>
+
+            <p class="mt-8">
+              <span class="ct-display-md block text-accent">{{ formatEuro(subscription.price) }}&nbsp;€</span>
+              <span class="ct-eyebrow mt-1 block">par {{ subscription.period }}, hors taxes</span>
+            </p>
+
+            <ul class="mt-8 grow space-y-3">
+              @for (feature of subscription.features; track feature) {
+                <li class="ct-prose flex gap-3 text-sm">
+                  <span class="mt-2 h-px w-3 shrink-0 bg-rule-strong" aria-hidden="true"></span>
+                  <span>{{ feature }}</span>
+                </li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+
+      <p class="ct-prose ct-column mt-10 text-sm">
+        <strong>Sans engagement de durée</strong>, et vous passez de l’un à l’autre quand vous
+        voulez. On commence en général par l’hébergement seul, et on ajoute la
+        maintenance le jour où vous vous rendez compte que vous nous écrivez tous
+        les mois.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ Ce qui n'est pas compris ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="exclus-title">
+    <div class="border-t border-rule-strong pt-10">
+      <h2 id="exclus-title" class="ct-display-md max-w-[18ch]">Ce que l’abonnement ne couvre pas</h2>
+      <p class="ct-prose ct-column mt-5">
+        Une page supplémentaire est facturée <strong>{{ extraPagePrice }}</strong>. Pour le
+        reste, voici la frontière, écrite avant la signature plutôt qu’au moment
+        de la facture.
+      </p>
+    </div>
+
+    <div class="mt-12">
+      @for (item of excluded(); track item.title) {
+        <div class="grid gap-4 border-t border-rule py-8 md:grid-cols-12 md:gap-10">
+          <h3 class="ct-title md:col-span-4">{{ item.title }}</h3>
+          <p class="ct-prose md:col-span-8">{{ item.body }}</p>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ═══ Ce qui reste au client, l'argument qui nous distingue ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="propriete-title">
+    <div class="grid gap-10 border-t border-rule-strong pt-10 md:grid-cols-12">
+      <div class="md:col-span-5">
+        <h2 id="propriete-title" class="ct-display-md max-w-[16ch]">
+          Vous n’êtes pas prisonnier
+        </h2>
+      </div>
+      <div class="ct-prose ct-column md:col-span-7">
+        <p>
+          <strong>Le nom de domaine est déposé à votre nom</strong>, pas au nôtre. C’est la
+          différence concrète avec les formules où le site s’éteint le jour où
+          vous cessez de payer, parce que l’adresse ne vous appartenait pas.
+        </p>
+        <p>
+          <strong>Le code du site est à vous.</strong> Si vous arrêtez l’abonnement, nous vous
+          remettons le site entier et le domaine, pour que vous puissiez les
+          confier à quelqu’un d’autre. Nous ne gardons rien en otage.
+        </p>
+        <p>
+          En contrepartie, nous ne livrons pas d’interface d’édition et les
+          modifications passent par nous. C’est ce qui garantit que le site reste
+          rapide et accessible dans le temps, et c’est un choix que nous assumons
+          plutôt qu’une limite que nous cachons.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Limite honnete : notre site n'est pas sur la meme pile ═══ -->
+  <section class="ct-section mt-20" aria-labelledby="limite-title">
+    <div class="grid gap-10 border-t border-rule-strong pt-10 md:grid-cols-12">
+      <div class="md:col-span-5">
+        <h2 id="limite-title" class="ct-display-md max-w-[16ch]">
+          Ce que cette page ne prouve pas
+        </h2>
+      </div>
+      <div class="ct-prose ct-column md:col-span-7">
+        <p>
+          Nous démarrons, et <strong>vous seriez parmi les premiers sites que nous
+          hébergeons</strong>. Nous préférons l’écrire ici plutôt que de laisser entendre
+          un parc de clients que nous n’avons pas.
+        </p>
+        <p>
+          Ce site-ci ne tourne d’ailleurs pas sur la même installation que celle
+          décrite plus haut : il est déployé automatiquement depuis notre dépôt de
+          code, sur une machine que nous administrons directement. Les sites
+          clients tournent sur une installation prévue pour en accueillir
+          plusieurs et pour être reprise par n’importe lequel d’entre nous.
+          <strong>Ce sont deux besoins différents, et nous ne prétendons pas le
+          contraire.</strong>
+        </p>
+        <p>
+          Ce que vous pouvez vérifier tout de suite, en revanche, c’est le soin
+          apporté au site que vous lisez.
+          <a routerLink="/ce-site">Les mesures sont sur cette page</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ct-flourish-host py-20">
+    <app-flourish variant="closing" />
+    <div class="ct-section border-t border-rule-strong pt-12">
+      <h2 class="ct-display-lg max-w-[18ch]">Qui s’occupe de votre site aujourd’hui ?</h2>
+      <p class="ct-lede ct-column mt-6">
+        <strong>Si vous ne savez pas répondre, c’est déjà une réponse.</strong> Dites-nous où
+        en est votre site, nous vous dirons ce qu’il faudrait faire.
+      </p>
+      <div class="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+        <a routerLink="/contact" class="ct-btn">Prendre contact</a>
+        <a routerLink="/creation-site-vitrine" class="ct-link">
+          La création du site
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</article>

@@ -19,7 +19,7 @@ test.describe('Questions de la FAQ', () => {
     await page.goto('/faq');
 
     const items = page.locator('details.ct-faq-item');
-    await expect(items).toHaveCount(18);
+    await expect(items).toHaveCount(19);
 
     const item = page.locator('details.ct-faq-item', {
       hasText: 'Que couvre l’abonnement mensuel ?',
@@ -44,9 +44,9 @@ test.describe('Questions de la FAQ', () => {
 
   test('chaque question est un titre de niveau 3', async ({ page }) => {
     await page.goto('/faq');
-    // Quatre rubriques en h2, dix-huit questions en h3 : sans cela les
+    // Quatre rubriques en h2, dix-neuf questions en h3 : sans cela les
     // questions n'apparaissent dans aucun plan de page.
-    await expect(page.locator('summary h3.ct-faq-question')).toHaveCount(18);
+    await expect(page.locator('summary h3.ct-faq-question')).toHaveCount(19);
   });
 
   test('les montants affiches viennent de pricing.config, pas d’une copie', async ({ page }) => {

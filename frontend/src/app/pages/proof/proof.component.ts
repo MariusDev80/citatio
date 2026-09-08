@@ -71,8 +71,9 @@ export class ProofComponent {
       title: 'Hébergé par nous',
       body:
         'Le site tourne dans des conteneurs Docker derrière Caddy, sur un serveur '
-        + 'que nous administrons. <strong>C’est la même infrastructure que celle proposée '
-        + 'à nos clients</strong> : nous en sommes les premiers utilisateurs.',
+        + 'que nous administrons. <strong>Les sites de nos clients tournent sur une autre '
+        + 'installation</strong>, prévue pour en accueillir plusieurs, mais elle est louée, '
+        + 'administrée et sauvegardée par les mêmes personnes : nous.',
     },
     {
       title: 'Déployé automatiquement',

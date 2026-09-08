@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '
 import { RouterLink } from '@angular/router';
 import { JsonLdService } from '../../services/json-ld.service';
 import { COMPANY } from '../../config/company.config';
-import { FORMULAS, OPTIONS, PRICE_FACTORS, SUBSCRIPTION } from '../../config/pricing.config';
+import { FORMULAS, OPTIONS, PRICE_FACTORS, SUBSCRIPTIONS } from '../../config/pricing.config';
 import { formatEuro } from '../../shared/format-euro';
 import { FlourishComponent } from '../../shared/components/flourish/flourish.component';
 
@@ -29,9 +29,10 @@ interface FaqGroup {
 }
 
 const [ESSENTIEL, VITRINE_SEO, VITRINE_GEO] = FORMULAS;
+const [HEBERGEMENT, MAINTENANCE] = SUBSCRIPTIONS;
 const EXTRA_PAGE = OPTIONS.find((o) => o.name === 'Pages supplémentaires');
 
-/** « 1 200 € » with the narrow no-break space French typography expects. */
+/** « 1 000 € » with the narrow no-break space French typography expects. */
 const euros = (amount: number) => `${formatEuro(amount)} €`;
 
 /**
@@ -143,9 +144,27 @@ export class FaqComponent {
         {
           question: 'Que couvre l’abonnement mensuel ?',
           answer:
-            SUBSCRIPTION.price + ' € hors taxes par ' + SUBSCRIPTION.period + '. '
-            + SUBSCRIPTION.description + ' Il n’y a pas d’engagement de durée, et pas de '
-            + 'frais de mise en service cachés derrière.',
+            'Il y a deux abonnements, et il en faut un pour que le site reste en ligne. '
+            + HEBERGEMENT.name + ', à ' + HEBERGEMENT.price + ' € hors taxes par '
+            + HEBERGEMENT.period + ', couvre le site sur nos serveurs en France, le nom de '
+            + 'domaine déposé à votre nom et renouvelé, le certificat HTTPS, des sauvegardes '
+            + 'quotidiennes conservées hors du serveur, la surveillance de la disponibilité et '
+            + 'les mises à jour de sécurité. ' + MAINTENANCE.name + ', à ' + MAINTENANCE.price
+            + ' € par ' + MAINTENANCE.period + ', ajoute vos modifications de contenu, la '
+            + 'correction des anomalies signalées et un support par mail et téléphone sous '
+            + 'deux jours ouvrés. Sur l’un comme sur l’autre, il n’y a pas d’engagement de '
+            + 'durée, et pas de frais de mise en service cachés derrière.',
+          links: [{ path: '/hebergement-et-maintenance', label: 'Le détail des deux abonnements' }],
+        },
+        {
+          question: 'Où mon site sera-t-il hébergé ?',
+          answer:
+            'Sur des serveurs que nous louons et administrons nous-mêmes, installés en '
+            + 'France, avec un espace, un accès et une base de données séparés pour chaque '
+            + 'client. Nous n’hébergeons que les sites que nous avons écrits : reprendre '
+            + 'l’exploitation d’un site dont nous n’avons pas la main sur le code '
+            + 'reviendrait à répondre de choix techniques que nous n’avons pas faits.',
+          links: [{ path: '/hebergement-et-maintenance', label: 'Ce que couvre l’hébergement' }],
         },
         {
           question: 'Qu’est-ce qui fait varier le prix d’un devis ?',

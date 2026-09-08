@@ -15,19 +15,30 @@ travail.
 
 Trois formules, prix plancher hors taxes, devis ferme sous cinq jours ouvrés :
 
-- **Vitrine Essentiel, à partir de 1 200 €** : site responsive de 3 à 5 pages,
+- **Vitrine Essentiel, à partir de 1 000 €** : site responsive de 3 à 5 pages,
   design sur mesure, formulaire de contact, base SEO technique, rendu serveur
   et accessibilité AA.
-- **Vitrine + SEO, à partir de 1 900 €** : le pack Essentiel, plus
+- **Vitrine + SEO, à partir de 1 750 €** : le pack Essentiel, plus
   l'optimisation SEO on-page, la recherche de mots-clés, les données
   structurées schema.org et des recommandations de contenu.
-- **Vitrine + GEO/SEO, à partir de 2 800 €** : le pack SEO, plus
+- **Vitrine + GEO/SEO, à partir de 2 500 €** : le pack SEO, plus
   l'optimisation GEO pour ChatGPT, Gemini et les AI Overviews de Google, et un
   contenu structuré pour la citation par les IA.
 
-**Abonnement 39 €/mois** couvrant l'hébergement, le nom de domaine et la
-maintenance, sans engagement de durée. Options à la carte : pack contenu,
-emailing, pages supplémentaires (180 €/page), identité visuelle.
+**Deux abonnements mensuels au choix**, sans engagement de durée, l'un des
+deux étant nécessaire pour que le site reste en ligne :
+
+- **Hébergement, 29 €/mois** : le site sur nos serveurs en France, le nom de
+  domaine déposé au nom du client et renouvelé, le certificat HTTPS, des
+  sauvegardes quotidiennes conservées hors du serveur, la surveillance de la
+  disponibilité et les mises à jour de sécurité.
+- **Hébergement et maintenance, 59 €/mois** : le pack Hébergement, plus les
+  modifications de contenu (textes, photos, horaires, tarifs), la correction des
+  anomalies signalées, un support par mail et téléphone sous deux jours ouvrés
+  et un point annuel sur l'état du site.
+
+Options à la carte : pack contenu, emailing, pages supplémentaires (180 €/page),
+identité visuelle.
 
 Ce que Citatio ne fait pas : boutique en ligne, application métier, reprise
 d'un site existant dont l'agence n'a pas la main sur le code. Citatio ne
@@ -40,6 +51,7 @@ garantit pas la première place sur Google.
 - [Création de site vitrine](https://citatio-geo.com/creation-site-vitrine) : ce qu'est un site vitrine, ce qui est livré, ce que Citatio refuse de faire, et le prix plancher.
 - [Référencement naturel](https://citatio-geo.com/referencement-seo) : le socle technique inclus partout, ce que l'option ajoute, les délais réalistes et ce qui n'est pas promis.
 - [Visibilité dans les IA](https://citatio-geo.com/visibilite-ia-geo) : definition du GEO, difference avec le SEO, ce qui est mis en place et ce qui echappe au controle.
+- [Hébergement et maintenance](https://citatio-geo.com/hebergement-et-maintenance) : ce que veut dire héberger un site, ce que couvre chacun des deux abonnements, et ce qui n'y est pas compris.
 - [Ce site](https://citatio-geo.com/ce-site) : le site sert de portfolio : scores Lighthouse mesurés et datés, décisions techniques, et ce que cette preuve ne démontre pas.
 - [Qui sommes-nous](https://citatio-geo.com/qui-sommes-nous) : les trois fondateurs, la manière de travailler, ce que l'agence refuse de faire.
 - [Questions fréquentes](https://citatio-geo.com/faq) : coût, délais, SEO et GEO, hébergement, contenu, mobile.

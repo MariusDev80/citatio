@@ -34,7 +34,8 @@ const parse = (s) => s.match(/\d+(\.\d+)?/g).slice(0, 3).map(Number);
 const browser = await chromium.launch();
 const page = await browser.newPage({ colorScheme: 'dark' });
 const routes = ['/', '/ce-site', '/qui-sommes-nous', '/offres-et-tarifs',
-  '/creation-site-vitrine', '/referencement-seo', '/visibilite-ia-geo', '/faq', '/contact', '/legal'];
+  '/creation-site-vitrine', '/referencement-seo', '/visibilite-ia-geo',
+  '/hebergement-et-maintenance', '/faq', '/contact', '/legal'];
 let worst = { r: 99, sel: '', route: '' };
 let failures = 0;
 let inspected = 0;
