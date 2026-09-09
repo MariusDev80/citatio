@@ -19,6 +19,10 @@ logs/
 *.log
 
 # Local
+# Identifiants SMTP du formulaire de contact, ecrits sur le VPS par le
+# deploiement depuis les secrets GitHub. Ce fichier ne doit jamais etre versionne :
+# docker compose le lit automatiquement a cote de docker-compose.yml.
+.env
 data/
 docker-compose.local.yml
 Caddyfile.local

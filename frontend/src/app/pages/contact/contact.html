@@ -66,6 +66,30 @@
 
     <!-- ═══ Qualifying form ═══ -->
     <div class="md:col-span-7 md:col-start-6">
+      @if (status() === 'success') {
+
+        <!-- ═══ Accusé de réception ═══
+             Remplace le formulaire, et n'affirme que ce qui est vrai : le
+             serveur a répondu 202, donc la demande est enregistrée. Il ne dit
+             pas « email envoyé », que rien ne permet de garantir à cet instant
+             (la notification part après la réponse). ═══ -->
+        <div class="ct-panel" role="status">
+          <h2 class="ct-title ct-focus-ring" tabindex="-1" #successHeading>Votre message est arrivé.</h2>
+          <p class="ct-prose mt-4">
+            Nous l’avons bien reçu et nous vous répondons <strong>sous deux jours
+            ouvrés</strong>, à l’adresse que vous nous avez indiquée.
+          </p>
+          <p class="ct-prose mt-4 text-sm">
+            Une précision à ajouter, ou pas de réponse de notre part&nbsp;?
+            Écrivez-nous directement à
+            <a [href]="'mailto:' + company.email" class="ct-link">{{ company.email }}</a>
+            ou appelez le
+            <a [href]="'tel:' + company.phoneRaw" class="ct-link">{{ company.phoneDisplay }}</a>.
+          </p>
+        </div>
+
+      } @else {
+
       <div class="border-t border-rule-strong pt-8">
         <h2 class="ct-title">Décrivez votre projet</h2>
         <p class="ct-prose mt-3 text-sm">
@@ -187,19 +211,73 @@
           }
         </div>
 
-        <!-- Honest about what submitting does: the backend mail service
-             (u1-communication) is not wired up yet, so we compose the message
-             in the visitor's own mail client rather than claiming it was sent. -->
+        <!-- Consentement RGPD. Case décochée par défaut : une case pré-cochée
+             ne recueille pas un consentement, elle le suppose. -->
+        <div class="flex gap-3 border-t border-rule pt-6">
+          <input
+            type="checkbox"
+            id="consent"
+            formControlName="consent"
+            class="ct-focus-ring mt-1 size-4 shrink-0 accent-accent"
+            [attr.aria-invalid]="showError('consent')"
+            [attr.aria-describedby]="showError('consent') ? 'consent-error' : null" />
+          <div>
+            <label for="consent" class="ct-prose text-sm">
+              J’accepte que ces informations soient utilisées pour répondre à ma demande. *
+            </label>
+            @if (showError('consent')) {
+              <p id="consent-error" class="mt-2 text-sm text-accent" role="alert">
+                Cochez cette case pour que nous puissions traiter votre demande.
+              </p>
+            }
+            <p class="ct-prose mt-2 text-sm">
+              Elles ne servent qu’à cela et ne sont transmises à personne. Détail dans nos
+              <a routerLink="/legal" class="ct-link">mentions légales</a>.
+            </p>
+          </div>
+        </div>
+
+        <!-- Leurre anti-robot. Masqué par CSS, retiré du parcours clavier et de
+             l'arbre d'accessibilité : un visiteur, souris ou lecteur d'écran, ne
+             peut pas le remplir. Un robot qui remplit tous les champs, si, et le
+             serveur écarte alors la demande sans le lui dire. -->
+        <div class="ct-honeypot" aria-hidden="true">
+          <label for="website">Ne remplissez pas ce champ</label>
+          <input
+            type="text"
+            id="website"
+            formControlName="website"
+            tabindex="-1"
+            autocomplete="off" />
+        </div>
+
         <div class="border-t border-rule pt-6">
-          <button type="submit" class="ct-btn">Préparer mon message</button>
-          <p class="ct-prose mt-4 text-sm">
-            <strong>Ce bouton ouvre votre logiciel de messagerie</strong> avec le message déjà
-            rempli, vous gardez la main sur ce qui part. Vous préférez écrire
-            vous-même&nbsp;?
-            <a [href]="'mailto:' + company.email">{{ company.email }}</a>
-          </p>
+          <button type="submit" class="ct-btn" [disabled]="status() === 'sending'">
+            {{ status() === 'sending' ? 'Envoi en cours…' : 'Envoyer mon message' }}
+          </button>
+
+          @if (status() === 'error') {
+            <!-- Le message ne prétend rien sur la cause : le visiteur n'a que
+                 faire du statut HTTP. Ce qui lui sert, ce sont les deux moyens
+                 de nous joindre qui ne dépendent pas de ce formulaire. -->
+            <p class="mt-4 text-sm text-accent" role="alert">
+              <strong>Votre message n’est pas parti.</strong> Réessayez dans un instant, ou
+              écrivez-nous à
+              <a [href]="'mailto:' + company.email" class="ct-link">{{ company.email }}</a>
+              ou au
+              <a [href]="'tel:' + company.phoneRaw" class="ct-link">{{ company.phoneDisplay }}</a>.
+            </p>
+          } @else {
+            <p class="ct-prose mt-4 text-sm">
+              Nous répondons <strong>sous deux jours ouvrés</strong>. Vous préférez écrire
+              vous-même&nbsp;?
+              <a [href]="'mailto:' + company.email">{{ company.email }}</a>
+            </p>
+          }
         </div>
       </form>
+
+      }
     </div>
   </div>
 </article>

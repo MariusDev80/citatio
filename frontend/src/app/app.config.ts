@@ -6,6 +6,7 @@ import {
   provideZoneChangeDetection,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideClientHydration } from '@angular/platform-browser';
@@ -29,6 +30,11 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideAppInitializer(markJsCapable),
+    // Premier appel HTTP du site : l'envoi du formulaire de contact. `withFetch`
+    // parce que fetch est l'API du navigateur et que XHR n'existe pas cote
+    // serveur ; les dix routes restent pre-rendues, aucune requete ne part au
+    // rendu, l'envoi ne se declenche que sur un clic du visiteur.
+    provideHttpClient(withFetch()),
     provideAnimationsAsync(),
     provideClientHydration(),
     provideRouter(

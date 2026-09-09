@@ -52,7 +52,7 @@ Deux objets portent les mêmes mots (« le site », « la page d'accueil », « 
    (multi-tenant, thème par client, gabarit vendu), c'est une **décision produit** : elle revient au
    propriétaire, pas à toi.
 
-### 1.2 État réel du projet, au 3 septembre 2026
+### 1.2 État réel du projet, au 9 septembre 2026
 
 Ce que le dépôt contient vraiment, pour éviter de raisonner sur un système imaginaire :
 
@@ -63,14 +63,17 @@ Ce que le dépôt contient vraiment, pour éviter de raisonner sur un système i
 | SEO / GEO on-page (meta, JSON-LD, sitemap, llms.txt, robots) | **En production** |
 | CI GitHub Actions (Vitest + Playwright + build/push GHCR + déploiement VPS) | **Opérationnelle** |
 | Gateway Caddy, TLS, en-têtes de sécurité, routage `/api/uX` | **Opérationnelle** |
-| `u1-communication`, `u2-blog` (Spring Boot) | **Squelettes** : `/health`, sondes Actuator et un ping croisé `ping-u1` / `ping-u2`, aucune entité métier, aucun envoi de mail |
+| `u1-communication` (Spring Boot) | **Une fonction réelle** : réception du formulaire de contact (entité `ContactRequest`, envoi SMTP asynchrone). Le reste (`/health`, sondes, `ping-u2`) est inchangé |
+| `u2-blog` (Spring Boot) | **Squelette** : `/health`, sondes Actuator et `ping-u1`, aucune entité métier |
 | Indépendance des deux microservices | **Acquise** : aucun `depends_on` croisé, appels absorbés par `UpstreamClient` (timeouts, disjoncteur, dégradation gracieuse) |
-| Consommation du backend par le frontend | **Inexistante** : aucun `HttpClient` dans `frontend/src`, le site est 100 % statique |
-| Formulaire de contact | Compose un **`mailto:` pré-rempli**, aucun envoi serveur (voir §6.2) |
+| Consommation du backend par le frontend | **Un seul appel** : `ContactService` poste sur `/api/u1/contact-requests`. `provideHttpClient(withFetch())` est en place, les 10 routes restent pré-rendues et aucune requête ne part au rendu |
+| Formulaire de contact | **Branché sur `u1-communication`** : la demande est enregistrée en base puis notifiée par email. Le `mailto:` a été retiré |
 | Blog | **Pas commencé**, prévu sur `u2-blog` |
 
-Conséquence pratique : **une modification du frontend n'a besoin d'aucun backend démarré**, et le
-backend n'a aujourd'hui aucun consommateur. Ne raisonne jamais comme si une API était déjà branchée.
+Conséquence pratique : **une modification du frontend n'a toujours besoin d'aucun backend démarré**,
+les 10 routes étant pré-rendues au build. Seul l'envoi du formulaire de contact appelle une API, et
+seulement sur un clic du visiteur. En dehors de ce point, ne raisonne pas comme si une API était
+branchée : il n'y en a qu'une.
 
 ---
 
@@ -417,10 +420,11 @@ chiffre est réel.
   toujours republier la date pour qu'un chiffre périmé se voie.
 - Refaire une mesure avant de la modifier. La procédure est en tête du fichier.
 - La page `/ce-site` assume explicitement **ce qu'elle ne prouve pas**. Cette section reste.
-- Le formulaire de contact **n'est pas branché** : il compose un `mailto:` pré-rempli. Il affichait
-  auparavant « message envoyé avec succès » alors que rien ne partait ; c'est exactement le genre de
-  mensonge que ce projet refuse. Tant que `u1-communication` n'envoie pas réellement, le
-  comportement `mailto:` reste, et rien ne prétend le contraire.
+- Le formulaire de contact **est branché** sur `u1-communication` (§12 l'a soldé). Il a affiché par
+  le passé « message envoyé avec succès » alors que rien ne partait, puis composé un `mailto:` en
+  l'assumant ; la règle qui en est sortie tient toujours. L'accusé de réception dit « votre message
+  est arrivé », pas « email envoyé » : le serveur répond 202 dès l'enregistrement en base, la
+  notification part derrière et peut échouer. On n'affirme que ce que la réponse prouve.
 - Aucune promesse de position sur Google, sur le site comme dans les offres.
 
 ### 6.3 Le ton éditorial
@@ -500,7 +504,7 @@ npm run check:contrast          # balayage de contraste en thème sombre, après
 npm run build:og                # régénère public/og-citatio.png depuis tools/og-image.html
 
 # Backend, depuis backend/
-./mvnw -B test                  # les 21 tests des trois modules (ce que lance la CI)
+./mvnw -B test                  # les 36 tests des trois modules (ce que lance la CI)
 ./mvnw clean package            # les trois modules
 ./mvnw -pl u2-blog -am package  # un module et ses dépendances
 
@@ -525,11 +529,14 @@ npx lighthouse http://localhost:4173 --preset=desktop --view
   des prix, absence de fausse preuve sociale, polices auto-hébergées, contenu présent dans le HTML
   pré-rendu, bascule de thème. S'ils tombent, la bonne réaction est presque toujours de corriger le
   code, pas le test.
-- Côté backend, 21 tests tournent sur H2 en mémoire, **sans aucune base externe**, et la CI les
-  lance sur tout push et toute PR (job `backend-test`). Deux familles sont des garde-fous et non des
+- Côté backend, 36 tests tournent sur H2 en mémoire, **sans aucune base externe**, et la CI les
+  lance sur tout push et toute PR (job `backend-test`). Trois familles sont des garde-fous et non des
   tests fonctionnels : `UpstreamClientTest` (aucune exception ne remonte d'un voisin coupé, le motif
-  ne fuit pas, le circuit s'ouvre) et `ApiExceptionHandlerTest` (une URL inconnue rend 404 et non
-  500). S'ils tombent, corrige le code. La première entité métier doit arriver avec ses tests.
+  ne fuit pas, le circuit s'ouvre), `ApiExceptionHandlerTest` (une URL inconnue rend 404 et non
+  500) et `ContactRequestServiceTest` (la demande est en base avant toute tentative d'envoi, un SMTP
+  coupé ne fait pas perdre le lead, le leurre n'écrit rien). S'ils tombent, corrige le code.
+  `SmtpMailSender` n'est couvert par aucun test : il faudrait un serveur SMTP factice, donc une
+  dépendance de plus, pour vérifier ce que la configuration exprime déjà.
 
 ---
 
@@ -601,10 +608,13 @@ Ne duplique jamais ces informations ailleurs, ne les code jamais en dur dans un 
 
 Non priorisés ici : la priorisation appartient au propriétaire.
 
-- Brancher le formulaire de contact sur `u1-communication` (envoi réel, validation, anti-spam),
-  puis retirer la solution `mailto:`.
-- Premières entités métier de `u2-blog` et pages blog côté Angular, avec Flyway au lieu de
-  `ddl-auto: update`.
+- Renseigner les secrets SMTP (`MAIL_*`) côté GitHub Actions : sans eux, une demande de contact est
+  bien enregistrée en base mais aucune notification ne part (statut `FAILED`).
+- Passer à **Flyway** : `ContactRequest` est la première entité réelle, sa table est aujourd'hui
+  créée par `ddl-auto: update`. La migration doit être posée avant qu'une deuxième entité arrive.
+- Rejouer les notifications en échec (`mail_status = FAILED`), aujourd'hui repérables seulement en
+  lisant la table ou les logs.
+- Premières entités métier de `u2-blog` et pages blog côté Angular.
 - Sortir les identifiants Postgres de `docker-compose.yml`.
 - Figer les tarifs de `pricing.config.ts` (aujourd'hui provisoires, marqués comme tels) une fois
   validés par le propriétaire.

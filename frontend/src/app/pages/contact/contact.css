@@ -1,2 +1,23 @@
 /* PrimeNG form inputs handle their own theming.
    Layout is handled by Tailwind utilities in the template. */
+
+/*
+ * Leurre anti-robot.
+ *
+ * Pas `sr-only` : cet utilitaire garde le champ dans l'arbre d'accessibilite,
+ * donc un lecteur d'ecran l'annoncerait et son utilisateur pourrait le remplir,
+ * ce qui ferait passer un visiteur pour un robot. Ici on veut l'inverse d'un
+ * contenu accessible : invisible pour tout le monde, y compris les technologies
+ * d'assistance (le conteneur porte aria-hidden, l'input tabindex="-1").
+ *
+ * `position: absolute` plutot que `display: none` : certains robots ignorent
+ * volontairement les champs en display none, celui-ci reste dans le flux du
+ * DOM et hors de l'ecran.
+ */
+.ct-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

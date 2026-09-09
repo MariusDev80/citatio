@@ -36,6 +36,23 @@ services:
       DB_USER: user
       DB_PASSWORD: password
       U2_BASE_URL: http://u2-blog:8082
+      # ── Envoi des emails du formulaire de contact ──
+      # Rien n'est code en dur cote application : hote, port, identifiants et
+      # adresses arrivent tous par variable. Les valeurs sensibles viennent de
+      # l'environnement du VPS (fichier .env a cote de docker-compose.yml,
+      # alimente par les secrets GitHub Actions), jamais du depot.
+      # Les defauts ':-' ne sont la que pour un demarrage local sans .env ;
+      # sans MAIL_USERNAME ni MAIL_PASSWORD, l'authentification SMTP echoue et
+      # la demande est enregistree en base avec le statut FAILED, ce qui est le
+      # comportement voulu : on perd le mail, jamais le lead.
+      MAIL_HOST: ${MAIL_HOST:-smtp.hostinger.com}
+      MAIL_PORT: ${MAIL_PORT:-465}
+      MAIL_SSL: ${MAIL_SSL:-true}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-client-request@citatio-geo.com}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Formulaire Citatio}
+      MAIL_TO: ${MAIL_TO:-contact@citatio-geo.com}
     # 'expose' uniquement : joignable par Caddy et par u2 via le reseau Docker
     # interne, jamais directement depuis Internet. (Debug local : compose override.)
     expose:
