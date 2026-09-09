@@ -14,7 +14,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>backend</name>
-	<description>Citatio backend — aggregateur multi-modules (microservices)</description>
+	<description>Citatio backend, aggregateur multi-modules (microservices)</description>
 
 	<!-- Chaque microservice est un module Maven autonome, buildable et testable independamment. -->
 	<modules>
@@ -25,6 +25,9 @@
 
 	<properties>
 		<java.version>21</java.version>
+		<!-- Pas gere par le BOM Spring Boot : la version est fixee ici pour que les
+		     trois modules partagent la meme. -->
+		<resilience4j.version>2.3.0</resilience4j.version>
 	</properties>
 
 	<dependencyManagement>

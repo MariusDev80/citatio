@@ -9,8 +9,10 @@ frontend/.angular/
 
 # Backend
 backend/target/
-backend/.mvn/
-backend/mvnw.cmd
+# Le wrapper Maven (.mvn/, mvnw, mvnw.cmd) est VERSIONNE, volontairement :
+# il etait ignore, si bien que ./mvnw echouait sur tout clone neuf, CI comprise,
+# alors que CLAUDE.md documente cette commande. C'est son role de figer la
+# version de Maven pour tout le monde.
 
 # Logs
 logs/

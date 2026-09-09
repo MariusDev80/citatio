@@ -19,7 +19,7 @@ services:
       timeout: 3s
       retries: 10
 
-  # ── Microservice u1-communication (email / contact / comms) — port 8081 ──
+  # ── Microservice u1-communication (email / contact / comms), port 8081 ──
   u1-communication:
     image: ghcr.io/mariusdev80/citatio/u1-communication:latest
     build:
@@ -35,12 +35,24 @@ services:
       DB_NAME: citatio_u1_db
       DB_USER: user
       DB_PASSWORD: password
+      U2_BASE_URL: http://u2-blog:8082
     # 'expose' uniquement : joignable par Caddy et par u2 via le reseau Docker
     # interne, jamais directement depuis Internet. (Debug local : compose override.)
     expose:
       - "8081"
+    # Sante propre au service : Docker connait l'etat de u1 independamment de u2.
+    # Sonde de LIVENESS et non /api/u1/health : cette derniere repond UP tant que
+    # le serveur web repond, base coupee comprise. La liveness ignore elle aussi la
+    # base, deliberement (une base momentanement absente ne doit pas declencher une
+    # boucle de redemarrage), la readiness est celle qui l'inclut.
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8081/actuator/health/liveness || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 40s
 
-  # ── Microservice u2-blog (articles) — port 8082, appelle u1 en REST ──
+  # ── Microservice u2-blog (articles), port 8082, appelle u1 en REST ──
   u2-blog:
     image: ghcr.io/mariusdev80/citatio/u2-blog:latest
     build:
@@ -48,11 +60,12 @@ services:
       dockerfile: u2-blog/Dockerfile
     container_name: citatio-u2
     restart: always
+    # AUCUNE dependance a u1-communication : les deux microservices demarrent et
+    # vivent independamment. Une coupure de u1 ne doit ni empecher u2 de demarrer,
+    # ni l'empecher de repondre (voir UpstreamClient : degradation gracieuse).
     depends_on:
       database:
         condition: service_healthy
-      u1-communication:
-        condition: service_started
     environment:
       DB_HOST: database
       DB_NAME: citatio_u2_db
@@ -63,6 +76,17 @@ services:
     # jamais directement depuis Internet.
     expose:
       - "8082"
+    # Sante propre au service : Docker connait l'etat de u2 independamment de u1.
+    # Sonde de LIVENESS et non /api/u2/health : cette derniere repond UP tant que
+    # le serveur web repond, base coupee comprise. La liveness ignore elle aussi la
+    # base, deliberement (une base momentanement absente ne doit pas declencher une
+    # boucle de redemarrage), la readiness est celle qui l'inclut.
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8082/actuator/health/liveness || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 40s
 
   frontend:
     image: ghcr.io/mariusdev80/citatio/frontend:latest

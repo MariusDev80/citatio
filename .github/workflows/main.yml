@@ -9,7 +9,7 @@ on:
 jobs:
   # ─────────────────────────────────────────────
   # Job 1 : Tests unitaires (Vitest)
-  # Tourne sur TOUT push/PR — jamais dans Docker
+  # Tourne sur TOUT push/PR, jamais dans Docker
   # ─────────────────────────────────────────────
   test:
     name: Unit Tests
@@ -36,7 +36,7 @@ jobs:
 
   # ─────────────────────────────────────────────
   # Job 2 : Tests de non-régression (Playwright)
-  # Tourne sur TOUT push/PR — jamais dans Docker
+  # Tourne sur TOUT push/PR, jamais dans Docker
   # ─────────────────────────────────────────────
   e2e:
     name: E2E Tests (Playwright)
@@ -77,12 +77,41 @@ jobs:
           retention-days: 7
 
   # ─────────────────────────────────────────────
-  # Job 3 : Build & Push Docker (develop only)
+  # Job 3 : Tests backend (JUnit 5, H2 en mémoire)
+  # Tourne sur TOUT push/PR, en parallèle du front.
+  # Les images Docker se construisent avec -DskipTests :
+  # sans ce job, aucun test backend ne tournait nulle part
+  # et l'indépendance u1/u2 n'était garantie par rien.
+  # ─────────────────────────────────────────────
+  backend-test:
+    name: Backend Tests (JUnit)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+
+      # ./mvnw et non mvn : la version de Maven est celle du dépôt, pas celle
+      # que le runner GitHub embarque et fait évoluer sans nous prévenir.
+      - name: Run backend tests
+        run: ./mvnw -B test
+
+  # ─────────────────────────────────────────────
+  # Job 4 : Build & Push Docker (develop only)
   # Ne se déclenche que si les tests passent
   # ─────────────────────────────────────────────
   build-and-push:
     name: Build & Push Docker images
-    needs: [ test, e2e ]
+    needs: [ test, e2e, backend-test ]
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
@@ -126,7 +155,7 @@ jobs:
           tags: ghcr.io/${{ env.REPO_LC }}/u2-blog:latest
 
   # ─────────────────────────────────────────────
-  # Job 4 : Déploiement VPS (develop only)
+  # Job 5 : Déploiement VPS (develop only)
   # ─────────────────────────────────────────────
   deploy:
     name: Deploy to VPS

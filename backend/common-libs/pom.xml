@@ -15,11 +15,32 @@
 
 	<dependencies>
 		<!-- Web MVC en 'optional' : necessaire pour compiler la config CORS partagee,
+		     le client REST inter-modules et le handler d'erreurs RFC 7807,
 		     mais ce sont les modules applicatifs qui l'apportent reellement au runtime. -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<!-- Disjoncteur des appels inter-modules. On prend le module coeur, en Java nu :
+		     le starter resilience4j-spring-boot3 vise Boot 3 / Spring 6, alors que le
+		     projet est sur Boot 4 / Spring 7. Voir UpstreamCircuitBreakers. -->
+		<dependency>
+			<groupId>io.github.resilience4j</groupId>
+			<artifactId>resilience4j-circuitbreaker</artifactId>
+			<version>${resilience4j.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
