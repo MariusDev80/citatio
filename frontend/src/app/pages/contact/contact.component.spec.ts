@@ -135,6 +135,58 @@ describe('ContactComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('n’est pas parti');
   });
 
+  it('sur 429, explique le quota et annonce le délai lu dans Retry-After', () => {
+    fillValidForm();
+    submit();
+    httpMock.expectOne(ENDPOINT).flush(null, {
+      status: 429,
+      statusText: 'Too Many Requests',
+      headers: { 'Retry-After': '2520' },
+    });
+    fixture.detectChanges();
+
+    const text = fixture.nativeElement.textContent;
+    // La cause, puis le délai : c'est ce qui manquait au message générique.
+    expect(text).toContain('déjà envoyé plusieurs messages');
+    expect(text).toContain('42 minutes');
+    // Le formulaire reste, la saisie n'est pas perdue.
+    expect(fixture.nativeElement.querySelector('form')).not.toBeNull();
+  });
+
+  it('sur 429 sans Retry-After lisible, ne chiffre pas un délai inventé', () => {
+    fillValidForm();
+    submit();
+    // En-tête absent : le cas se produit si la config CORS cesse de l'exposer.
+    httpMock.expectOne(ENDPOINT).flush(null, { status: 429, statusText: 'Too Many Requests' });
+    fixture.detectChanges();
+
+    const text = fixture.nativeElement.textContent;
+    expect(text).toContain('déjà envoyé plusieurs messages');
+    expect(text).toContain('d’ici une heure');
+    expect(text).not.toContain('minutes.');
+  });
+
+  it('sur une requête qui n\'aboutit pas, parle de connexion et non du serveur', () => {
+    fillValidForm();
+    submit();
+    httpMock.expectOne(ENDPOINT).error(new ProgressEvent('error'));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Vérifiez votre connexion');
+  });
+
+  it('rend les erreurs en rouge et non dans le bleu des liens', () => {
+    fillValidForm();
+    submit();
+    httpMock.expectOne(ENDPOINT).flush(null, { status: 503, statusText: 'Service Unavailable' });
+    fixture.detectChanges();
+
+    // Le token, pas la couleur calculée : jsdom ne résout pas les variables CSS.
+    const alert = fixture.nativeElement.querySelector('[role="alert"]');
+    expect(alert.className).toContain('text-danger');
+    expect(alert.className).not.toContain('text-accent');
+  });
+
   it('renvoie après un échec, et un second essai peut réussir', () => {
     fillValidForm();
     submit();

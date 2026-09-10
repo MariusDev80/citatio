@@ -1,8 +1,10 @@
 package com.citatio.u1communication.api;
 
+import com.citatio.u1communication.contact.ContactRateLimitExceededException;
 import com.citatio.u1communication.contact.ContactRateLimiter;
 import com.citatio.u1communication.contact.ContactRequestService;
 import com.citatio.u1communication.contact.ContactSubmission;
+import com.citatio.u1communication.contact.RateLimitVerdict;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Reception des demandes du formulaire de contact du site.
@@ -43,13 +44,11 @@ public class ContactController {
 
         String clientIp = ClientIpResolver.resolve(request);
 
-        if (!rateLimiter.tryAcquire(clientIp)) {
-            // ResponseStatusException plutot qu'un handler dedie : la classe
-            // parente d'ApiExceptionHandler la traduit deja en Problem Details
-            // avec le bon statut. Le detail reste volontairement vague, il n'a
-            // pas a renseigner sur le seuil exact.
-            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS,
-                    "Trop de demandes envoyees depuis cette connexion. Reessayez plus tard.");
+        RateLimitVerdict verdict = rateLimiter.tryAcquire(clientIp);
+        if (!verdict.allowed()) {
+            // L'exception porte son Retry-After : ApiExceptionHandler, via sa
+            // classe parente, en fait un Problem Details 429 avec l'en-tete.
+            throw new ContactRateLimitExceededException(verdict.retryAfter());
         }
 
         contactRequestService.submit(submission, clientIp);

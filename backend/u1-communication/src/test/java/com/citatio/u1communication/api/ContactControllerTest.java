@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -14,6 +15,7 @@ import com.citatio.common.web.ApiExceptionHandler;
 import com.citatio.u1communication.contact.ContactRateLimiter;
 import com.citatio.u1communication.contact.ContactRequestService;
 import com.citatio.u1communication.contact.ContactSubmission;
+import com.citatio.u1communication.contact.RateLimitVerdict;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,9 +23,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.Duration;
 
 /**
  * Contrat HTTP de la reception du formulaire de contact.
@@ -64,7 +69,8 @@ class ContactControllerTest {
 
     @BeforeEach
     void allowByDefault() {
-        given(rateLimiter.tryAcquire(anyString())).willReturn(true);
+        given(rateLimiter.tryAcquire(anyString()))
+                .willReturn(new RateLimitVerdict(true, Duration.ZERO));
     }
 
     @Test
@@ -140,13 +146,17 @@ class ContactControllerTest {
     }
 
     @Test
-    @DisplayName("Quota depasse : 429, rien n'est enregistre")
+    @DisplayName("Quota depasse : 429 avec Retry-After, rien n'est enregistre")
     void rateLimitedSubmissionIsRefused() throws Exception {
-        given(rateLimiter.tryAcquire(anyString())).willReturn(false);
+        given(rateLimiter.tryAcquire(anyString()))
+                .willReturn(new RateLimitVerdict(false, Duration.ofMinutes(42)));
 
         mockMvc.perform(post(ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
                 .andExpect(status().isTooManyRequests())
-                .andExpect(jsonPath("$.status").value(429));
+                .andExpect(jsonPath("$.status").value(429))
+                // Sans cet en-tete, la page ne peut annoncer qu'un vague
+                // "reessayez plus tard" : c'est lui qui porte le delai reel.
+                .andExpect(header().string(HttpHeaders.RETRY_AFTER, "2520"));
 
         verify(contactRequestService, never()).submit(any(), anyString());
     }

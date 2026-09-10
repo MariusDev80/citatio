@@ -1,10 +1,10 @@
-import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
+import { HttpErrorResponse, HttpHeaders, provideHttpClient } from '@angular/common/http';
 import {
   HttpTestingController,
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { ContactService, ContactSubmission } from './contact.service';
+import { ContactService, ContactSubmission, toContactFailure } from './contact.service';
 
 describe('ContactService', () => {
   let service: ContactService;
@@ -56,6 +56,31 @@ describe('ContactService', () => {
     expect(req.request.body.consent).toBe(true);
     expect(req.request.body.email).toBe('camille.roy@example.test');
     req.flush(null, { status: 202, statusText: 'Accepted' });
+  });
+
+  it('classe un 429 et lit le délai de Retry-After', () => {
+    const failure = toContactFailure(
+      new HttpErrorResponse({
+        status: 429,
+        headers: new HttpHeaders({ 'Retry-After': '2520' }),
+      }),
+    );
+
+    expect(failure).toEqual({ kind: 'rateLimited', retryAfterSeconds: 2520 });
+  });
+
+  it('rend un délai nul plutôt qu\'inventé quand Retry-After manque', () => {
+    // Arrive si la config CORS cesse d'exposer l'en-tête : le navigateur le
+    // masque au JavaScript sans qu'aucune erreur ne soit levée.
+    const failure = toContactFailure(new HttpErrorResponse({ status: 429 }));
+
+    expect(failure).toEqual({ kind: 'rateLimited', retryAfterSeconds: null });
+  });
+
+  it('distingue une requête qui n\'aboutit pas d\'une erreur serveur', () => {
+    expect(toContactFailure(new HttpErrorResponse({ status: 0 }))).toEqual({ kind: 'offline' });
+    expect(toContactFailure(new HttpErrorResponse({ status: 400 }))).toEqual({ kind: 'rejected' });
+    expect(toContactFailure(new HttpErrorResponse({ status: 503 }))).toEqual({ kind: 'server' });
   });
 
   it('remonte l\'erreur à l\'appelant plutôt que de l\'avaler', () => {

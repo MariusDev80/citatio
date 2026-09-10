@@ -340,7 +340,9 @@ ligne, et il faut le lire avant de styler quoi que ce soit.
 ### 5.1 Les partis pris
 
 - **Palette papier / encre / outremer, en tokens sémantiques.** `--color-paper`, `--color-surface`,
-  `--color-ink`, `--color-ink-soft`, `--color-ink-faint`, `--color-rule`, `--color-accent`.
+  `--color-ink`, `--color-ink-soft`, `--color-ink-faint`, `--color-rule`, `--color-accent`, plus
+  `--color-danger` réservé aux messages d'erreur (brique en clair, corail en sombre). Une erreur
+  rendue en `--color-accent` se lisait comme un lien, pas comme un échec.
   Les gabarits n'utilisent **jamais** une couleur Tailwind brute.
 - **Le thème sombre est une permutation de tokens, pas un second jeu d'utilitaires.** Les valeurs
   sont redéfinies sous `html.dark` dans `@layer base`. Conséquence, et c'est **la règle qui surprend
@@ -504,7 +506,7 @@ npm run check:contrast          # balayage de contraste en thème sombre, après
 npm run build:og                # régénère public/og-citatio.png depuis tools/og-image.html
 
 # Backend, depuis backend/
-./mvnw -B test                  # les 36 tests des trois modules (ce que lance la CI)
+./mvnw -B test                  # les 38 tests des trois modules (ce que lance la CI)
 ./mvnw clean package            # les trois modules
 ./mvnw -pl u2-blog -am package  # un module et ses dépendances
 
@@ -529,7 +531,7 @@ npx lighthouse http://localhost:4173 --preset=desktop --view
   des prix, absence de fausse preuve sociale, polices auto-hébergées, contenu présent dans le HTML
   pré-rendu, bascule de thème. S'ils tombent, la bonne réaction est presque toujours de corriger le
   code, pas le test.
-- Côté backend, 36 tests tournent sur H2 en mémoire, **sans aucune base externe**, et la CI les
+- Côté backend, 38 tests tournent sur H2 en mémoire, **sans aucune base externe**, et la CI les
   lance sur tout push et toute PR (job `backend-test`). Trois familles sont des garde-fous et non des
   tests fonctionnels : `UpstreamClientTest` (aucune exception ne remonte d'un voisin coupé, le motif
   ne fuit pas, le circuit s'ouvre), `ApiExceptionHandlerTest` (une URL inconnue rend 404 et non

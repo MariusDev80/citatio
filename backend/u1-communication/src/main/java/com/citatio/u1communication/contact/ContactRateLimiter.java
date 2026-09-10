@@ -8,7 +8,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Limite le nombre de demandes de contact par IP : 5 par heure glissante.
@@ -46,30 +46,34 @@ public class ContactRateLimiter {
     private final Map<String, Deque<Instant>> recentHits = new ConcurrentHashMap<>();
 
     /**
-     * Consomme un jeton pour cette IP.
+     * Consomme un creneau pour cette IP.
      *
-     * @return {@code true} si la demande passe, {@code false} si le quota horaire
-     *         est deja atteint
+     * <p>Sur un refus, le verdict porte le temps restant : la fenetre glisse, le
+     * prochain creneau se libere quand la plus ancienne des demandes retenues
+     * sort de l'heure. Ce delai est calcule, pas estime, et c'est lui que
+     * l'en-tete {@code Retry-After} publie.
      */
-    public boolean tryAcquire(String clientIp) {
+    public RateLimitVerdict tryAcquire(String clientIp) {
         Instant now = Instant.now();
         if (recentHits.size() > SWEEP_THRESHOLD) {
             sweepExpired(now);
         }
 
-        AtomicBoolean allowed = new AtomicBoolean();
+        AtomicReference<RateLimitVerdict> verdict = new AtomicReference<>();
         recentHits.compute(clientIp, (ip, hits) -> {
             Deque<Instant> window = hits == null ? new ArrayDeque<>() : hits;
             window.removeIf(hit -> hit.isBefore(now.minus(WINDOW)));
 
-            boolean underQuota = window.size() < MAX_PER_WINDOW;
-            if (underQuota) {
+            if (window.size() < MAX_PER_WINDOW) {
                 window.addLast(now);
+                verdict.set(RateLimitVerdict.granted());
+            } else {
+                verdict.set(RateLimitVerdict.refused(
+                        Duration.between(now, window.getFirst().plus(WINDOW))));
             }
-            allowed.set(underQuota);
             return window;
         });
-        return allowed.get();
+        return verdict.get();
     }
 
     /** Retire les IP dont toutes les demandes sont sorties de la fenetre. */

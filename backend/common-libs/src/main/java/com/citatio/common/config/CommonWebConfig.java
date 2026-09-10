@@ -1,6 +1,7 @@
 package com.citatio.common.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -45,6 +46,13 @@ public class CommonWebConfig implements WebMvcConfigurer {
         registry.addMapping("/api/**")
                 .allowedOrigins(allowedOrigins)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                // Par defaut, un navigateur ne laisse lire d'une reponse
+                // cross-origin que six en-teles simples : tout le reste est
+                // present sur le reseau mais invisible au JavaScript. Retry-After
+                // sert au formulaire de contact a dire quand renvoyer un message
+                // apres un 429 ; sans cette ligne il serait silencieusement nul,
+                // et la page retomberait sur un "reessayez plus tard" vague.
+                .exposedHeaders(HttpHeaders.RETRY_AFTER)
                 // Aucun cookie ni en-tete d'authentification n'est echange
                 // aujourd'hui : laisser les identifiants fermes evite d'avoir a y
                 // repenser le jour ou une origine serait ajoutee a la liste.

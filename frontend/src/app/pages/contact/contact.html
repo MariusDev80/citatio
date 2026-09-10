@@ -111,7 +111,7 @@
             [attr.aria-invalid]="showError('name')"
             [attr.aria-describedby]="showError('name') ? 'name-error' : null" />
           @if (showError('name')) {
-            <p id="name-error" class="text-sm text-accent" role="alert">
+            <p id="name-error" class="text-sm text-danger" role="alert">
               Indiquez votre nom (2 caractères minimum).
             </p>
           }
@@ -129,7 +129,7 @@
             [attr.aria-invalid]="showError('email')"
             [attr.aria-describedby]="showError('email') ? 'email-error' : null" />
           @if (showError('email')) {
-            <p id="email-error" class="text-sm text-accent" role="alert">
+            <p id="email-error" class="text-sm text-danger" role="alert">
               Indiquez une adresse email valide, pour que nous puissions vous répondre.
             </p>
           }
@@ -159,7 +159,7 @@
             }
           </select>
           @if (showError('projectType')) {
-            <p id="projectType-error" class="text-sm text-accent" role="alert">
+            <p id="projectType-error" class="text-sm text-danger" role="alert">
               Choisissez le type de projet qui s’en rapproche le plus.
             </p>
           }
@@ -205,7 +205,7 @@
             [attr.aria-invalid]="showError('message')"
             [attr.aria-describedby]="showError('message') ? 'message-error' : null"></textarea>
           @if (showError('message')) {
-            <p id="message-error" class="text-sm text-accent" role="alert">
+            <p id="message-error" class="text-sm text-danger" role="alert">
               Décrivez votre projet en quelques phrases (20 caractères minimum).
             </p>
           }
@@ -226,7 +226,7 @@
               J’accepte que ces informations soient utilisées pour répondre à ma demande. *
             </label>
             @if (showError('consent')) {
-              <p id="consent-error" class="mt-2 text-sm text-accent" role="alert">
+              <p id="consent-error" class="mt-2 text-sm text-danger" role="alert">
                 Cochez cette case pour que nous puissions traiter votre demande.
               </p>
             }
@@ -257,16 +257,59 @@
           </button>
 
           @if (status() === 'error') {
-            <!-- Le message ne prétend rien sur la cause : le visiteur n'a que
-                 faire du statut HTTP. Ce qui lui sert, ce sont les deux moyens
-                 de nous joindre qui ne dépendent pas de ce formulaire. -->
-            <p class="mt-4 text-sm text-accent" role="alert">
-              <strong>Votre message n’est pas parti.</strong> Réessayez dans un instant, ou
-              écrivez-nous à
-              <a [href]="'mailto:' + company.email" class="ct-link">{{ company.email }}</a>
-              ou au
-              <a [href]="'tel:' + company.phoneRaw" class="ct-link">{{ company.phoneDisplay }}</a>.
-            </p>
+            <!-- Un message par cause. Le statut HTTP ne dit rien au visiteur,
+                 mais la raison si, et surtout ce qu'il peut faire ensuite. Le
+                 cas du quota est le plus important : sans explication, un
+                 visiteur légitime croit que le site est cassé. -->
+            <div class="mt-4 border-l-2 border-danger pl-4 text-sm text-danger" role="alert">
+              @switch (failure()?.kind) {
+                @case ('rateLimited') {
+                  <p>
+                    <strong>Vous avez déjà envoyé plusieurs messages depuis cette
+                    connexion.</strong>
+                    Nous limitons les envois pour écarter les robots, votre message n’a donc
+                    pas été transmis.
+                    @if (retryInMinutes(); as minutes) {
+                      Vous pourrez réessayer dans {{ minutes }} minute{{ minutes > 1 ? 's' : '' }}.
+                    } @else {
+                      Vous pourrez réessayer d’ici une heure.
+                    }
+                  </p>
+                  <!-- Le lien termine la phrase : une adresse email est longue,
+                       elle passe seule à la ligne et laisserait la ponctuation
+                       qui la suit orpheline en début de ligne. -->
+                  <p class="mt-2">
+                    C’est urgent&nbsp;? Cette limite ne s’applique pas à l’email, écrivez-nous à
+                    <a [href]="'mailto:' + company.email" class="ct-link">{{ company.email }}</a>
+                  </p>
+                }
+                @case ('offline') {
+                  <p>
+                    <strong>Nous n’avons pas pu joindre notre serveur.</strong>
+                    Vérifiez votre connexion, puis réessayez. Votre message est toujours dans
+                    le formulaire, rien n’est à retaper.
+                  </p>
+                }
+                @case ('rejected') {
+                  <p>
+                    <strong>Le serveur a refusé le formulaire.</strong>
+                    Reprenez les champs marqués en rouge et réessayez. Si tout semble correct,
+                    l’erreur vient de chez nous, écrivez-nous à
+                    <a [href]="'mailto:' + company.email" class="ct-link">{{ company.email }}</a>
+                  </p>
+                }
+                @default {
+                  <p>
+                    <strong>Votre message n’est pas parti.</strong>
+                    Notre serveur n’a pas répondu comme prévu. Réessayez dans un instant, ou
+                    appelez le
+                    <a [href]="'tel:' + company.phoneRaw" class="ct-link">{{ company.phoneDisplay }}</a>
+                    ou écrivez-nous à
+                    <a [href]="'mailto:' + company.email" class="ct-link">{{ company.email }}</a>
+                  </p>
+                }
+              }
+            </div>
           } @else {
             <p class="ct-prose mt-4 text-sm">
               Nous répondons <strong>sous deux jours ouvrés</strong>. Vous préférez écrire

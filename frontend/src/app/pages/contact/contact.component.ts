@@ -1,8 +1,10 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
   ElementRef,
+  computed,
   effect,
   inject,
   signal,
@@ -13,7 +15,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
-import { ContactService } from '../../services/contact.service';
+import { ContactFailure, ContactService, toContactFailure } from '../../services/contact.service';
 import { JsonLdService } from '../../services/json-ld.service';
 import { COMPANY } from '../../config/company.config';
 import { BUDGET_BRACKETS } from '../../config/pricing.config';
@@ -52,6 +54,24 @@ export class ContactComponent {
 
   /** Titre de l'accuse de reception, present seulement en etat `success`. */
   private readonly successHeading = viewChild<ElementRef<HTMLElement>>('successHeading');
+
+  /** Cause du dernier echec, `null` hors de l'etat `error`. */
+  protected readonly failure = signal<ContactFailure | null>(null);
+
+  /**
+   * Delai avant de pouvoir renvoyer, arrondi a la minute superieure.
+   *
+   * <p>Arrondi vers le haut et jamais vers le bas : annoncer 40 minutes quand il
+   * en reste 41 offre au visiteur un second refus. Vaut `null` quand le serveur
+   * n'a pas donne de delai, la page dit alors autre chose.
+   */
+  protected readonly retryInMinutes = computed(() => {
+    const failure = this.failure();
+    if (failure?.kind !== 'rateLimited' || failure.retryAfterSeconds === null) {
+      return null;
+    }
+    return Math.max(1, Math.ceil(failure.retryAfterSeconds / 60));
+  });
 
   protected readonly projectTypes = [
     'Création d’un premier site',
@@ -177,6 +197,7 @@ export class ContactComponent {
     }
 
     this.status.set('sending');
+    this.failure.set(null);
     this.contact
       .submit(this.contactForm.getRawValue())
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -189,10 +210,13 @@ export class ContactComponent {
           this.contactForm.reset();
           this.submitted.set(false);
         },
-        // Aucun detail technique a l'ecran : un statut HTTP ou un message de
-        // pile ne dit rien d'utile au visiteur. Le message d'erreur du gabarit
-        // rappelle l'adresse et le telephone, qui eux marchent toujours.
-        error: () => this.status.set('error'),
+        // On classe l'echec sans jamais afficher de detail technique : le
+        // statut HTTP ne dit rien au visiteur, sa cause si. Chaque cas rappelle
+        // l'adresse et le telephone, qui eux ne dependent pas du formulaire.
+        error: (error: HttpErrorResponse) => {
+          this.failure.set(toContactFailure(error));
+          this.status.set('error');
+        },
       });
   }
 }
