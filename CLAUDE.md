@@ -506,7 +506,7 @@ npm run check:contrast          # balayage de contraste en thème sombre, après
 npm run build:og                # régénère public/og-citatio.png depuis tools/og-image.html
 
 # Backend, depuis backend/
-./mvnw -B test                  # les 39 tests des trois modules (ce que lance la CI)
+./mvnw -B test                  # les 40 tests des trois modules (ce que lance la CI)
 ./mvnw clean package            # les trois modules
 ./mvnw -pl u2-blog -am package  # un module et ses dépendances
 
@@ -531,7 +531,7 @@ npx lighthouse http://localhost:4173 --preset=desktop --view
   des prix, absence de fausse preuve sociale, polices auto-hébergées, contenu présent dans le HTML
   pré-rendu, bascule de thème. S'ils tombent, la bonne réaction est presque toujours de corriger le
   code, pas le test.
-- Côté backend, 39 tests tournent sur H2 en mémoire, **sans aucune base externe**, et la CI les
+- Côté backend, 40 tests tournent sur H2 en mémoire, **sans aucune base externe**, et la CI les
   lance sur tout push et toute PR (job `backend-test`). Trois familles sont des garde-fous et non des
   tests fonctionnels : `UpstreamClientTest` (aucune exception ne remonte d'un voisin coupé, le motif
   ne fuit pas, le circuit s'ouvre), `ApiExceptionHandlerTest` (une URL inconnue rend 404 et non
