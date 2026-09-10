@@ -180,10 +180,23 @@ jobs:
 
       - name: SSH Deploy
         uses: appleboy/ssh-action@v1.2.5
+        # Les identifiants SMTP passent par l'environnement de l'action, pas par
+        # le texte du script : ils ne sont donc jamais interpolés dans une ligne
+        # de commande visible, et restent masqués dans les logs du runner.
+        env:
+          MAIL_HOST: ${{ secrets.MAIL_HOST }}
+          MAIL_PORT: ${{ secrets.MAIL_PORT }}
+          MAIL_SSL: ${{ secrets.MAIL_SSL }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_FROM_NAME: ${{ secrets.MAIL_FROM_NAME }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
         with:
           host: ${{ secrets.VPS_IP }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: MAIL_HOST,MAIL_PORT,MAIL_SSL,MAIL_USERNAME,MAIL_PASSWORD,MAIL_FROM,MAIL_FROM_NAME,MAIL_TO
           # `set -e` tient le rôle de l'option `script_stop`, que l'action a
           # supprimée en v1.2.5 (son README renvoie explicitement vers `set -e`).
           # Sans lui, une commande qui échoue laisse le job au vert et on
@@ -191,6 +204,31 @@ jobs:
           script: |
             set -e
             cd /opt/citatio
+            # docker-compose.yml lit ces variables via ${VAR:-défaut} : sans ce
+            # fichier, les valeurs par défaut s'appliquent, u1 démarre sans
+            # identifiants SMTP et chaque demande de contact finit en base avec
+            # le statut FAILED. Le .env n'est jamais versionné, il est réécrit à
+            # chaque déploiement depuis les secrets GitHub.
+            #
+            # Écrit avec `printf` et non un heredoc : la valeur passe par un
+            # argument, elle n'est donc jamais réinterprétée par le shell (un
+            # mot de passe contenant $ ou ` ne déclenche rien). Réserve connue :
+            # docker compose lit ce fichier ensuite, un mot de passe contenant $
+            # y serait pris pour une interpolation. Si le compte d'envoi en a un,
+            # le doubler ($$) au moment de créer le secret.
+            #
+            # umask avant l'écriture : le fichier naît en 600, il n'existe à
+            # aucun instant en lecture pour les autres comptes du VPS.
+            ( umask 077 && {
+                printf 'MAIL_HOST=%s\n'      "$MAIL_HOST"
+                printf 'MAIL_PORT=%s\n'      "$MAIL_PORT"
+                printf 'MAIL_SSL=%s\n'       "$MAIL_SSL"
+                printf 'MAIL_USERNAME=%s\n'  "$MAIL_USERNAME"
+                printf 'MAIL_PASSWORD=%s\n'  "$MAIL_PASSWORD"
+                printf 'MAIL_FROM=%s\n'      "$MAIL_FROM"
+                printf 'MAIL_FROM_NAME=%s\n' "$MAIL_FROM_NAME"
+                printf 'MAIL_TO=%s\n'        "$MAIL_TO"
+              } > .env )
             # Authentification au registre privé GHCR depuis le pipeline,
             # pour ne plus dépendre d'un login manuel sur le VPS qui expire silencieusement.
             echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u MariusDev80 --password-stdin

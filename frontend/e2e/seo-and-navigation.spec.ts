@@ -189,15 +189,31 @@ test.describe('Accessibilité de base', () => {
 
   test('les champs du formulaire de contact ont un label', async ({ page }) => {
     await page.goto('/contact');
-    for (const id of ['name', 'email', 'projectType', 'message']) {
+    for (const id of ['name', 'email', 'projectType', 'message', 'consent']) {
       await expect(page.locator(`label[for="${id}"]`)).toHaveCount(1);
     }
   });
 
   test('un envoi invalide affiche des erreurs au lieu d\'échouer en silence', async ({ page }) => {
     await page.goto('/contact');
-    await page.getByRole('button', { name: /préparer mon message/i }).click();
+    await page.getByRole('button', { name: /envoyer mon message/i }).click();
     await expect(page.getByRole('alert').first()).toBeVisible();
+  });
+
+  test('le leurre anti-robot est hors de portée du clavier et des lecteurs d\'écran', async ({ page }) => {
+    // Un visiteur ne doit jamais pouvoir remplir ce champ : s'il y arrivait, sa
+    // demande serait écartée en silence par le serveur.
+    await page.goto('/contact');
+    const honeypot = page.locator('#website');
+    await expect(honeypot).toHaveCount(1);
+    await expect(honeypot).toHaveAttribute('tabindex', '-1');
+    // Retiré de l'arbre d'accessibilité, donc jamais annoncé.
+    await expect(page.locator('[aria-hidden="true"] #website')).toHaveCount(1);
+    // Rejeté hors de l'écran plutôt que display:none, que certains robots
+    // ignorent volontairement. Playwright tient un élément de 1px hors cadre
+    // pour « visible » : c'est sa position qu'il faut vérifier, pas sa visibilité.
+    const box = await honeypot.boundingBox();
+    expect(box!.x + box!.width).toBeLessThan(0);
   });
 });
 

@@ -33,6 +33,22 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+		<!-- Bean Validation. Le starter webmvc ne l'embarque pas (elle a ete sortie
+		     de starter-web depuis Boot 2.3) : sans lui, les annotations
+		     jakarta.validation d'un DTO sont ignorees en silence et @Valid ne
+		     rejette rien. CLAUDE.md §4.2 impose la validation sur les DTO d'entree,
+		     le formulaire de contact est le premier a en avoir besoin. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+		<!-- Envoi SMTP de la notification de demande de contact. Seule dependance
+		     ajoutee par la fonctionnalite : tout le reste (validation, JPA, async)
+		     vient des starters deja presents. Version pilotee par le BOM Boot. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.postgresql</groupId>
