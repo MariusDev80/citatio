@@ -52,13 +52,13 @@ Deux objets portent les mêmes mots (« le site », « la page d'accueil », « 
    (multi-tenant, thème par client, gabarit vendu), c'est une **décision produit** : elle revient au
    propriétaire, pas à toi.
 
-### 1.2 État réel du projet, au 9 septembre 2026
+### 1.2 État réel du projet, au 11 septembre 2026
 
 Ce que le dépôt contient vraiment, pour éviter de raisonner sur un système imaginaire :
 
 | Brique | État |
 |--------|------|
-| Site vitrine Angular, 10 routes, entièrement pré-rendu | **En production**, sur `citatio-geo.com` |
+| Site vitrine Angular, 11 routes, entièrement pré-rendu | **En production**, sur `citatio-geo.com` |
 | Design system éditorial (tokens, typo, filets, thème sombre) | **En production** |
 | SEO / GEO on-page (meta, JSON-LD, sitemap, llms.txt, robots) | **En production** |
 | CI GitHub Actions (Vitest + Playwright + build/push GHCR + déploiement VPS) | **Opérationnelle** |
@@ -66,12 +66,12 @@ Ce que le dépôt contient vraiment, pour éviter de raisonner sur un système i
 | `u1-communication` (Spring Boot) | **Une fonction réelle** : réception du formulaire de contact (entité `ContactRequest`, envoi SMTP asynchrone). Le reste (`/health`, sondes, `ping-u2`) est inchangé |
 | `u2-blog` (Spring Boot) | **Squelette** : `/health`, sondes Actuator et `ping-u1`, aucune entité métier |
 | Indépendance des deux microservices | **Acquise** : aucun `depends_on` croisé, appels absorbés par `UpstreamClient` (timeouts, disjoncteur, dégradation gracieuse) |
-| Consommation du backend par le frontend | **Un seul appel** : `ContactService` poste sur `/api/u1/contact-requests`. `provideHttpClient(withFetch())` est en place, les 10 routes restent pré-rendues et aucune requête ne part au rendu |
+| Consommation du backend par le frontend | **Un seul appel** : `ContactService` poste sur `/api/u1/contact-requests`. `provideHttpClient(withFetch())` est en place, les 11 routes restent pré-rendues et aucune requête ne part au rendu |
 | Formulaire de contact | **Branché sur `u1-communication`** : la demande est enregistrée en base puis notifiée par email. Le `mailto:` a été retiré |
 | Blog | **Pas commencé**, prévu sur `u2-blog` |
 
 Conséquence pratique : **une modification du frontend n'a toujours besoin d'aucun backend démarré**,
-les 10 routes étant pré-rendues au build. Seul l'envoi du formulaire de contact appelle une API, et
+les 11 routes étant pré-rendues au build. Seul l'envoi du formulaire de contact appelle une API, et
 seulement sur un clic du visiteur. En dehors de ce point, ne raisonne pas comme si une API était
 branchée : il n'y en a qu'une.
 
@@ -155,9 +155,9 @@ La liste complète des sept points est en §7. En oublier un (typiquement le `si
 | Une couleur Tailwind brute (`indigo-600`, `slate-900`) | Elle échappe au thème, donc au thème sombre et au contrôle de contraste. |
 | Coder en dur un prix, une adresse, un SIRET, un score | Trois fichiers de configuration font autorité (§11). Un doublon dérive, et ici une dérive est un mensonge affiché. |
 | Afficher un chiffre non mesuré, un faux avis, un logo client | Le site est notre seule preuve. Une preuve fausse détruit l'argument commercial entier (§6.2). |
-| Écrire un tiret cadratin | C'est le marqueur d'écriture par IA le plus reconnaissable. Le dépôt en a été purgé volontairement (§6.3). |
+| Écrire un tiret cadratin | C'est le marqueur d'écriture par IA le plus reconnaissable, et le site est notre seule preuve. **Interdit dans tout fichier du dépôt**, code, commentaires, Markdown et messages de commit compris. Ordre complet et commande de vérification en §6.3. |
 | `standalone: true`, `@Input()`, `ngClass`, injection par constructeur | Conventions Angular 21 du projet (§4.1). L'uniformité rend le code relisible en un coup d'œil. |
-| Toucher au DOM, à `window` ou à `localStorage` hors `afterNextRender` | Le prerendering plante, et l'hydratation avec lui. Les 10 routes sont pré-rendues. |
+| Toucher au DOM, à `window` ou à `localStorage` hors `afterNextRender` | Le prerendering plante, et l'hydratation avec lui. Les 11 routes sont pré-rendues. |
 | Cacher du contenu derrière une animation sans garde `html.ct-js` | Sans JavaScript et pour un crawler, le contenu resterait invisible. |
 | Exposer une entité JPA dans une réponse | Le schéma de base devient un contrat public, impossible à faire évoluer. |
 | Une jointure vers la base d'un autre module | Le découpage en microservices ne tiendrait plus, et les deux bases se verrouilleraient mutuellement. |
@@ -218,7 +218,7 @@ citatio/
 `@primeuix/themes` (preset Aura dérivé dans `src/app/theme/citatio-preset.ts`) · PrimeIcons ·
 **CSS pur** (jamais de SCSS) · **Vitest** (unitaire) · **Playwright** (e2e) · TypeScript strict.
 
-**Rendu** : les 10 routes sont **pré-rendues** (`app.routes.server.ts`, `RenderMode.Prerender`),
+**Rendu** : les 11 routes sont **pré-rendues** (`app.routes.server.ts`, `RenderMode.Prerender`),
 la 404 seule est rendue côté client. Le build produit du HTML statique servi par nginx. C'est un
 **argument commercial affiché sur `/ce-site`** : le contenu doit être dans le HTML source, jamais
 injecté par JavaScript. Un test e2e verrouille cette propriété. Toute page future qui dépendra d'une
@@ -433,12 +433,61 @@ chiffre est réel.
 
 - **Copie en français (`fr_FR`)**, à la première personne du pluriel, concrète, sans jargon.
   On dit combien ça coûte, en combien de temps, et ce qu'on ne fait pas.
-- **Aucun tiret cadratin, nulle part** : ni dans la copie, ni dans les commentaires, ni dans les
-  messages de commit. C'est le marqueur d'écriture par IA le plus reconnaissable. Un commit entier
-  (`chore: retirer tous les tirets cadratins du frontend`) a servi à les éliminer.
+- **Aucun tiret cadratin, nulle part.** Règle détaillée juste en dessous, elle ne souffre aucune
+  exception.
 - Pas de superlatif, pas d'exclamation, pas de « n'hésitez pas ».
 - Les URL sont **en français** et descriptives (`/creation-site-vitrine`, `/qui-sommes-nous`).
 - Les prix affichés sortent de `pricing.config.ts`, jamais codés en dur dans un gabarit.
+
+#### Ordre : jamais de tiret cadratin dans un fichier de ce dépôt
+
+**Le tiret cadratin (U+2014) est interdit dans tout fichier du dépôt, sans exception.** Il est
+nommé ici par son point de code et non par son glyphe, pour que ce document reste lui-même conforme
+et que la commande ci-dessous ne se signale pas elle-même.
+
+**Le périmètre est le dépôt entier**, pas seulement la copie visible par le visiteur :
+
+- les gabarits, les composants et les fichiers de configuration du frontend ;
+- le code Java et les commentaires du backend ;
+- les fichiers d'infrastructure (`Caddyfile`, `nginx.conf`, `docker-compose.yml`, workflows) ;
+- les fichiers publics (`llms.txt`, `robots.txt`, `sitemap.xml`) ;
+- **ce document et tout fichier Markdown du dépôt** ;
+- les messages de commit et les descriptions de PR.
+
+**Pourquoi cette sévérité.** C'est le marqueur d'écriture par IA le plus reconnaissable, et ce site
+est notre seule preuve de savoir-faire (§6). Un prospect qui repère la signature d'un générateur
+dans notre propre vitrine n'a plus de raison de croire que nous écrivons nos sites à la main. Un
+commit entier (`chore: retirer tous les tirets cadratins du frontend`) a servi à les éliminer, le
+dépôt en compte **zéro** aujourd'hui, et cet état se maintient.
+
+**Ce qu'on écrit à la place**, selon l'intention : deux points pour annoncer, une virgule pour
+incidenter, un point pour trancher, des parenthèses pour mettre à distance. Un tiret court `-`
+reste valide comme puce de liste, comme trait d'union, et dans un tableau Markdown.
+
+**Le cas du tiret demi-cadratin (U+2013).** Il est **autorisé entre deux valeurs**, où il est la
+typographie juste pour une plage (`400-600` en graisses, `U+0000-00FF` en plage Unicode, le dépôt
+en compte cinq de cette forme). Il est **interdit comme ponctuation de phrase**, c'est à dire isolé
+entre deux espaces : dans cet emploi il est un tiret cadratin déguisé et porte le même marqueur.
+
+**La vérification**, à lancer avant de dire que c'est fini si tu as écrit du texte :
+
+```bash
+SRC=(--include="*.ts" --include="*.html" --include="*.css" --include="*.java" --include="*.md" \
+     --include="*.txt" --include="*.xml" --include="*.yml" --include="*.properties" --include="*.conf")
+
+# 1. Tiret cadratin, interdit partout.
+grep -rn "$(printf '\u2014')" "${SRC[@]}" . | grep -v node_modules
+
+# 2. Tiret demi-cadratin en ponctuation, interdit. Entre deux valeurs, il ne sort pas.
+grep -rn "$(printf ' \u2013 ')" "${SRC[@]}" . | grep -v node_modules
+```
+
+Aucune sortie sur les deux commandes est le résultat attendu. Toute ligne retournée est à corriger
+avant commit.
+
+> **Hors périmètre** : le coffre Obsidian de l'entreprise (`~/Documents/Citatio`) est une
+> documentation interne, jamais publiée, et le propriétaire a tranché que les tirets cadratins y
+> restent. Ne les y retire pas.
 
 ### 6.4 Les commentaires expliquent le pourquoi
 
