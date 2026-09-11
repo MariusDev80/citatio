@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.2</version>
+		<version>4.0.8</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -28,6 +28,7 @@
 		<!-- Pas gere par le BOM Spring Boot : la version est fixee ici pour que les
 		     trois modules partagent la meme. -->
 		<resilience4j.version>2.3.0</resilience4j.version>
+		<tomcat.version>11.0.25</tomcat.version>
 	</properties>
 
 	<dependencyManagement>
