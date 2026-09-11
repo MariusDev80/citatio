@@ -27,5 +27,7 @@ data/
 docker-compose.local.yml
 Caddyfile.local
 
+docs/
+
 # OS
 .DS_Store
