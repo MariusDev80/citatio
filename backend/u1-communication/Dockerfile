@@ -1,6 +1,6 @@
 # Contexte de build attendu : dossier ./backend (acces au POM parent + common-libs).
 # Stage 1: Build
-FROM maven:3.9-eclipse-temurin-21-alpine AS build
+FROM maven:3-eclipse-temurin-26-alpine AS build
 WORKDIR /app
 # On copie tout le multi-module : le POM parent reference les 3 modules et Maven
 # doit pouvoir lire chacun pour construire le reacteur. Le -pl/-am ne COMPILE que
