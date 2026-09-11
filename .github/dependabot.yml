@@ -6,6 +6,21 @@ updates:
     schedule: { interval: weekly }
     groups:
       angular: { patterns: ["@angular/*", "@angular-devkit/*"] }
+    # Les versions majeures d'Angular se font à la main avec `ng update`, qui
+    # monte tous les paquets ensemble et migre le code. Dependabot ne sait
+    # faire ni l'un ni l'autre : ses PR majeures cassaient `npm ci`.
+    # PrimeNG et TypeScript suivent la version majeure d'Angular.
+    ignore:
+      - dependency-name: "@angular/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@angular-devkit/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "primeng"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@primeuix/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: maven
     directory: /backend
     target-branch: develop

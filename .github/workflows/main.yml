@@ -131,11 +131,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # `provenance: false` sur les trois images : sans cela, buildx peut publier
+      # un index et un manifeste d'attestation à côté de l'image, soit plusieurs
+      # versions GHCR par build. Le nettoyage (job 6) compte des versions : il
+      # garderait moins de 3 builds, et pourrait supprimer une partie d'une image
+      # encore utilisée.
       - name: Build & Push Front
         uses: docker/build-push-action@v7
         with:
           context: ./frontend
           push: true
+          provenance: false
           tags: ghcr.io/${{ env.REPO_LC }}/frontend:latest
 
       - name: Build & Push u1-communication
@@ -144,6 +150,7 @@ jobs:
           context: ./backend
           file: ./backend/u1-communication/Dockerfile
           push: true
+          provenance: false
           tags: ghcr.io/${{ env.REPO_LC }}/u1-communication:latest
 
       - name: Build & Push u2-blog
@@ -152,6 +159,7 @@ jobs:
           context: ./backend
           file: ./backend/u2-blog/Dockerfile
           push: true
+          provenance: false
           tags: ghcr.io/${{ env.REPO_LC }}/u2-blog:latest
 
   # ─────────────────────────────────────────────
@@ -237,3 +245,36 @@ jobs:
             docker logout ghcr.io
             docker image prune -f
             docker ps
+
+  # ─────────────────────────────────────────────
+  # Job 6 : Nettoyage des images GHCR (develop only)
+  # Chaque déploiement publie une nouvelle version de chaque image, et
+  # l'ancienne perd son tag `latest` sans être supprimée : le stockage
+  # GitHub Packages grossissait à chaque push. On garde les 3 versions les
+  # plus récentes : l'image en production et les 2 précédentes, qui restent
+  # récupérables par digest pour revenir en arrière.
+  # Placé après `deploy`, et seulement s'il réussit : aucune version n'est
+  # supprimée tant que la nouvelle n'est pas en ligne.
+  # ─────────────────────────────────────────────
+  cleanup-images:
+    name: Clean up old GHCR images
+    needs: deploy
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    strategy:
+      # Un paquet en échec ne doit pas empêcher le nettoyage des deux autres.
+      fail-fast: false
+      matrix:
+        image: [ frontend, u1-communication, u2-blog ]
+
+    steps:
+      - name: Keep the 3 most recent versions of ${{ matrix.image }}
+        uses: actions/delete-package-versions@v5
+        with:
+          # Nom du paquet GHCR : le chemin après le propriétaire, comme dans
+          # docker-compose.yml (ghcr.io/mariusdev80/citatio/<image>).
+          package-name: citatio/${{ matrix.image }}
+          package-type: container
+          min-versions-to-keep: 3
