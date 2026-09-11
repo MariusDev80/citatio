@@ -9,7 +9,7 @@ COPY . .
 RUN mvn -pl u2-blog -am clean package -DskipTests
 
 # Stage 2: Run
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
 COPY --from=build /app/u2-blog/target/*.jar app.jar
 EXPOSE 8082
