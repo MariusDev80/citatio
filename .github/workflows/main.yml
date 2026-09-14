@@ -170,28 +170,27 @@ jobs:
     needs: build-and-push
     if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v7
 
-      # Synchronise la conf d'infra vers le VPS AVANT de (re)démarrer la stack.
-      # Sans ça, modifier docker-compose.yml / Caddyfile / init.sql dans le repo
-      # n'a AUCUN effet sur le VPS (le déploiement ne faisait que tirer les images).
-      - name: Sync infra config to VPS
-        uses: appleboy/scp-action@v1.0.0
-        with:
-          host: ${{ secrets.VPS_IP }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "docker-compose.yml,Caddyfile,backend/docker/postgres/init.sql"
-          target: "/opt/citatio"
-          overwrite: true
-
-      - name: SSH Deploy
-        uses: appleboy/ssh-action@v1.2.5
-        # Les identifiants SMTP passent par l'environnement de l'action, pas par
-        # le texte du script : ils ne sont donc jamais interpolés dans une ligne
-        # de commande visible, et restent masqués dans les logs du runner.
+      # OpenSSH du runner, et non appleboy/scp-action et appleboy/ssh-action.
+      # Ces deux actions recevaient la clé SSH, le PAT GHCR et les secrets SMTP,
+      # étaient épinglées par un tag déplaçable, et ne vérifiaient pas la clé
+      # d'hôte du VPS. Les épingler par SHA ne suffisait pas : elles téléchargent
+      # au lancement un binaire depuis leurs releases, dont la somme de contrôle
+      # vient de la même release. Un compte tiers compromis tenait donc la
+      # production (audit SEC-02, voir la compromission de tj-actions en 2025).
+      #
+      # Les secrets passent par l'environnement du step, jamais par le texte du
+      # script : `${{ }}` dans un `run:` serait recopié tel quel dans le fichier
+      # exécuté par le runner.
+      - name: Deploy to VPS
         env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          VPS: ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}
+          GHCR_PAT: ${{ secrets.GHCR_PAT }}
           MAIL_HOST: ${{ secrets.MAIL_HOST }}
           MAIL_PORT: ${{ secrets.MAIL_PORT }}
           MAIL_SSL: ${{ secrets.MAIL_SSL }}
@@ -200,51 +199,92 @@ jobs:
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
           MAIL_FROM_NAME: ${{ secrets.MAIL_FROM_NAME }}
           MAIL_TO: ${{ secrets.MAIL_TO }}
-        with:
-          host: ${{ secrets.VPS_IP }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: MAIL_HOST,MAIL_PORT,MAIL_SSL,MAIL_USERNAME,MAIL_PASSWORD,MAIL_FROM,MAIL_FROM_NAME,MAIL_TO
-          # `set -e` tient le rôle de l'option `script_stop`, que l'action a
-          # supprimée en v1.2.5 (son README renvoie explicitement vers `set -e`).
-          # Sans lui, une commande qui échoue laisse le job au vert et on
-          # retrouve les déploiements "réussis" qui ne déploient rien.
-          script: |
-            set -e
-            cd /opt/citatio
-            # docker-compose.yml lit ces variables via ${VAR:-défaut} : sans ce
-            # fichier, les valeurs par défaut s'appliquent, u1 démarre sans
-            # identifiants SMTP et chaque demande de contact finit en base avec
-            # le statut FAILED. Le .env n'est jamais versionné, il est réécrit à
-            # chaque déploiement depuis les secrets GitHub.
-            #
-            # Écrit avec `printf` et non un heredoc : la valeur passe par un
-            # argument, elle n'est donc jamais réinterprétée par le shell (un
-            # mot de passe contenant $ ou ` ne déclenche rien). Réserve connue :
-            # docker compose lit ce fichier ensuite, un mot de passe contenant $
-            # y serait pris pour une interpolation. Si le compte d'envoi en a un,
-            # le doubler ($$) au moment de créer le secret.
-            #
-            # umask avant l'écriture : le fichier naît en 600, il n'existe à
-            # aucun instant en lecture pour les autres comptes du VPS.
-            ( umask 077 && {
-                printf 'MAIL_HOST=%s\n'      "$MAIL_HOST"
-                printf 'MAIL_PORT=%s\n'      "$MAIL_PORT"
-                printf 'MAIL_SSL=%s\n'       "$MAIL_SSL"
-                printf 'MAIL_USERNAME=%s\n'  "$MAIL_USERNAME"
-                printf 'MAIL_PASSWORD=%s\n'  "$MAIL_PASSWORD"
-                printf 'MAIL_FROM=%s\n'      "$MAIL_FROM"
-                printf 'MAIL_FROM_NAME=%s\n' "$MAIL_FROM_NAME"
-                printf 'MAIL_TO=%s\n'        "$MAIL_TO"
-              } > .env )
-            # Authentification au registre privé GHCR depuis le pipeline,
-            # pour ne plus dépendre d'un login manuel sur le VPS qui expire silencieusement.
-            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u MariusDev80 --password-stdin
-            docker compose pull
-            docker compose up -d --remove-orphans
-            docker logout ghcr.io
-            docker image prune -f
-            docker ps
+        run: |
+          set -euo pipefail
+
+          install -m 700 -d ~/.ssh
+          ( umask 077 && printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy )
+
+          # Clé d'hôte du VPS, lue sur le serveur lui-même le 14 septembre 2026
+          # (ED25519 SHA256:e5cPDbnEq7CTk7KTc7XXSKCMfVXtEO2cYsCKkiwqYiI). Une clé
+          # publique n'est pas un secret : elle reste lisible ici, dans le diff.
+          # Si le VPS est réinstallé, le déploiement échoue au lieu de parler à un
+          # serveur inconnu ; relire alors la clé depuis la console Hostinger
+          # (`cat /etc/ssh/ssh_host_ed25519_key.pub`), jamais depuis ssh-keyscan
+          # seul, qui croit ce que le réseau lui répond.
+          # HostKeyAlias : la ligne ne dépend pas de l'adresse IP, qui reste un secret.
+          echo 'citatio-vps ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILgozgycZDFXg9N4uu8YQT1v+7eTJsGhFMX1HK9ehB3L' > ~/.ssh/known_hosts
+          ssh_opts=(-i ~/.ssh/deploy -o BatchMode=yes -o ConnectTimeout=30
+                    -o StrictHostKeyChecking=yes -o HostKeyAlias=citatio-vps)
+
+          # Synchronise la conf d'infra vers le VPS AVANT de (re)démarrer la stack.
+          # Sans ça, modifier docker-compose.yml / Caddyfile / init.sql dans le repo
+          # n'a AUCUN effet sur le VPS (le déploiement ne faisait que tirer les images).
+          scp "${ssh_opts[@]}" docker-compose.yml Caddyfile deploy.sh "$VPS:/opt/citatio/"
+          scp "${ssh_opts[@]}" backend/docker/postgres/init.sql "$VPS:/opt/citatio/backend/docker/postgres/"
+
+          # docker-compose.yml lit ces variables via ${VAR:-défaut} : sans ce
+          # fichier, les valeurs par défaut s'appliquent, u1 démarre sans
+          # identifiants SMTP et chaque demande de contact finit en base avec
+          # le statut FAILED. Le .env n'est jamais versionné, il est réécrit à
+          # chaque déploiement depuis les secrets GitHub.
+          #
+          # Écrit avec `printf` et envoyé sur l'entrée standard de ssh : les
+          # valeurs ne touchent ni le disque du runner, ni une ligne de commande,
+          # et ne sont jamais réinterprétées par un shell. Réserve connue :
+          # docker compose lit ce fichier ensuite, un mot de passe contenant $
+          # y serait pris pour une interpolation. Si le compte d'envoi en a un,
+          # le doubler ($$) au moment de créer le secret.
+          #
+          # umask avant l'écriture : le fichier naît en 600. Écriture dans un
+          # fichier temporaire puis `mv` : une coupure réseau en cours de copie
+          # ne laisse pas un .env tronqué.
+          {
+            printf 'MAIL_HOST=%s\n'      "$MAIL_HOST"
+            printf 'MAIL_PORT=%s\n'      "$MAIL_PORT"
+            printf 'MAIL_SSL=%s\n'       "$MAIL_SSL"
+            printf 'MAIL_USERNAME=%s\n'  "$MAIL_USERNAME"
+            printf 'MAIL_PASSWORD=%s\n'  "$MAIL_PASSWORD"
+            printf 'MAIL_FROM=%s\n'      "$MAIL_FROM"
+            printf 'MAIL_FROM_NAME=%s\n' "$MAIL_FROM_NAME"
+            printf 'MAIL_TO=%s\n'        "$MAIL_TO"
+          } | ssh "${ssh_opts[@]}" "$VPS" \
+                'umask 077 && cat > /opt/citatio/.env.tmp && mv /opt/citatio/.env.tmp /opt/citatio/.env'
+
+          # Le PAT GHCR arrive sur l'entrée standard de deploy.sh, qui le passe
+          # à `docker login --password-stdin`.
+          printf '%s' "$GHCR_PAT" | ssh "${ssh_opts[@]}" "$VPS" 'bash /opt/citatio/deploy.sh'
+
+      # Vérifie ce que voit réellement un visiteur. Sans ce contrôle, la gateway a
+      # tourné douze jours sur un ancien Caddyfile avec un pipeline au vert
+      # (audit INF-01). Mêmes points que la vérification d'infrastructure du CLAUDE.md §2.3.
+      - name: Verify production
+        run: |
+          set -eu
+          code() { curl -s -o /dev/null -w '%{http_code}' --max-time 15 "$1"; }
+          check() {
+            got=$(code "$1")
+            if [ "$got" != "$2" ]; then echo "ECHEC $1 : attendu $2, obtenu $got"; exit 1; fi
+            echo "ok $1 -> $got"
+          }
+
+          # u1 est recréé à chaque déploiement (nouvelle image) et met jusqu'à
+          # 40 s à démarrer : on attend qu'il réponde avant de conclure. 405 en
+          # GET, puisque la route n'accepte que POST.
+          for _ in $(seq 1 30); do
+            [ "$(code https://citatio-geo.com/api/u1/contact-requests)" = 405 ] && break
+            sleep 5
+          done
+
+          check https://citatio-geo.com/ 200
+          check https://citatio-geo.com/faq 200
+          check https://www.citatio-geo.com/faq 301
+          check https://citatio-geo.com/page-inexistante 404
+          check https://citatio-geo.com/api/u1/ping-u2 404
+          check https://citatio-geo.com/api/u2/ping-u1 404
+          check https://citatio-geo.com/api/u1/contact-requests 405
+          curl -sI --max-time 15 https://citatio-geo.com/ | grep -qi '^strict-transport-security:' \
+            || { echo "ECHEC : en-tete HSTS absent"; exit 1; }
 
   # ─────────────────────────────────────────────
   # Job 6 : Nettoyage des images GHCR (develop only)

@@ -11,6 +11,13 @@ RUN mvn -pl u2-blog -am clean package -DskipTests
 # Stage 2: Run
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
+# Utilisateur systeme sans privilege : la JVM tournait en root dans le conteneur,
+# si bien qu'une faille applicative donnait root sur tout le systeme de fichiers
+# du conteneur (audit INF-04). Le port 8082 est au-dessus de 1024, aucun droit
+# particulier n'est requis pour l'ouvrir, et l'application n'ecrit que dans /tmp.
+# Le jar reste a root : lisible par app, mais pas modifiable par lui.
+RUN addgroup -S app && adduser -S -G app app
 COPY --from=build /app/u2-blog/target/*.jar app.jar
+USER app
 EXPOSE 8082
 ENTRYPOINT ["java", "-jar", "app.jar"]

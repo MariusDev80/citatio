@@ -1,8 +1,21 @@
+# Rotation des logs Docker, commune a tous les services. Le pilote json-file ne
+# limite rien par defaut : les journaux grossissaient sans fin sur le disque du
+# VPS, celui-la meme qui porte la base (audit INF-04). 3 fichiers de 10 Mo, soit
+# 30 Mo au plus par conteneur : de quoi remonter plusieurs jours en arriere.
+# Declare ici plutot que dans /etc/docker/daemon.json : versionne, et deploye
+# avec le reste de la configuration.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   database:
     image: postgres:15-alpine
     container_name: citatio-db
     restart: always
+    logging: *logging
     environment:
       POSTGRES_DB: citatio_db
       POSTGRES_USER: user
@@ -27,6 +40,7 @@ services:
       dockerfile: u1-communication/Dockerfile
     container_name: citatio-u1
     restart: always
+    logging: *logging
     depends_on:
       database:
         condition: service_healthy
@@ -77,6 +91,7 @@ services:
       dockerfile: u2-blog/Dockerfile
     container_name: citatio-u2
     restart: always
+    logging: *logging
     # AUCUNE dependance a u1-communication : les deux microservices demarrent et
     # vivent independamment. Une coupure de u1 ne doit ni empecher u2 de demarrer,
     # ni l'empecher de repondre (voir UpstreamClient : degradation gracieuse).
@@ -110,6 +125,12 @@ services:
     build:
       context: ./frontend
     container_name: citatio-front
+    # Seul service qui n'avait aucune politique de redemarrage : apres un reboot
+    # du VPS, Caddy revenait mais pas nginx, et tout le site repondait 502
+    # (audit INF-02). unless-stopped plutot que always : un conteneur arrete a la
+    # main pour une intervention ne revient pas tout seul au redemarrage du demon.
+    restart: unless-stopped
+    logging: *logging
     expose:
       - "80"
 
@@ -117,6 +138,7 @@ services:
     image: caddy:2.11.4-alpine
     container_name: citatio-gateway
     restart: always
+    logging: *logging
     ports:
       - "80:80"     # HTTP (pour redirection automatique)
       - "443:443"   # HTTPS

@@ -43,7 +43,16 @@ citatio-geo.com {
 
     # API microservices, le préfixe /api/uX est conservé (handle, pas handle_path)
     # car les contrôleurs Spring sont mappés sous /api/u1 et /api/u2.
+    # Limite de corps avant le proxy : sans elle, Jackson deserialisait n'importe
+    # quelle taille avant que la validation ne rejette, et le limiteur de debit ne
+    # compte que les requetes valides (audit SEC-05). La plus grosse soumission
+    # legitime du formulaire fait environ 5 900 caracteres, soit 35 Ko dans le pire
+    # cas (echappement JSON \uXXXX a 6 octets) : 64 Ko ne refuse aucun vrai envoi.
+    # Au-dela, Caddy repond 413 sans rien transmettre a u1.
     handle /api/u1/* {
+        request_body {
+            max_size 64KB
+        }
         reverse_proxy u1-communication:8081
     }
 
