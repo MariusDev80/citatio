@@ -186,6 +186,7 @@ citatio/
 ├── docker-compose.yml            ← orchestration complète (db, u1, u2, front, gateway)
 ├── Caddyfile                     ← gateway : TLS, redirection www, en-têtes, routage /api/uX
 ├── .github/workflows/main.yml    ← CI/CD
+├── deploy.sh                     ← exécuté sur le VPS par le job deploy (pull, up, gateway)
 ├── data/                         ← volumes Docker locaux, ignoré par git
 ├── frontend/                     ← Angular 21, SSR + prerendering
 │   ├── src/app/config/           ← identité, tarifs, mesures : sources de vérité uniques
@@ -322,9 +323,14 @@ Caddy (TLS, gateway) → nginx (statique) ou microservices Spring.
 - **CI/CD** (`.github/workflows/main.yml`) : tests unitaires, e2e et **tests backend** (`./mvnw -B
   test`) sur **tout push et toute PR** vers `develop` et `master`. Les images se construisant avec
   `-DskipTests`, sans ce job les tests backend ne tourneraient nulle part. Build et push des trois
-  images, puis déploiement VPS, **uniquement sur push `develop`**. Le déploiement synchronise
-  d'abord `docker-compose.yml`, `Caddyfile` et `init.sql` vers le VPS, puis
-  `docker compose pull && up -d`.
+  images, puis déploiement VPS, **uniquement sur push `develop`**. Le déploiement passe par
+  l'OpenSSH du runner, **sans action tierce** (les actions `appleboy/*` recevaient la clé SSH et
+  téléchargeaient un binaire non épinglé), avec la **clé d'hôte du VPS écrite dans le workflow** :
+  un serveur inconnu fait échouer le job. Il copie `docker-compose.yml`, `Caddyfile`, `deploy.sh`
+  et `init.sql`, écrit le `.env` depuis les secrets, puis lance `deploy.sh` : `docker compose pull
+  && up -d`, et **recréation de la gateway si le Caddyfile a changé**, après `caddy validate`.
+  Un dernier step **vérifie la production** (200, 301 du www, vraies 404, diagnostics coupés,
+  HSTS) et fait échouer le job au moindre écart.
 - **Secrets** : `VPS_IP`, `VPS_USER`, `SSH_PRIVATE_KEY`, `GHCR_PAT`, côté GitHub. Jamais de secret
   dans le dépôt. Les identifiants Postgres de `docker-compose.yml` sont des valeurs de
   développement, à remplacer par des variables d'environnement le jour où la base porte des données
@@ -622,6 +628,10 @@ Chacun de ces points a coûté un correctif. Ne les réintroduis pas.
 - **Le déploiement ne synchronisait pas la configuration d'infra** : modifier `Caddyfile` ou
   `docker-compose.yml` n'avait aucun effet sur le VPS. L'étape `scp` du workflow le règle,
   ne la retire pas.
+- **Copier le Caddyfile ne suffisait pas non plus** : Compose ne recrée pas la gateway quand seul
+  le contenu du fichier monté change, et Caddy ne le relit pas. La production a tourné du 2 au
+  14 septembre 2026 sans redirection www ni en-têtes de sécurité, pipeline au vert. `deploy.sh`
+  recrée la gateway, le step « Verify production » l'aurait vu dès le premier déploiement.
 - **`--color-ink-faint` échouait au contraste** à 3,59:1 en thème sombre. Toute nouvelle valeur de
   couleur passe par `npm run check:contrast`.
 - **Le `.ct-reveal` caché sans garde `html.ct-js`** cachait le contenu aux crawlers et sans
