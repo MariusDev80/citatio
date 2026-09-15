@@ -1,10 +1,20 @@
 name: CI/CD Pipeline
 
+# Integration continue et environnement dev. La mise en production n'est plus
+# declenchee ici : elle passe par le bouton de deploy-prod.yml, qui ne promeut
+# qu'un commit deja deploye et verifie en dev par ce workflow.
 on:
   push:
-    branches: [ develop, master ]
+    branches: [ develop ]
   pull_request:
-    branches: [ develop, master ]
+    branches: [ develop ]
+
+# Un nouveau commit sur une PR annule le pipeline du commit precedent : la dev
+# doit montrer le dernier etat de la PR, pas finir de deployer un etat perime.
+# Les pushs sur develop ont chacun leur groupe (run_id) et ne s'annulent jamais.
+concurrency:
+  group: ci-${{ github.event_name == 'pull_request' && github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   # ─────────────────────────────────────────────
@@ -106,13 +116,17 @@ jobs:
         run: ./mvnw -B test
 
   # ─────────────────────────────────────────────
-  # Job 4 : Build & Push Docker (develop only)
-  # Ne se déclenche que si les tests passent
+  # Job 4 : Build & Push Docker (push develop, et PR du dépôt)
+  # Ne se déclenche que si les tests passent.
+  # Les PR venues d'un fork ne reçoivent aucun secret : elles gardent les tests,
+  # sans build ni déploiement.
   # ─────────────────────────────────────────────
   build-and-push:
     name: Build & Push Docker images
     needs: [ test, e2e, backend-test ]
-    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    if: >-
+      github.event_name == 'push'
+      || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -124,25 +138,33 @@ jobs:
       - name: Lowercase repo name
         run: echo "REPO_LC=$(echo "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
 
+      # Sur une PR ouverte par Dependabot, GitHub donne un GITHUB_TOKEN en lecture
+      # seule, quelles que soient les `permissions` du job : il ne peut pas publier
+      # d'image. On passe alors par GHCR_PAT, lu dans le coffre de secrets
+      # Dependabot (qui doit donc le contenir, avec le droit write:packages).
       - name: Log in to GHCR
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ github.actor == 'dependabot[bot]' && 'MariusDev80' || github.actor }}
+          password: ${{ github.actor == 'dependabot[bot]' && secrets.GHCR_PAT || secrets.GITHUB_TOKEN }}
 
+      # Tag = SHA du commit construit, et plus `latest` : la dev et la production
+      # tirent chacune un SHA précis (IMAGE_TAG dans docker-compose.yml), une PR ne
+      # peut donc jamais remplacer l'image de production. Sur une PR, github.sha est
+      # le commit de fusion de la PR dans develop : la dev montre ce que develop
+      # deviendrait après le merge.
+      #
       # `provenance: false` sur les trois images : sans cela, buildx peut publier
       # un index et un manifeste d'attestation à côté de l'image, soit plusieurs
-      # versions GHCR par build. Le nettoyage (job 6) compte des versions : il
-      # garderait moins de 3 builds, et pourrait supprimer une partie d'une image
-      # encore utilisée.
+      # versions GHCR par build, que le nettoyage (job 6) compterait à tort.
       - name: Build & Push Front
         uses: docker/build-push-action@v7
         with:
           context: ./frontend
           push: true
           provenance: false
-          tags: ghcr.io/${{ env.REPO_LC }}/frontend:latest
+          tags: ghcr.io/${{ env.REPO_LC }}/frontend:${{ github.sha }}
 
       - name: Build & Push u1-communication
         uses: docker/build-push-action@v7
@@ -151,7 +173,7 @@ jobs:
           file: ./backend/u1-communication/Dockerfile
           push: true
           provenance: false
-          tags: ghcr.io/${{ env.REPO_LC }}/u1-communication:latest
+          tags: ghcr.io/${{ env.REPO_LC }}/u1-communication:${{ github.sha }}
 
       - name: Build & Push u2-blog
         uses: docker/build-push-action@v7
@@ -160,36 +182,38 @@ jobs:
           file: ./backend/u2-blog/Dockerfile
           push: true
           provenance: false
-          tags: ghcr.io/${{ env.REPO_LC }}/u2-blog:latest
+          tags: ghcr.io/${{ env.REPO_LC }}/u2-blog:${{ github.sha }}
 
   # ─────────────────────────────────────────────
-  # Job 5 : Déploiement VPS (develop only)
+  # Job 5 : Déploiement de l'environnement dev
+  # À chaque commit de PR et à chaque push sur develop, après le build.
+  # Un seul environnement dev : le dernier déploiement l'emporte.
   # ─────────────────────────────────────────────
-  deploy:
-    name: Deploy to VPS
+  deploy-dev:
+    name: Deploy to dev
     needs: build-and-push
-    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    # En série : deux déploiements simultanés se disputeraient les mêmes
+    # conteneurs. Un déploiement en cours n'est jamais annulé par ce groupe
+    # (seul le pipeline d'une PR dépassée l'est, voir `concurrency` en tête).
+    concurrency:
+      group: deploy-dev
+      cancel-in-progress: false
+
     steps:
       - uses: actions/checkout@v7
 
-      # OpenSSH du runner, et non appleboy/scp-action et appleboy/ssh-action.
-      # Ces deux actions recevaient la clé SSH, le PAT GHCR et les secrets SMTP,
-      # étaient épinglées par un tag déplaçable, et ne vérifiaient pas la clé
-      # d'hôte du VPS. Les épingler par SHA ne suffisait pas : elles téléchargent
-      # au lancement un binaire depuis leurs releases, dont la somme de contrôle
-      # vient de la même release. Un compte tiers compromis tenait donc la
-      # production (audit SEC-02, voir la compromission de tj-actions en 2025).
-      #
-      # Les secrets passent par l'environnement du step, jamais par le texte du
-      # script : `${{ }}` dans un `run:` serait recopié tel quel dans le fichier
-      # exécuté par le runner.
-      - name: Deploy to VPS
+      - uses: ./.github/actions/vps-ssh
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.VPS_IP }}
+          user: ${{ secrets.VPS_USER }}
+
+      - name: Deploy to dev
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          VPS: ${{ secrets.VPS_USER }}@${{ secrets.VPS_IP }}
+          IMAGE_TAG: ${{ github.sha }}
           GHCR_PAT: ${{ secrets.GHCR_PAT }}
           MAIL_HOST: ${{ secrets.MAIL_HOST }}
           MAIL_PORT: ${{ secrets.MAIL_PORT }}
@@ -197,137 +221,146 @@ jobs:
           MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
           MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
-          MAIL_FROM_NAME: ${{ secrets.MAIL_FROM_NAME }}
           MAIL_TO: ${{ secrets.MAIL_TO }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          U1_DB_PASSWORD: ${{ secrets.U1_DB_PASSWORD }}
-          U2_DB_PASSWORD: ${{ secrets.U2_DB_PASSWORD }}
         run: |
           set -euo pipefail
 
-          # Un secret absent vaut une chaîne vide, et docker-compose.yml retombe
-          # alors sur les mots de passe de développement, versionnés : la base de
-          # production démarrerait avec eux, sans aucune erreur. On échoue avant.
-          for secret in POSTGRES_PASSWORD U1_DB_PASSWORD U2_DB_PASSWORD; do
-            if [ -z "${!secret}" ]; then echo "ECHEC : secret $secret absent"; exit 1; fi
-          done
+          # /opt/citatio-dev est créé une fois, par root, et appartient au compte
+          # de déploiement (qui n'a pas le droit d'écrire dans /opt). S'il manque,
+          # mkdir échoue ici avec un message explicite.
+          ssh citatio-vps 'mkdir -p /opt/citatio-dev/caddy /opt/citatio-dev/backend/docker/postgres'
+          scp docker-compose.yml docker-compose.dev.yml deploy.sh citatio-vps:/opt/citatio-dev/
+          scp caddy/Caddyfile.dev caddy/routes.caddy citatio-vps:/opt/citatio-dev/caddy/
+          scp backend/docker/postgres/init-databases.sh citatio-vps:/opt/citatio-dev/backend/docker/postgres/
 
-          install -m 700 -d ~/.ssh
-          ( umask 077 && printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy )
-
-          # Clé d'hôte du VPS, lue sur le serveur lui-même le 14 septembre 2026
-          # (ED25519 SHA256:e5cPDbnEq7CTk7KTc7XXSKCMfVXtEO2cYsCKkiwqYiI). Une clé
-          # publique n'est pas un secret : elle reste lisible ici, dans le diff.
-          # Si le VPS est réinstallé, le déploiement échoue au lieu de parler à un
-          # serveur inconnu ; relire alors la clé depuis la console Hostinger
-          # (`cat /etc/ssh/ssh_host_ed25519_key.pub`), jamais depuis ssh-keyscan
-          # seul, qui croit ce que le réseau lui répond.
-          # HostKeyAlias : la ligne ne dépend pas de l'adresse IP, qui reste un secret.
-          echo 'citatio-vps ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILgozgycZDFXg9N4uu8YQT1v+7eTJsGhFMX1HK9ehB3L' > ~/.ssh/known_hosts
-          ssh_opts=(-i ~/.ssh/deploy -o BatchMode=yes -o ConnectTimeout=30
-                    -o StrictHostKeyChecking=yes -o HostKeyAlias=citatio-vps)
-
-          # Synchronise la conf d'infra vers le VPS AVANT de (re)démarrer la stack.
-          # Sans ça, modifier docker-compose.yml / Caddyfile / script d'init dans le repo
-          # n'a AUCUN effet sur le VPS (le déploiement ne faisait que tirer les images).
-          scp "${ssh_opts[@]}" docker-compose.yml Caddyfile deploy.sh "$VPS:/opt/citatio/"
-          scp "${ssh_opts[@]}" backend/docker/postgres/init-databases.sh "$VPS:/opt/citatio/backend/docker/postgres/"
-
-          # docker-compose.yml lit ces variables via ${VAR:-défaut} : sans ce
-          # fichier, les valeurs par défaut s'appliquent, u1 démarre sans
-          # identifiants SMTP et chaque demande de contact finit en base avec
-          # le statut FAILED. Le .env n'est jamais versionné, il est réécrit à
-          # chaque déploiement depuis les secrets GitHub.
-          #
-          # Écrit avec `printf` et envoyé sur l'entrée standard de ssh : les
-          # valeurs ne touchent ni le disque du runner, ni une ligne de commande,
-          # et ne sont jamais réinterprétées par un shell. Réserve connue :
-          # docker compose lit ce fichier ensuite, un mot de passe contenant $
-          # y serait pris pour une interpolation. Si le compte d'envoi en a un,
-          # le doubler ($$) au moment de créer le secret.
-          #
-          # umask avant l'écriture : le fichier naît en 600. Écriture dans un
-          # fichier temporaire puis `mv` : une coupure réseau en cours de copie
-          # ne laisse pas un .env tronqué.
+          # .env de la dev, réécrit à chaque déploiement.
+          # - Mots de passe Postgres tirés au hasard à chaque fois : la base est
+          #   recréée à chaque déploiement, ils ne servent que le temps de sa vie,
+          #   n'ont pas de secret à gérer, et ne sont jamais ceux de la production.
+          # - SMTP : le même compte que la production, et la même boîte de
+          #   réception. Le nom d'expéditeur signale la dev, pour le tri.
+          # Même précautions que la production : printf, entrée standard de ssh,
+          # fichier né en 600, écriture atomique par mv.
           {
+            printf 'IMAGE_TAG=%s\n'      "$IMAGE_TAG"
             printf 'MAIL_HOST=%s\n'      "$MAIL_HOST"
             printf 'MAIL_PORT=%s\n'      "$MAIL_PORT"
             printf 'MAIL_SSL=%s\n'       "$MAIL_SSL"
             printf 'MAIL_USERNAME=%s\n'  "$MAIL_USERNAME"
             printf 'MAIL_PASSWORD=%s\n'  "$MAIL_PASSWORD"
             printf 'MAIL_FROM=%s\n'      "$MAIL_FROM"
-            printf 'MAIL_FROM_NAME=%s\n' "$MAIL_FROM_NAME"
+            printf 'MAIL_FROM_NAME=%s\n' 'Formulaire Citatio (dev)'
             printf 'MAIL_TO=%s\n'        "$MAIL_TO"
-            printf 'POSTGRES_PASSWORD=%s\n' "$POSTGRES_PASSWORD"
-            printf 'U1_DB_PASSWORD=%s\n'    "$U1_DB_PASSWORD"
-            printf 'U2_DB_PASSWORD=%s\n'    "$U2_DB_PASSWORD"
-          } | ssh "${ssh_opts[@]}" "$VPS" \
-                'umask 077 && cat > /opt/citatio/.env.tmp && mv /opt/citatio/.env.tmp /opt/citatio/.env'
+            printf 'POSTGRES_PASSWORD=%s\n' "$(openssl rand -hex 32)"
+            printf 'U1_DB_PASSWORD=%s\n'    "$(openssl rand -hex 32)"
+            printf 'U2_DB_PASSWORD=%s\n'    "$(openssl rand -hex 32)"
+          } | ssh citatio-vps \
+                'umask 077 && cat > /opt/citatio-dev/.env.tmp && mv /opt/citatio-dev/.env.tmp /opt/citatio-dev/.env'
 
           # Le PAT GHCR arrive sur l'entrée standard de deploy.sh, qui le passe
           # à `docker login --password-stdin`.
-          printf '%s' "$GHCR_PAT" | ssh "${ssh_opts[@]}" "$VPS" 'bash /opt/citatio/deploy.sh'
+          printf '%s' "$GHCR_PAT" | ssh citatio-vps 'bash /opt/citatio-dev/deploy.sh dev'
 
-      # Vérifie ce que voit réellement un visiteur. Sans ce contrôle, la gateway a
-      # tourné douze jours sur un ancien Caddyfile avec un pipeline au vert
-      # (audit INF-01). Mêmes points que la vérification d'infrastructure du CLAUDE.md §2.3.
-      - name: Verify production
+      # Contrôles depuis le VPS, dans la gateway dev elle-même : ils ne dépendent ni
+      # du DNS, ni de l'authentification, ni de la configuration de la gateway de
+      # production (appliquée seulement au déploiement de production). Ils
+      # éprouvent donc la pile dev seule, routage Caddy compris.
+      - name: Verify dev
         run: |
-          set -eu
-          code() { curl -s -o /dev/null -w '%{http_code}' --max-time 15 "$1"; }
+          ssh citatio-vps 'bash -s' <<'VERIFY'
+          set -euo pipefail
+          # Statut HTTP vu par la gateway dev. wget de busybox (image Caddy alpine)
+          # affiche les en-têtes avec -S, y compris sur une erreur. Il sort en échec
+          # sur un 404 attendu : `|| true`, sinon pipefail arrêterait le script
+          # sans message à la première page d'erreur.
+          status() {
+            { docker exec citatio-dev-gateway wget -S -O /dev/null "http://localhost$1" 2>&1 || true; } \
+              | awk '/^  HTTP\//{code=$2} END{print code}'
+          }
           check() {
-            got=$(code "$1")
-            if [ "$got" != "$2" ]; then echo "ECHEC $1 : attendu $2, obtenu $got"; exit 1; fi
+            got=$(status "$1")
+            if [ "$got" != "$2" ]; then echo "ECHEC $1 : attendu $2, obtenu ${got:-rien}"; exit 1; fi
             echo "ok $1 -> $got"
           }
+          ready() {
+            docker exec "$1" wget -qO- "http://localhost:$2/actuator/health/readiness" 2>/dev/null | grep -q '"UP"'
+          }
 
-          # u1 est recréé à chaque déploiement (nouvelle image) et met jusqu'à
-          # 40 s à démarrer : on attend qu'il réponde avant de conclure. 405 en
-          # GET, puisque la route n'accepte que POST.
-          for _ in $(seq 1 30); do
-            [ "$(code https://citatio-geo.com/api/u1/contact-requests)" = 405 ] && break
+          # Base neuve et JVM limitées en mémoire : u1 et u2 mettent plus de temps
+          # qu'en production à démarrer. La readiness inclut la base : UP prouve
+          # que les rôles ont été créés et que le schéma s'est appliqué.
+          for _ in $(seq 1 36); do
+            ready citatio-dev-u1 8081 && ready citatio-dev-u2 8082 && break
             sleep 5
           done
+          ready citatio-dev-u1 8081 || { echo "ECHEC : u1 pas prêt"; docker logs --tail 80 citatio-dev-u1; exit 1; }
+          ready citatio-dev-u2 8082 || { echo "ECHEC : u2 pas prêt"; docker logs --tail 80 citatio-dev-u2; exit 1; }
+          echo "ok u1 et u2 prêts, base comprise"
 
-          check https://citatio-geo.com/ 200
-          check https://citatio-geo.com/faq 200
-          check https://www.citatio-geo.com/faq 301
-          check https://citatio-geo.com/page-inexistante 404
-          check https://citatio-geo.com/api/u1/ping-u2 404
-          check https://citatio-geo.com/api/u2/ping-u1 404
-          check https://citatio-geo.com/api/u1/contact-requests 405
-          curl -sI --max-time 15 https://citatio-geo.com/ | grep -qi '^strict-transport-security:' \
-            || { echo "ECHEC : en-tete HSTS absent"; exit 1; }
+          check / 200
+          check /faq 200
+          check /page-inexistante 404
+          check /api/u1/ping-u2 404
+          check /api/u2/ping-u1 404
+          check /api/u1/contact-requests 405
+          VERIFY
+
+      # Vu d'Internet : la dev doit exister et être fermée. Avertissement et non
+      # échec : le bloc dev.citatio-geo.com n'est appliqué qu'au déploiement de
+      # production. Tant qu'il n'a pas eu lieu (première mise en place), la dev
+      # tourne mais n'est pas encore joignable, sans que le déploiement soit en cause.
+      - name: Check dev is reachable and closed
+        run: |
+          got=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 https://dev.citatio-geo.com/ || true)
+          if [ "$got" = 401 ]; then
+            echo "ok https://dev.citatio-geo.com/ -> 401 (authentification demandée)"
+          else
+            echo "::warning::https://dev.citatio-geo.com/ répond ${got:-rien} au lieu de 401 : DNS ou gateway de production pas encore à jour ?"
+          fi
 
   # ─────────────────────────────────────────────
-  # Job 6 : Nettoyage des images GHCR (develop only)
-  # Chaque déploiement publie une nouvelle version de chaque image, et
-  # l'ancienne perd son tag `latest` sans être supprimée : le stockage
-  # GitHub Packages grossissait à chaque push. On garde les 3 versions les
-  # plus récentes : l'image en production et les 2 précédentes, qui restent
-  # récupérables par digest pour revenir en arrière.
-  # Placé après `deploy`, et seulement s'il réussit : aucune version n'est
-  # supprimée tant que la nouvelle n'est pas en ligne.
+  # Job 6 : Nettoyage des images GHCR (push develop only)
+  # Chaque build publie une version de chaque image, PR comprises : le stockage
+  # GitHub Packages grossirait sans fin. On garde les 20 versions les plus
+  # récentes, plus celle taguée `prod` quel que soit son âge : c'est l'image en
+  # production, et elle doit rester téléchargeable (redémarrage, reprise du VPS).
+  #
+  # Script plutôt que actions/delete-package-versions : pour une image, son
+  # filtre `ignore-versions` porte sur le digest et non sur les tags, il ne sait
+  # donc pas épargner `prod`.
+  #
+  # Pas sur les PR : sur une PR Dependabot, le jeton est en lecture seule.
+  # Après `deploy-dev`, et seulement s'il réussit.
   # ─────────────────────────────────────────────
   cleanup-images:
     name: Clean up old GHCR images
-    needs: deploy
-    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    needs: deploy-dev
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       packages: write
-    strategy:
-      # Un paquet en échec ne doit pas empêcher le nettoyage des deux autres.
-      fail-fast: false
-      matrix:
-        image: [ frontend, u1-communication, u2-blog ]
-
+    env:
+      GH_TOKEN: ${{ github.token }}
+      OWNER: ${{ github.repository_owner }}
+      KEEP: 20
     steps:
-      - name: Keep the 3 most recent versions of ${{ matrix.image }}
-        uses: actions/delete-package-versions@v5
-        with:
-          # Nom du paquet GHCR : le chemin après le propriétaire, comme dans
-          # docker-compose.yml (ghcr.io/mariusdev80/citatio/<image>).
-          package-name: citatio/${{ matrix.image }}
-          package-type: container
-          min-versions-to-keep: 3
+      - name: Keep the 20 most recent versions, and the production one
+        run: |
+          set -euo pipefail
+          for image in frontend u1-communication u2-blog; do
+            # Nom du paquet GHCR : le chemin après le propriétaire, comme dans
+            # docker-compose.yml (ghcr.io/mariusdev80/citatio/<image>), encodé.
+            pkg="citatio%2F$image"
+            # `latest` est aussi épargné : c'est encore l'image de production tant
+            # que le premier déploiement par le bouton n'a pas eu lieu.
+            gh api --paginate "/users/$OWNER/packages/container/$pkg/versions" \
+                --jq '.[] | {id, created_at, tags: .metadata.container.tags}' \
+              | jq -s --argjson keep "$KEEP" '
+                  sort_by(.created_at) | reverse | .[$keep:][]
+                  | select((.tags | index("prod")) == null and (.tags | index("latest")) == null)
+                  | .id' \
+              | while read -r id; do
+                  gh api -X DELETE "/users/$OWNER/packages/container/$pkg/versions/$id"
+                  echo "supprimé : $image, version $id"
+                done
+          done

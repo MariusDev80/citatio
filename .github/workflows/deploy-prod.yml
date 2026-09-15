@@ -1,0 +1,240 @@
+name: Deploy production
+
+# Mise en production, uniquement à la main : onglet Actions, « Deploy production »,
+# « Run workflow » sur la branche develop.
+#
+# Le bouton ne construit rien. Il promeut les images d'un commit de develop déjà
+# construites, déployées et vérifiées en dev par main.yml, et refuse tout commit
+# qui n'y est pas passé. Ce qui part en production est donc exactement ce qui a
+# tourné en dev, octet pour octet.
+#
+# Revenir en arrière : relancer le bouton avec le SHA d'un commit précédent.
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Commit de develop à mettre en production (vide : le dernier). Un SHA précédent sert à revenir en arrière."
+        required: false
+        default: ""
+
+# Une mise en production à la fois, jamais annulée en cours de route.
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  deploy-prod:
+    name: Deploy to production
+    # Le bouton peut être lancé sur n'importe quelle branche depuis l'interface :
+    # seule develop met en production.
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Lire les pipelines de main.yml, pour vérifier le passage en dev.
+      actions: read
+      # Poser le tag `prod` sur les images promues.
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Resolve commit
+        id: commit
+        env:
+          INPUT_SHA: ${{ inputs.sha }}
+        run: |
+          set -euo pipefail
+          ref=${INPUT_SHA:-$GITHUB_SHA}
+          sha=$(git rev-parse --verify --quiet "${ref}^{commit}") \
+            || { echo "ECHEC : commit $ref introuvable"; exit 1; }
+          git merge-base --is-ancestor "$sha" origin/develop \
+            || { echo "ECHEC : $sha n'est pas sur develop"; exit 1; }
+          echo "Commit promu : $(git log -1 --format='%h %s' "$sha")"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+      # Seuls les pipelines déclenchés par un push sur develop comptent. Sur une PR,
+      # les images portent le SHA du commit de fusion et non celui de la branche :
+      # un succès en dev sur une PR ne garantit pas que les images de ce SHA existent.
+      - name: Require a successful dev deployment of this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.commit.outputs.sha }}
+        run: |
+          set -euo pipefail
+          runs=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/main.yml/runs?head_sha=$SHA&event=push&branch=develop&per_page=50" \
+                   --jq '.workflow_runs[].id')
+          for run in $runs; do
+            if gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run/jobs" \
+                 --jq '.jobs[] | select(.name == "Deploy to dev" and .conclusion == "success") | .id' \
+               | grep -q .; then
+              echo "ok : déployé et vérifié en dev par le pipeline $run"
+              exit 0
+            fi
+          done
+          echo "ECHEC : aucun déploiement dev réussi pour $SHA. Attendre la fin du pipeline de develop, ou choisir un commit passé en dev."
+          exit 1
+
+      # Fichiers d'infrastructure du commit promu, et non ceux de develop : un
+      # retour en arrière restaure aussi le compose et le Caddyfile de l'époque.
+      - name: Check out the promoted commit
+        env:
+          SHA: ${{ steps.commit.outputs.sha }}
+        run: git checkout --detach "$SHA"
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Tag `prod` avant le déploiement : le nettoyage de main.yml épargne cette
+      # version quel que soit son âge, l'image que la production va tirer ne peut
+      # donc pas disparaître du registre. `imagetools create` copie le manifeste
+      # dans le registre, sans télécharger ni reconstruire l'image.
+      - name: Tag images as prod
+        env:
+          SHA: ${{ steps.commit.outputs.sha }}
+        run: |
+          set -euo pipefail
+          repo=$(echo "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')
+          for image in frontend u1-communication u2-blog; do
+            docker buildx imagetools create \
+              --tag "ghcr.io/$repo/$image:prod" "ghcr.io/$repo/$image:$SHA"
+          done
+
+      - uses: ./.github/actions/vps-ssh
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.VPS_IP }}
+          user: ${{ secrets.VPS_USER }}
+
+      - name: Deploy to production
+        env:
+          IMAGE_TAG: ${{ steps.commit.outputs.sha }}
+          GHCR_PAT: ${{ secrets.GHCR_PAT }}
+          MAIL_HOST: ${{ secrets.MAIL_HOST }}
+          MAIL_PORT: ${{ secrets.MAIL_PORT }}
+          MAIL_SSL: ${{ secrets.MAIL_SSL }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_FROM_NAME: ${{ secrets.MAIL_FROM_NAME }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          U1_DB_PASSWORD: ${{ secrets.U1_DB_PASSWORD }}
+          U2_DB_PASSWORD: ${{ secrets.U2_DB_PASSWORD }}
+          DEV_AUTH_HASH: ${{ secrets.DEV_AUTH_HASH }}
+        run: |
+          set -euo pipefail
+
+          # Un secret absent vaut une chaîne vide, et docker-compose.yml retombe
+          # alors sur les mots de passe de développement, versionnés : la base de
+          # production démarrerait avec eux, sans aucune erreur. On échoue avant.
+          # DEV_AUTH_HASH : sans lui, la dev resterait fermée à tout le monde.
+          for secret in POSTGRES_PASSWORD U1_DB_PASSWORD U2_DB_PASSWORD DEV_AUTH_HASH; do
+            if [ -z "${!secret}" ]; then echo "ECHEC : secret $secret absent"; exit 1; fi
+          done
+          # Le hash est écrit entre apostrophes dans .env.gateway : il doit être un
+          # hash bcrypt (sortie de `caddy hash-password`), sans apostrophe.
+          if ! [[ "$DEV_AUTH_HASH" =~ ^\$2[aby]\$[0-9]{2}\$[./A-Za-z0-9]{53}$ ]]; then
+            echo "ECHEC : DEV_AUTH_HASH n'est pas un hash bcrypt"; exit 1
+          fi
+
+          # Synchronise la conf d'infra vers le VPS AVANT de (re)démarrer la stack.
+          # Sans ça, modifier docker-compose.yml / Caddyfile / script d'init dans le
+          # repo n'a AUCUN effet sur le VPS (le déploiement ne faisait que tirer les
+          # images).
+          ssh citatio-vps 'mkdir -p /opt/citatio/caddy /opt/citatio/backend/docker/postgres'
+          scp docker-compose.yml Caddyfile deploy.sh citatio-vps:/opt/citatio/
+          scp caddy/routes.caddy citatio-vps:/opt/citatio/caddy/
+          scp backend/docker/postgres/init-databases.sh citatio-vps:/opt/citatio/backend/docker/postgres/
+
+          # docker-compose.yml lit ces variables via ${VAR:-défaut} : sans ce
+          # fichier, les valeurs par défaut s'appliquent, u1 démarre sans
+          # identifiants SMTP et chaque demande de contact finit en base avec
+          # le statut FAILED. Le .env n'est jamais versionné, il est réécrit à
+          # chaque déploiement depuis les secrets GitHub.
+          #
+          # Écrit avec `printf` et envoyé sur l'entrée standard de ssh : les
+          # valeurs ne touchent ni le disque du runner, ni une ligne de commande,
+          # et ne sont jamais réinterprétées par un shell. Réserve connue :
+          # docker compose lit ce fichier ensuite, un mot de passe contenant $
+          # y serait pris pour une interpolation. Si le compte d'envoi en a un,
+          # le doubler ($$) au moment de créer le secret.
+          #
+          # umask avant l'écriture : le fichier naît en 600. Écriture dans un
+          # fichier temporaire puis `mv` : une coupure réseau en cours de copie
+          # ne laisse pas un .env tronqué.
+          {
+            printf 'IMAGE_TAG=%s\n'      "$IMAGE_TAG"
+            printf 'MAIL_HOST=%s\n'      "$MAIL_HOST"
+            printf 'MAIL_PORT=%s\n'      "$MAIL_PORT"
+            printf 'MAIL_SSL=%s\n'       "$MAIL_SSL"
+            printf 'MAIL_USERNAME=%s\n'  "$MAIL_USERNAME"
+            printf 'MAIL_PASSWORD=%s\n'  "$MAIL_PASSWORD"
+            printf 'MAIL_FROM=%s\n'      "$MAIL_FROM"
+            printf 'MAIL_FROM_NAME=%s\n' "$MAIL_FROM_NAME"
+            printf 'MAIL_TO=%s\n'        "$MAIL_TO"
+            printf 'POSTGRES_PASSWORD=%s\n' "$POSTGRES_PASSWORD"
+            printf 'U1_DB_PASSWORD=%s\n'    "$U1_DB_PASSWORD"
+            printf 'U2_DB_PASSWORD=%s\n'    "$U2_DB_PASSWORD"
+          } | ssh citatio-vps \
+                'umask 077 && cat > /opt/citatio/.env.tmp && mv /opt/citatio/.env.tmp /opt/citatio/.env'
+
+          # Fichier séparé, valeur entre apostrophes : Compose la lit sans
+          # interpréter les $ du hash (voir docker-compose.yml, service gateway).
+          printf "DEV_AUTH_HASH='%s'\n" "$DEV_AUTH_HASH" | ssh citatio-vps \
+            'umask 077 && cat > /opt/citatio/.env.gateway.tmp && mv /opt/citatio/.env.gateway.tmp /opt/citatio/.env.gateway'
+
+          # Le PAT GHCR arrive sur l'entrée standard de deploy.sh, qui le passe
+          # à `docker login --password-stdin`.
+          printf '%s' "$GHCR_PAT" | ssh citatio-vps 'bash /opt/citatio/deploy.sh prod'
+
+      # Vérifie ce que voit réellement un visiteur. Sans ce contrôle, la gateway a
+      # tourné douze jours sur un ancien Caddyfile avec un pipeline au vert
+      # (audit INF-01). Mêmes points que la vérification d'infrastructure du
+      # CLAUDE.md §2.3, plus la porte de la dev, portée par cette gateway.
+      - name: Verify production
+        run: |
+          set -eu
+          code() { curl -s -o /dev/null -w '%{http_code}' --max-time 15 "$1"; }
+          check() {
+            got=$(code "$1")
+            if [ "$got" != "$2" ]; then echo "ECHEC $1 : attendu $2, obtenu $got"; exit 1; fi
+            echo "ok $1 -> $got"
+          }
+
+          # u1 est recréé à chaque déploiement (nouvelle image) et met jusqu'à
+          # 40 s à démarrer : on attend qu'il réponde avant de conclure. 405 en
+          # GET, puisque la route n'accepte que POST.
+          for _ in $(seq 1 30); do
+            [ "$(code https://citatio-geo.com/api/u1/contact-requests)" = 405 ] && break
+            sleep 5
+          done
+
+          check https://citatio-geo.com/ 200
+          check https://citatio-geo.com/faq 200
+          check https://www.citatio-geo.com/faq 301
+          check https://citatio-geo.com/page-inexistante 404
+          check https://citatio-geo.com/api/u1/ping-u2 404
+          check https://citatio-geo.com/api/u2/ping-u1 404
+          check https://citatio-geo.com/api/u1/contact-requests 405
+          curl -sI --max-time 15 https://citatio-geo.com/ | grep -qi '^strict-transport-security:' \
+            || { echo "ECHEC : en-tete HSTS absent"; exit 1; }
+
+          # La dev doit être fermée sans mot de passe, et non ouverte ni absente.
+          # Un premier certificat pour dev.citatio-geo.com peut prendre quelques
+          # secondes après la recréation de la gateway : on lui laisse une minute.
+          for _ in $(seq 1 12); do
+            [ "$(code https://dev.citatio-geo.com/)" = 401 ] && break
+            sleep 5
+          done
+          check https://dev.citatio-geo.com/ 401
+          curl -sI --max-time 15 https://dev.citatio-geo.com/ | grep -qi '^x-robots-tag: *noindex' \
+            || { echo "ECHEC : en-tete X-Robots-Tag absent sur la dev"; exit 1; }

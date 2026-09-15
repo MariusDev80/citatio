@@ -23,6 +23,9 @@ logs/
 # deploiement depuis les secrets GitHub. Ce fichier ne doit jamais etre versionne :
 # docker compose le lit automatiquement a cote de docker-compose.yml.
 .env
+# Hash de l'authentification de dev.citatio-geo.com, ecrit sur le VPS par le
+# deploiement de production (voir docker-compose.yml, service gateway).
+.env.gateway
 data/
 docker-compose.local.yml
 Caddyfile.local

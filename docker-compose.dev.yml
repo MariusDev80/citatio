@@ -1,0 +1,74 @@
+# Environnement dev, superpose a docker-compose.yml sur le VPS :
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml ...
+# (deploy.sh dev s'en charge, dans /opt/citatio-dev).
+#
+# Seules les differences avec la production sont ici. Tout le reste (images,
+# sondes, variables, dependances) vient du fichier de production, pour que la
+# dev eprouve la definition qui partira en production.
+#
+# Cloisonnement : projet Compose, conteneurs, reseau par defaut, base, volumes
+# et .env propres a la dev. Seule la gateway dev rejoint le reseau citatio-edge,
+# ou l'attend la gateway de production. Limite a connaitre : les deux piles
+# tournent sur le meme VPS et sous le meme compte Docker, le cloisonnement porte
+# sur les donnees et le reseau, pas sur les privileges.
+
+name: citatio-dev
+
+# Limites memoire (mem_limit), propres a la dev : le VPS n'a pas de swap et la
+# production n'en a pas encore (audit INF-04). Une fuite ou une montee de charge
+# en dev ne doit jamais faire tuer un conteneur de production par le noyau.
+# MaxRAMPercentage : sans lui, la JVM ne prend que 25 % de la limite pour le
+# tas, soit 128 Mo, trop juste pour Spring Boot et Hibernate.
+
+services:
+  database:
+    container_name: citatio-dev-db
+    mem_limit: 256m
+    # Volume nomme a la place de ./data/db : `down -v` le supprime a chaque
+    # deploiement, et chaque deploiement rejoue la creation de la base depuis
+    # zero. Aucune PR ne herite ainsi du schema d'une autre.
+    volumes: !override
+      - dev-db:/var/lib/postgresql/data
+      - ./backend/docker/postgres/init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh:ro
+
+  u1-communication:
+    container_name: citatio-dev-u1
+    mem_limit: 512m
+    environment:
+      JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=70
+      # Le frontend dev appelle l'API depuis https://dev.citatio-geo.com.
+      # Derriere les gateways, Spring voit la requete en HTTP et la traite comme
+      # une requete CORS : sans cette origine, le formulaire serait refuse en 403.
+      CORS_ALLOWED_ORIGINS: https://dev.citatio-geo.com
+
+  u2-blog:
+    container_name: citatio-dev-u2
+    mem_limit: 512m
+    environment:
+      JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=70
+      CORS_ALLOWED_ORIGINS: https://dev.citatio-geo.com
+
+  frontend:
+    container_name: citatio-dev-front
+    mem_limit: 64m
+
+  gateway:
+    container_name: citatio-dev-gateway
+    mem_limit: 128m
+    # Aucun port : 80 et 443 appartiennent a la gateway de production.
+    ports: !reset []
+    # Ni certificats ni .env.gateway : le TLS et l'authentification sont portes
+    # par la production.
+    volumes: !override
+      - ./caddy/Caddyfile.dev:/etc/caddy/Caddyfile:ro
+      - ./caddy/routes.caddy:/etc/caddy/routes.caddy:ro
+    env_file: !reset []
+
+volumes:
+  dev-db:
+
+networks:
+  # Cree par la production (ou par deploy.sh) : la dev ne fait que le rejoindre.
+  edge:
+    name: citatio-edge
+    external: true

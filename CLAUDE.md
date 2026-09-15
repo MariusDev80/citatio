@@ -62,6 +62,7 @@ Ce que le dépôt contient vraiment, pour éviter de raisonner sur un système i
 | Design system éditorial (tokens, typo, filets, thème sombre) | **En production** |
 | SEO / GEO on-page (meta, JSON-LD, sitemap, llms.txt, robots) | **En production** |
 | CI GitHub Actions (Vitest + Playwright + build/push GHCR + déploiement VPS) | **Opérationnelle** |
+| Environnement dev (`dev.citatio-geo.com`, même VPS, cloisonné) | **Déployé à chaque commit de PR et push sur `develop`**. La production ne part plus que par le bouton « Deploy production » (§4.3) |
 | Gateway Caddy, TLS, en-têtes de sécurité, routage `/api/uX` | **Opérationnelle** |
 | `u1-communication` (Spring Boot) | **Une fonction réelle** : réception du formulaire de contact (entité `ContactRequest`, envoi SMTP asynchrone). Le reste (`/health`, sondes, `ping-u2`) est inchangé |
 | `u2-blog` (Spring Boot) | **Squelette** : `/health`, sondes Actuator et `ping-u1`, aucune entité métier |
@@ -141,11 +142,13 @@ La liste complète des sept points est en §7. En oublier un (typiquement le `si
 **Infrastructure**
 
 1. `docker compose up --build` en local, la pile complète démarre.
-2. Le fichier modifié est-il **synchronisé vers le VPS** par l'étape `scp` du workflow ? Sinon le
-   changement n'aura aucun effet en production.
+2. Le fichier modifié est-il **synchronisé vers le VPS** par les étapes `scp` des deux workflows
+   (`deploy-dev` dans `main.yml`, et `deploy-prod.yml`) ? Sinon le changement n'aura aucun effet.
 3. Aucun `ports:` sur `u1-communication` ni `u2-blog`.
-4. Après déploiement, vérifier en une passe : `https://www.citatio-geo.com` répond 301,
-   une route pré-rendue répond 200 **sans redirection**, une URL inconnue répond **404** et non 200.
+4. La PR passe **en dev** (job `Deploy to dev` vert, contrôles compris) avant le merge.
+5. Après la mise en production, le step « Verify production » vérifie en une passe :
+   `https://www.citatio-geo.com` répond 301, une route pré-rendue répond 200 **sans redirection**,
+   une URL inconnue répond **404** et non 200, la dev répond 401.
 
 ### 2.4 Les interdits, et pourquoi
 
@@ -162,9 +165,11 @@ La liste complète des sept points est en §7. En oublier un (typiquement le `si
 | Exposer une entité JPA dans une réponse | Le schéma de base devient un contrat public, impossible à faire évoluer. |
 | Une jointure vers la base d'un autre module | Le découpage en microservices ne tiendrait plus, et les deux bases se verrouilleraient mutuellement. |
 | `ports:` sur `u1` ou `u2` dans `docker-compose.yml` | Cela publie les microservices sur Internet. Déjà corrigé une fois (§10). |
-| `handle_path` à la place de `handle` dans le `Caddyfile` | Le préfixe `/api/uX` serait retiré, alors que les contrôleurs Spring sont mappés dessus. |
-| Retirer l'étape `scp` du workflow de déploiement | `docker-compose.yml` et `Caddyfile` ne seraient plus déployés : le VPS resterait sur l'ancienne configuration, en silence. |
-| Pousser sur `develop` ou `master` sans demande explicite | **Un push sur `develop` déploie en production.** |
+| `handle_path` à la place de `handle` dans `caddy/routes.caddy` | Le préfixe `/api/uX` serait retiré, alors que les contrôleurs Spring sont mappés dessus. |
+| Retirer une étape `scp` d'un workflow de déploiement | `docker-compose.yml`, le `Caddyfile` et les routes ne seraient plus déployés : le VPS resterait sur l'ancienne configuration, en silence. |
+| Pousser sur `develop` sans demande explicite, ou lancer « Deploy production » | Un push sur `develop` **redéploie la dev**, qu'une PR en cours de test occupait peut-être. Le bouton **met en production**. |
+| Faire rejoindre `citatio-edge` à un autre conteneur que les deux gateways | Les noms de service (`frontend`, `u1-communication`) s'y résoudraient entre dev et production : la gateway de production pourrait servir la dev. |
+| Remettre un tag `latest` dans le déploiement | La dev et la production tirent un SHA précis. Avec `latest`, une PR pourrait remplacer l'image de production. |
 | Annoncer une vérification qui n'a pas tourné | Voir §2.5. |
 
 ### 2.5 Rendre compte
@@ -183,10 +188,15 @@ La liste complète des sept points est en §7. En oublier un (typiquement le `si
 ```
 citatio/
 ├── CLAUDE.md                     ← ce fichier, seul document de référence
-├── docker-compose.yml            ← orchestration complète (db, u1, u2, front, gateway)
-├── Caddyfile                     ← gateway : TLS, redirection www, en-têtes, routage /api/uX
-├── .github/workflows/main.yml    ← CI/CD
-├── deploy.sh                     ← exécuté sur le VPS par le job deploy (pull, up, gateway)
+├── docker-compose.yml            ← orchestration complète (db, u1, u2, front, gateway), production
+├── docker-compose.dev.yml        ← surcharge de l'environnement dev (noms, base jetable, sans port)
+├── Caddyfile                     ← gateway de production : domaines, TLS, www, porte de la dev
+├── caddy/routes.caddy            ← en-têtes, diagnostics, routage /api/uX, communs prod et dev
+├── caddy/Caddyfile.dev           ← gateway dev, derrière celle de production
+├── .github/workflows/main.yml    ← tests, build, déploiement dev, nettoyage GHCR
+├── .github/workflows/deploy-prod.yml ← bouton de mise en production (et de retour en arrière)
+├── .github/actions/vps-ssh/      ← connexion SSH au VPS, clé d'hôte vérifiée, commune aux deux
+├── deploy.sh                     ← exécuté sur le VPS : `deploy.sh prod` ou `deploy.sh dev`
 ├── data/                         ← volumes Docker locaux, ignoré par git
 ├── frontend/                     ← Angular 21, SSR + prerendering
 │   ├── src/app/config/           ← identité, tarifs, mesures : sources de vérité uniques
@@ -299,7 +309,8 @@ JPA · PostgreSQL 15 · Lombok · Maven multi-modules · JUnit 5 + Mockito (H2 e
 **Chaîne complète** : GitHub Actions → images `ghcr.io` → VPS Hostinger → `docker compose` →
 Caddy (TLS, gateway) → nginx (statique) ou microservices Spring.
 
-- **Caddy** (`Caddyfile`) : certificats automatiques, `www` redirigé en **301** vers l'apex,
+- **Caddy** (`Caddyfile` pour les domaines, `caddy/routes.caddy` pour le reste, importé aussi par
+  la dev) : certificats automatiques, `www` redirigé en **301** vers l'apex,
   compression `zstd gzip`, en-têtes de sécurité (HSTS 2 ans, `nosniff`, `Referrer-Policy`,
   `X-Frame-Options`, `Permissions-Policy`, suppression de l'en-tête `Server`).
   Routage : `/api/u1/*` → `u1-communication:8081`, `/api/u2/*` → `u2-blog:8082`, tout le reste →
@@ -323,20 +334,44 @@ Caddy (TLS, gateway) → nginx (statique) ou microservices Spring.
   `try_files $uri $uri/index.html` pour servir les routes pré-rendues **sans slash final**
   (le slash contredirait les balises canoniques), et `error_page 404` renvoyant le corps du SPA avec
   un **vrai statut 404** (un « soft 404 » se fait désindexer).
-- **CI/CD** (`.github/workflows/main.yml`) : tests unitaires, e2e et **tests backend** (`./mvnw -B
-  test`) sur **tout push et toute PR** vers `develop` et `master`. Les images se construisant avec
-  `-DskipTests`, sans ce job les tests backend ne tourneraient nulle part. Build et push des trois
-  images, puis déploiement VPS, **uniquement sur push `develop`**. Le déploiement passe par
-  l'OpenSSH du runner, **sans action tierce** (les actions `appleboy/*` recevaient la clé SSH et
-  téléchargeaient un binaire non épinglé), avec la **clé d'hôte du VPS écrite dans le workflow** :
-  un serveur inconnu fait échouer le job. Il copie `docker-compose.yml`, `Caddyfile`, `deploy.sh`
-  et `init-databases.sh`, écrit le `.env` depuis les secrets, puis lance `deploy.sh` : `docker compose pull
-  && up -d`, et **recréation de la gateway si le Caddyfile a changé**, après `caddy validate`.
-  Un dernier step **vérifie la production** (200, 301 du www, vraies 404, diagnostics coupés,
-  HSTS) et fait échouer le job au moindre écart.
+- **CI/CD, intégration et dev** (`.github/workflows/main.yml`) : tests unitaires, e2e et **tests
+  backend** (`./mvnw -B test`) sur **tout push sur `develop` et toute PR vers `develop`**. Les images
+  se construisant avec `-DskipTests`, sans ce job les tests backend ne tourneraient nulle part.
+  Ensuite, sur un push `develop` **et sur chaque commit d'une PR du dépôt** (Dependabot compris, pas
+  les forks) : build et push des trois images **taguées par SHA** (jamais `latest`), puis
+  **déploiement en dev** et contrôles depuis le VPS (u1 et u2 prêts base comprise, 200, 404,
+  diagnostics coupés, 405). Un nouveau commit sur une PR annule le pipeline du précédent ; les
+  déploiements dev passent en série, le dernier l'emporte. Sur push `develop` seulement, le
+  nettoyage GHCR garde les 20 dernières versions de chaque image, plus celle taguée `prod`.
+- **CI/CD, production** (`.github/workflows/deploy-prod.yml`) : **uniquement à la main**, onglet
+  Actions, « Deploy production », sur `develop`. Rien n'est reconstruit : le bouton **refuse un commit
+  qui n'a pas réussi son déploiement dev** sur un push `develop`, tague ses images `prod`, et les
+  déploie. Un SHA précédent en entrée sert de **retour en arrière**, infrastructure de l'époque
+  comprise. Le déploiement passe par l'OpenSSH du runner, **sans action tierce** (les actions
+  `appleboy/*` recevaient la clé SSH et téléchargeaient un binaire non épinglé), avec la **clé d'hôte
+  du VPS écrite dans `.github/actions/vps-ssh`** : un serveur inconnu fait échouer le job. Il copie
+  `docker-compose.yml`, `Caddyfile`, `caddy/routes.caddy`, `deploy.sh` et `init-databases.sh`, écrit
+  le `.env` depuis les secrets, puis lance `deploy.sh prod` : `caddy validate`, `docker compose pull
+  && up -d`, et **recréation de la gateway si le Caddyfile ou les routes ont changé**. Un dernier
+  step **vérifie la production** (200, 301 du www, vraies 404, diagnostics coupés, HSTS, dev en 401
+  avec `X-Robots-Tag`) et fait échouer le job au moindre écart.
+- **Environnement dev** (`https://dev.citatio-geo.com`, identifiant `citatio`) : même VPS, projet
+  Compose `citatio-dev` dans `/opt/citatio-dev`, `docker-compose.yml` surchargé par
+  `docker-compose.dev.yml`. Cloisonné par les **données et le réseau**, pas par les privilèges
+  (même compte Docker) : conteneurs `citatio-dev-*`, réseau par défaut propre, limites mémoire, et
+  **base recréée à chaque déploiement** (`down -v`, mots de passe tirés au hasard) : chaque
+  déploiement rejoue les migrations depuis zéro, aucune PR n'hérite du schéma d'une autre. La gateway
+  de production termine le TLS, pose l'**authentification basique** et `X-Robots-Tag: noindex`,
+  puis relaie vers `citatio-dev-gateway` par le réseau `citatio-edge`, où ne se trouvent que les deux
+  gateways. Ces protections vivant dans le `Caddyfile` de production, une PR ne peut pas les retirer.
+  Les notifications du formulaire partent vers la même boîte que la production, expéditeur
+  « Formulaire Citatio (dev) ». À savoir : le workflow et `deploy.sh` exécutés pour une PR sont ceux
+  de la branche, donc quiconque peut pousser une branche agit sur le VPS.
 - **Secrets** : `VPS_IP`, `VPS_USER`, `SSH_PRIVATE_KEY`, `GHCR_PAT`, les `MAIL_*`, et
-  `POSTGRES_PASSWORD`, `U1_DB_PASSWORD`, `U2_DB_PASSWORD`, côté GitHub. Jamais de secret dans le
-  dépôt. Les mots de passe Postgres de `docker-compose.yml` (`password`, `u1_dev_password`...) ne
+  `POSTGRES_PASSWORD`, `U1_DB_PASSWORD`, `U2_DB_PASSWORD`, `DEV_AUTH_HASH` (sortie de
+  `caddy hash-password`), côté GitHub. Pour que les PR Dependabot se déploient en dev, les secrets
+  utilisés par `build-and-push` et `deploy-dev` sont **aussi dans le coffre Dependabot**, `GHCR_PAT`
+  avec le droit `write:packages`. Jamais de secret dans le dépôt. Les mots de passe Postgres de `docker-compose.yml` (`password`, `u1_dev_password`...) ne
   servent qu'en local ; le déploiement échoue si l'un des trois secrets manque, pour que la
   production ne démarre jamais avec eux. Ils ne sont lus qu'à l'**initialisation** de la base :
   changer un secret ensuite demande un `ALTER ROLE` sur le VPS, sinon u1 ou u2 ne se connecte plus.
@@ -608,9 +643,11 @@ npx lighthouse http://localhost:4173 --preset=desktop --view
 - **Commits conventionnels, en français** : `feat:`, `fix:`, `chore:`, `docs:`, `perf:`, avec portée
   optionnelle (`feat(seo):`). Le corps du message explique **le problème, la décision et les
   vérifications faites** ; voir `9cb9acb` et `d4401ed` comme modèles. Sans tiret cadratin.
-- **Branches** : travail sur des branches thématiques, PR vers `develop`. **Un push sur `develop`
-  déploie en production.** Ne pousse jamais directement sur `develop` ou `master` sans demande
-  explicite.
+- **Branches** : `develop` est la seule branche longue (`master` a été supprimée). Travail sur des
+  branches thématiques, PR vers `develop` : **chaque commit de la PR se déploie en dev**, le merge
+  redéploie la dev depuis `develop`. **La production ne part que par le bouton « Deploy
+  production »**, sur un commit passé en dev. Ne pousse jamais directement sur `develop` et ne lance
+  jamais ce bouton sans demande explicite.
 - **Ne commit et ne push que si le propriétaire le demande.**
 - `data/` (volumes Postgres et Caddy) est ignoré par git et ne doit jamais y entrer.
 - Interface en français, identifiants de code en anglais, commentaires en français.
@@ -651,6 +688,13 @@ Chacun de ces points a coûté un correctif. Ne les réintroduis pas.
   enum fermée, le message reste dans les logs.
 - **`backend/mvnw` était versionné sans `.mvn/wrapper/maven-wrapper.properties`** : la commande
   documentée `./mvnw` échouait. Le fichier est là, ne le supprime pas.
+- **Un réseau créé par `docker network create` sans étiquettes est refusé par Compose** pour un
+  réseau qu'il déclare (« incorrect label com.docker.compose.network »). `deploy.sh` crée
+  `citatio-edge` avec les étiquettes du projet `citatio`, et `docker-compose.yml` fixe ce nom de
+  projet : ne retire ni l'un ni l'autre, le déploiement de production échouerait après une première
+  dev. Trouvé en test le 15 septembre 2026, avant la mise en place.
+- **`wget` sort en échec sur un 404, et `pipefail` arrête alors le script sans message.** Le
+  contrôle de la dev l'absorbe (`|| true`) : un contrôle qui attend un 404 doit le faire aussi.
 
 ---
 
@@ -666,7 +710,9 @@ Ne duplique jamais ces informations ailleurs, ne les code jamais en dur dans un 
 | Design system complet | `frontend/src/styles.css` |
 | Thème PrimeNG | `frontend/src/app/theme/citatio-preset.ts` |
 | Routes, titres et descriptions SEO | `frontend/src/app/app.routes.ts` |
-| Routage API, TLS, en-têtes | `Caddyfile` |
+| Domaines, TLS, porte de la dev | `Caddyfile` |
+| Routage API, en-têtes, diagnostics (prod et dev) | `caddy/routes.caddy` |
+| Différences de l'environnement dev | `docker-compose.dev.yml` |
 | Cache, redirections, 404 | `frontend/nginx.conf` |
 
 ---

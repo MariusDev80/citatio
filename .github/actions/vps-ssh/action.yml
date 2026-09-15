@@ -1,0 +1,70 @@
+name: Connexion SSH au VPS
+description: >
+  Prépare l'OpenSSH du runner pour joindre le VPS sous l'alias `citatio-vps`
+  (`ssh citatio-vps`, `scp fichier citatio-vps:/opt/...`), clé d'hôte vérifiée.
+
+# Action locale plutôt que ce bloc recopié dans deploy-dev et deploy-prod : la
+# clé d'hôte et les options de sécurité n'existent qu'à un endroit, et les deux
+# déploiements ne peuvent pas diverger.
+#
+# OpenSSH du runner, et non appleboy/scp-action et appleboy/ssh-action. Ces deux
+# actions recevaient la clé SSH, le PAT GHCR et les secrets SMTP, étaient
+# épinglées par un tag déplaçable, et ne vérifiaient pas la clé d'hôte du VPS.
+# Les épingler par SHA ne suffisait pas : elles téléchargent au lancement un
+# binaire depuis leurs releases, dont la somme de contrôle vient de la même
+# release (audit SEC-02, voir la compromission de tj-actions en 2025).
+
+inputs:
+  ssh-private-key:
+    description: Clé privée de déploiement (secret SSH_PRIVATE_KEY).
+    required: true
+  host:
+    description: Adresse du VPS (secret VPS_IP).
+    required: true
+  user:
+    description: Compte de déploiement (secret VPS_USER).
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Configurer ssh
+      shell: bash
+      # Les valeurs passent par l'environnement du step, jamais par le texte du
+      # script : `${{ }}` dans un `run:` serait recopié tel quel dans le fichier
+      # exécuté par le runner.
+      env:
+        SSH_PRIVATE_KEY: ${{ inputs.ssh-private-key }}
+        VPS_HOST: ${{ inputs.host }}
+        VPS_USER: ${{ inputs.user }}
+      run: |
+        set -euo pipefail
+        for value in SSH_PRIVATE_KEY VPS_HOST VPS_USER; do
+          if [ -z "${!value}" ]; then echo "ECHEC : $value vide (secret absent ?)"; exit 1; fi
+        done
+
+        install -m 700 -d ~/.ssh
+        ( umask 077 && printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy )
+
+        # Clé d'hôte du VPS, lue sur le serveur lui-même le 14 septembre 2026
+        # (ED25519 SHA256:e5cPDbnEq7CTk7KTc7XXSKCMfVXtEO2cYsCKkiwqYiI). Une clé
+        # publique n'est pas un secret : elle reste lisible ici, dans le diff.
+        # Si le VPS est réinstallé, le déploiement échoue au lieu de parler à un
+        # serveur inconnu ; relire alors la clé depuis la console Hostinger
+        # (`cat /etc/ssh/ssh_host_ed25519_key.pub`), jamais depuis ssh-keyscan
+        # seul, qui croit ce que le réseau lui répond.
+        # HostKeyAlias : la ligne ne dépend pas de l'adresse IP, qui reste un secret.
+        echo 'citatio-vps ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILgozgycZDFXg9N4uu8YQT1v+7eTJsGhFMX1HK9ehB3L' > ~/.ssh/known_hosts
+
+        {
+          echo 'Host citatio-vps'
+          printf '  HostName %s\n' "$VPS_HOST"
+          printf '  User %s\n' "$VPS_USER"
+          echo '  IdentityFile ~/.ssh/deploy'
+          echo '  IdentitiesOnly yes'
+          echo '  BatchMode yes'
+          echo '  ConnectTimeout 30'
+          echo '  StrictHostKeyChecking yes'
+          echo '  HostKeyAlias citatio-vps'
+        } > ~/.ssh/config
+        chmod 600 ~/.ssh/config

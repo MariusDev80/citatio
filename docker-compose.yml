@@ -10,6 +10,20 @@ x-logging: &logging
     max-size: "10m"
     max-file: "3"
 
+# Ce fichier decrit la production. L'environnement dev le reprend tel quel et ne
+# change que ce qui doit l'etre (noms, base jetable, gateway sans port) dans
+# docker-compose.dev.yml : un deploiement qui passe en dev a donc eprouve la
+# meme definition que celle de la production.
+#
+# IMAGE_TAG : SHA du commit dont les images ont ete construites, ecrit dans le
+# .env par le deploiement. Chaque image est ainsi tracable jusqu'a son commit,
+# et revenir en arriere revient a redeployer un SHA precedent (audit CI-01).
+# `latest` ne sert plus qu'au build local (`docker compose up --build`).
+
+# Nom de projet fixe plutot que celui du dossier : deploy.sh cree le reseau
+# citatio-edge avec l'etiquette de ce projet, qui doit donc etre connue d'avance.
+name: citatio
+
 services:
   database:
     image: postgres:15-alpine
@@ -46,7 +60,7 @@ services:
 
   # ── Microservice u1-communication (email / contact / comms), port 8081 ──
   u1-communication:
-    image: ghcr.io/mariusdev80/citatio/u1-communication:latest
+    image: ghcr.io/mariusdev80/citatio/u1-communication:${IMAGE_TAG:-latest}
     build:
       context: ./backend
       dockerfile: u1-communication/Dockerfile
@@ -98,7 +112,7 @@ services:
 
   # ── Microservice u2-blog (articles), port 8082, appelle u1 en REST ──
   u2-blog:
-    image: ghcr.io/mariusdev80/citatio/u2-blog:latest
+    image: ghcr.io/mariusdev80/citatio/u2-blog:${IMAGE_TAG:-latest}
     build:
       context: ./backend
       dockerfile: u2-blog/Dockerfile
@@ -135,7 +149,7 @@ services:
       start_period: 40s
 
   frontend:
-    image: ghcr.io/mariusdev80/citatio/frontend:latest
+    image: ghcr.io/mariusdev80/citatio/frontend:${IMAGE_TAG:-latest}
     build:
       context: ./frontend
     container_name: citatio-front
@@ -157,10 +171,32 @@ services:
       - "80:80"     # HTTP (pour redirection automatique)
       - "443:443"   # HTTPS
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Regles communes a la production et a la dev, importees par le Caddyfile.
+      - ./caddy/routes.caddy:/etc/caddy/routes.caddy:ro
       - ./data/caddy_data:/data
       - ./data/caddy_config:/config
+    # DEV_AUTH_HASH, hash de l'authentification de dev.citatio-geo.com, ecrit par
+    # le deploiement de production. Fichier a part plutot que le .env : il est lu
+    # tel quel (valeur entre apostrophes), alors qu'un hash bcrypt plein de $
+    # serait interpole par Compose. Facultatif : sans lui, en local, le Caddyfile
+    # retombe sur un hash qui n'ouvre rien.
+    env_file:
+      - path: .env.gateway
+        required: false
+    networks:
+      - default
+      # Seul lien entre la production et la dev : la gateway de production y
+      # rejoint la gateway dev, et aucun autre conteneur.
+      - edge
     depends_on:
       - frontend
       - u1-communication
       - u2-blog
+
+networks:
+  # Nom fixe, pour que le projet dev le retrouve. Cree par la production ; le
+  # deploiement le cree aussi s'il manque, si bien que l'ordre des premiers
+  # deploiements n'importe pas.
+  edge:
+    name: citatio-edge
