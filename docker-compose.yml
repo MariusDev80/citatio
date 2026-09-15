@@ -18,16 +18,28 @@ services:
     logging: *logging
     environment:
       POSTGRES_DB: citatio_db
+      # Superutilisateur : administration seulement, aucun service ne s'en sert.
+      # Mots de passe : .env ecrit par le deploiement depuis les secrets GitHub
+      # (le job echoue s'ils manquent). Les defauts ':-' ne servent qu'au
+      # developpement local, sur une base qui n'est publiee sur aucun port.
       POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      # Lus par init-databases.sh pour creer u1_app et u2_app.
+      U1_DB_PASSWORD: ${U1_DB_PASSWORD:-u1_dev_password}
+      U2_DB_PASSWORD: ${U2_DB_PASSWORD:-u2_dev_password}
     volumes:
       - ./data/db:/var/lib/postgresql/data
-      # Cree citatio_u1_db et citatio_u2_db au premier init (volume vide uniquement).
-      - ./backend/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      # Cree les bases et les roles de u1 et u2 au premier init (volume vide
+      # uniquement). Changer un mot de passe ensuite ne passe plus par ici :
+      # ALTER ROLE a la main, ou volume vide si les donnees sont jetables.
+      - ./backend/docker/postgres/init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh:ro
     # Les microservices attendent que la base soit reellement prete (evite les
     # "Connection refused" au demarrage pendant l'init de Postgres).
+    # -h 127.0.0.1 : pendant l'init, l'image lance un serveur temporaire qui
+    # n'ecoute que sur le socket Unix. Sans -h, la sonde le declarait sain avant
+    # que les roles existent, et u1 demarrait sur un echec d'authentification.
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d citatio_db"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U user -d citatio_db"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -47,8 +59,9 @@ services:
     environment:
       DB_HOST: database
       DB_NAME: citatio_u1_db
-      DB_USER: user
-      DB_PASSWORD: password
+      # Role limite a citatio_u1_db (init-databases.sh), jamais le superutilisateur.
+      DB_USER: u1_app
+      DB_PASSWORD: ${U1_DB_PASSWORD:-u1_dev_password}
       U2_BASE_URL: http://u2-blog:8082
       # ── Envoi des emails du formulaire de contact ──
       # Rien n'est code en dur cote application : hote, port, identifiants et
@@ -101,8 +114,9 @@ services:
     environment:
       DB_HOST: database
       DB_NAME: citatio_u2_db
-      DB_USER: user
-      DB_PASSWORD: password
+      # Role limite a citatio_u2_db (init-databases.sh), jamais le superutilisateur.
+      DB_USER: u2_app
+      DB_PASSWORD: ${U2_DB_PASSWORD:-u2_dev_password}
       U1_BASE_URL: http://u1-communication:8081
     # 'expose' uniquement : joignable par Caddy via le reseau Docker interne,
     # jamais directement depuis Internet.

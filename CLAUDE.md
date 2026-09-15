@@ -204,7 +204,7 @@ citatio/
     ├── common-libs/              ← DTO et config partagés
     ├── u1-communication/         ← mails, contact (port 8081, base citatio_u1_db)
     ├── u2-blog/                  ← blog (port 8082, base citatio_u2_db)
-    └── docker/postgres/init.sql  ← crée les deux bases au premier démarrage du volume
+    └── docker/postgres/init-databases.sh ← bases et rôles u1_app / u2_app, premier démarrage du volume
 ```
 
 ---
@@ -251,8 +251,11 @@ JPA · PostgreSQL 15 · Lombok · Maven multi-modules · JUnit 5 + Mockito (H2 e
 
 **Architecture microservices :**
 
-- **Une base par module.** `citatio_u1_db` et `citatio_u2_db`. Les **jointures inter-modules sont
-  interdites**, sans exception.
+- **Une base et un rôle par module.** `citatio_u1_db` appartient à `u1_app`, `citatio_u2_db` à
+  `u2_app`, créés par `init-databases.sh`. Chaque rôle est refusé sur la base de l'autre (droit
+  `CONNECT` retiré à `PUBLIC`) et n'est pas superutilisateur : les **jointures inter-modules sont
+  interdites**, sans exception, et la base le garantit. Aucun service ne se connecte avec le
+  superutilisateur `user`, réservé à l'administration.
 - Les modules ne se parlent **qu'en REST**, et **jamais en direct** : tout appel inter-modules passe
   par `common-libs/client/UpstreamClient`, qui absorbe la panne et la rend en `UpstreamStatus`
   (`REACHABLE` / `UNREACHABLE` + motif fermé). L'appelant n'a donc **aucune exception à gérer** et
@@ -327,14 +330,17 @@ Caddy (TLS, gateway) → nginx (statique) ou microservices Spring.
   l'OpenSSH du runner, **sans action tierce** (les actions `appleboy/*` recevaient la clé SSH et
   téléchargeaient un binaire non épinglé), avec la **clé d'hôte du VPS écrite dans le workflow** :
   un serveur inconnu fait échouer le job. Il copie `docker-compose.yml`, `Caddyfile`, `deploy.sh`
-  et `init.sql`, écrit le `.env` depuis les secrets, puis lance `deploy.sh` : `docker compose pull
+  et `init-databases.sh`, écrit le `.env` depuis les secrets, puis lance `deploy.sh` : `docker compose pull
   && up -d`, et **recréation de la gateway si le Caddyfile a changé**, après `caddy validate`.
   Un dernier step **vérifie la production** (200, 301 du www, vraies 404, diagnostics coupés,
   HSTS) et fait échouer le job au moindre écart.
-- **Secrets** : `VPS_IP`, `VPS_USER`, `SSH_PRIVATE_KEY`, `GHCR_PAT`, côté GitHub. Jamais de secret
-  dans le dépôt. Les identifiants Postgres de `docker-compose.yml` sont des valeurs de
-  développement, à remplacer par des variables d'environnement le jour où la base porte des données
-  réelles.
+- **Secrets** : `VPS_IP`, `VPS_USER`, `SSH_PRIVATE_KEY`, `GHCR_PAT`, les `MAIL_*`, et
+  `POSTGRES_PASSWORD`, `U1_DB_PASSWORD`, `U2_DB_PASSWORD`, côté GitHub. Jamais de secret dans le
+  dépôt. Les mots de passe Postgres de `docker-compose.yml` (`password`, `u1_dev_password`...) ne
+  servent qu'en local ; le déploiement échoue si l'un des trois secrets manque, pour que la
+  production ne démarre jamais avec eux. Ils ne sont lus qu'à l'**initialisation** de la base :
+  changer un secret ensuite demande un `ALTER ROLE` sur le VPS, sinon u1 ou u2 ne se connecte plus.
+  En local, un `./data/db` créé avant les rôles (15 septembre 2026) est à vider une fois.
 
 ---
 
@@ -676,7 +682,6 @@ Non priorisés ici : la priorisation appartient au propriétaire.
 - Rejouer les notifications en échec (`mail_status = FAILED`), aujourd'hui repérables seulement en
   lisant la table ou les logs.
 - Premières entités métier de `u2-blog` et pages blog côté Angular.
-- Sortir les identifiants Postgres de `docker-compose.yml`.
 - Figer les tarifs de `pricing.config.ts` (aujourd'hui provisoires, marqués comme tels) une fois
   validés par le propriétaire.
 - Migrer progressivement les commentaires anglais du frontend vers le français.
