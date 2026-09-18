@@ -50,7 +50,7 @@
     "@angular/compiler-cli": "21.2.23",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4.3.3",
-    "@types/node": "^25.4.0",
+    "@types/node": "^26.5.1",
     "autoprefixer": "^10.4.27",
     "http-server": "^14.1.1",
     "jsdom": "^30.0.1",
