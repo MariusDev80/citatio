@@ -9,7 +9,7 @@ COPY . .
 RUN mvn -pl u2-blog -am clean package -DskipTests
 
 # Stage 2: Run
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:24-jre-alpine
 WORKDIR /app
 # Utilisateur systeme sans privilege : la JVM tournait en root dans le conteneur,
 # si bien qu'une faille applicative donnait root sur tout le systeme de fichiers
