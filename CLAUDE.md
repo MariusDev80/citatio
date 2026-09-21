@@ -371,7 +371,12 @@ Caddy (TLS, gateway) → nginx (statique) ou microservices Spring.
   `POSTGRES_PASSWORD`, `U1_DB_PASSWORD`, `U2_DB_PASSWORD`, `DEV_AUTH_HASH` (sortie de
   `caddy hash-password`), côté GitHub. Pour que les PR Dependabot se déploient en dev, les secrets
   utilisés par `build-and-push` et `deploy-dev` sont **aussi dans le coffre Dependabot**, `GHCR_PAT`
-  avec le droit `write:packages`. Jamais de secret dans le dépôt. Les mots de passe Postgres de `docker-compose.yml` (`password`, `u1_dev_password`...) ne
+  avec le droit `write:packages`. **Au 21 septembre 2026, ce jeton est refusé par GHCR**
+  (`denied` dès le `docker login`), donc une PR Dependabot passe les tests mais ne se déploie pas en
+  dev. Contournement employé pour les cinq PR de ce jour : pousser un commit vide sur la branche, ce
+  qui rend la main au jeton standard de GitHub Actions et coupe le suivi Dependabot sur cette
+  branche. Correctif durable à trancher : jeton classic valide, ou schéma `workflow_run` qui
+  supprime le besoin de jeton. Jamais de secret dans le dépôt. Les mots de passe Postgres de `docker-compose.yml` (`password`, `u1_dev_password`...) ne
   servent qu'en local ; le déploiement échoue si l'un des trois secrets manque, pour que la
   production ne démarre jamais avec eux. Ils ne sont lus qu'à l'**initialisation** de la base :
   changer un secret ensuite demande un `ALTER ROLE` sur le VPS, sinon u1 ou u2 ne se connecte plus.
