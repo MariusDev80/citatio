@@ -7,7 +7,7 @@ COPY . .
 RUN npm run build -- --configuration production
 
 # Stage 2: Serve
-FROM nginx:1.28-alpine
+FROM nginx:1.31-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 # On copie depuis le dossier de build Angular 21
 COPY --from=build /app/dist/citatio-front/browser /usr/share/nginx/html
