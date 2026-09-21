@@ -1,0 +1,73 @@
+# Regles de service du site, communes a la production et a l'environnement dev.
+#
+# Importe par le Caddyfile de production (bloc citatio-geo.com) et par
+# caddy/Caddyfile.dev. Un seul fichier plutot que deux copies : la dev sert a
+# verifier ce qui partira en production, y compris le routage de la gateway.
+# Une copie divergerait, et la dev validerait alors une configuration qui
+# n'est pas celle de la production.
+
+# zstd avant gzip : Caddy retient le meilleur encodage accepte par le client.
+# Pas de brotli ici : l'encodeur `br` n'est pas enregistre dans l'image Caddy
+# standard, il faudrait un build xcaddy dedie. zstd apporte l'essentiel du
+# gain sur les navigateurs recents, gzip reste le repli universel.
+encode zstd gzip
+
+# En-tetes de securite. L'effet sur le classement est marginal, mais l'agence
+# vend la rigueur technique : un prospect qui passe le site sur
+# securityheaders.com doit y trouver ce qu'on lui promet.
+header {
+    # 2 ans, sous-domaines inclus. A ne preloader qu'une fois la valeur stable.
+    Strict-Transport-Security "max-age=63072000; includeSubDomains"
+    X-Content-Type-Options "nosniff"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    X-Frame-Options "SAMEORIGIN"
+    Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    # Caddy annonce sa presence par defaut ; inutile de le publier.
+    -Server
+}
+
+# Endpoints de diagnostic, hors surface publique. ping-u1 et ping-u2 servent
+# a verifier le cablage entre microservices : ils nomment les services et
+# renseignent sur la topologie interne, sans rendre aucun service au visiteur.
+# Ils restent joignables depuis le reseau Docker, ce qui suffit a l'exploitation :
+#   docker exec citatio-gateway wget -qO- http://u1-communication:8081/api/u1/ping-u2
+# On repond 404 et non 403 : un 403 confirmerait que la route existe.
+# (Les sondes /actuator/** ne sont pas listees ici : rien ne les route vers les
+# microservices, seuls /api/u1/* et /api/u2/* le sont.)
+@diagnostics path /api/u1/ping-u2 /api/u2/ping-u1
+handle @diagnostics {
+    respond 404
+}
+
+# API microservices, le prefixe /api/uX est conserve (handle, pas handle_path)
+# car les controleurs Spring sont mappes sous /api/u1 et /api/u2.
+# Limite de corps avant le proxy : sans elle, Jackson deserialisait n'importe
+# quelle taille avant que la validation ne rejette, et le limiteur de debit ne
+# compte que les requetes valides (audit SEC-05). La plus grosse soumission
+# legitime du formulaire fait environ 5 900 caracteres, soit 35 Ko dans le pire
+# cas (echappement JSON \uXXXX a 6 octets) : 64 Ko ne refuse aucun vrai envoi.
+# Au-dela, Caddy repond 413 sans rien transmettre a u1.
+handle /api/u1/* {
+    request_body {
+        max_size 64KB
+    }
+    reverse_proxy u1-communication:8081 {
+        # Le limiteur de u1 lit la derniere valeur de X-Forwarded-For
+        # (ClientIpResolver). En production, {client_ip} est l'adresse du
+        # visiteur, exactement ce que Caddy ecrivait deja : rien ne change. En
+        # dev, deux gateways se suivent et, sans cette ligne, la derniere valeur
+        # serait l'adresse de la gateway de production, la meme pour tous : la
+        # limite de 5 demandes par heure deviendrait globale. Caddyfile.dev fait
+        # confiance a la gateway de production, {client_ip} y redevient le visiteur.
+        header_up X-Forwarded-For {client_ip}
+    }
+}
+
+handle /api/u2/* {
+    reverse_proxy u2-blog:8082
+}
+
+# Tout le reste va vers le frontend Angular
+handle {
+    reverse_proxy frontend:80
+}

@@ -1,3 +1,10 @@
+# Gateway de production : seul conteneur publie sur 80 et 443 du VPS. Elle sert
+# le site et porte aussi l'entree de l'environnement dev (bloc en bas).
+#
+# Les regles de service (compression, en-tetes, diagnostics, routage /api/uX)
+# vivent dans caddy/routes.caddy, partage avec la dev. Ce fichier ne garde que
+# ce qui est propre a la production : les noms de domaine et la porte de la dev.
+
 # Redirection du www vers le domaine nu, en 301.
 # Les deux hotes servaient jusqu'ici la meme page en 200 : les balises
 # <link rel="canonical"> pointent toutes vers l'apex, donc Google finissait par
@@ -8,60 +15,35 @@ www.citatio-geo.com {
 }
 
 citatio-geo.com {
-    # zstd avant gzip : Caddy retient le meilleur encodage accepte par le client.
-    # Pas de brotli ici : l'encodeur `br` n'est pas enregistre dans l'image Caddy
-    # standard, il faudrait un build xcaddy dedie. zstd apporte l'essentiel du
-    # gain sur les navigateurs recents, gzip reste le repli universel.
-    encode zstd gzip
+    import routes.caddy
+}
 
-    # En-tetes de securite. L'effet sur le classement est marginal, mais l'agence
-    # vend la rigueur technique : un prospect qui passe le site sur
-    # securityheaders.com doit y trouver ce qu'on lui promet.
-    header {
-        # 2 ans, sous-domaines inclus. A ne preloader qu'une fois la valeur stable.
-        Strict-Transport-Security "max-age=63072000; includeSubDomains"
-        X-Content-Type-Options "nosniff"
-        Referrer-Policy "strict-origin-when-cross-origin"
-        X-Frame-Options "SAMEORIGIN"
-        Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
-        # Caddy annonce sa presence par defaut ; inutile de le publier.
-        -Server
+# Environnement dev, deploye par la CI a chaque commit de PR et a chaque push
+# sur develop. Deux gateways ne peuvent pas ecouter sur 443 : la production
+# termine le TLS et relaie vers la gateway de la dev, seul conteneur dev relie a
+# celle-ci, par le reseau citatio-edge. Les autres conteneurs dev restent sur
+# leur propre reseau : s'ils rejoignaient celui de la production, un nom comme
+# `frontend` pourrait s'y resoudre vers le conteneur dev.
+#
+# L'authentification et le noindex sont poses ici, cote production, et non dans
+# Caddyfile.dev : une PR ne peut donc pas les retirer de la dev en modifiant sa
+# propre configuration, puisque ce fichier n'est applique qu'au deploiement de
+# production.
+dev.citatio-geo.com {
+    # Le hash bcrypt vient de .env.gateway, ecrit par le deploiement de production
+    # depuis le secret DEV_AUTH_HASH. La valeur par defaut est le hash d'une chaine
+    # aleatoire jetee a sa creation : sans secret (pile locale), la dev reste
+    # fermee au lieu de s'ouvrir, et Caddy demarre quand meme.
+    basic_auth {
+        citatio {$DEV_AUTH_HASH:$2a$14$nCPZWQKfLWuRJQ3YrvUpUO8J00A4LS1G/SgH8BgI87HN8Nh02wuUO}
     }
 
-    # Endpoints de diagnostic, hors surface publique. ping-u1 et ping-u2 servent
-    # a verifier le cablage entre microservices : ils nomment les services et
-    # renseignent sur la topologie interne, sans rendre aucun service au visiteur.
-    # Ils restent joignables depuis le reseau Docker, ce qui suffit a l'exploitation :
-    #   docker exec citatio-gateway wget -qO- http://u1-communication:8081/api/u1/ping-u2
-    # On repond 404 et non 403 : un 403 confirmerait que la route existe.
-    # (Les sondes /actuator/** ne sont pas listees ici : rien ne les route vers les
-    # microservices, seuls /api/u1/* et /api/u2/* le sont.)
-    @diagnostics path /api/u1/ping-u2 /api/u2/ping-u1
-    handle @diagnostics {
-        respond 404
-    }
+    # Consigne aux moteurs de ne rien indexer. L'authentification suffit
+    # aujourd'hui ; l'en-tete protege du jour ou elle sauterait par erreur, sans
+    # quoi la dev ferait doublon avec le site et lui volerait son referencement.
+    header X-Robots-Tag "noindex, nofollow"
 
-    # API microservices, le préfixe /api/uX est conservé (handle, pas handle_path)
-    # car les contrôleurs Spring sont mappés sous /api/u1 et /api/u2.
-    # Limite de corps avant le proxy : sans elle, Jackson deserialisait n'importe
-    # quelle taille avant que la validation ne rejette, et le limiteur de debit ne
-    # compte que les requetes valides (audit SEC-05). La plus grosse soumission
-    # legitime du formulaire fait environ 5 900 caracteres, soit 35 Ko dans le pire
-    # cas (echappement JSON \uXXXX a 6 octets) : 64 Ko ne refuse aucun vrai envoi.
-    # Au-dela, Caddy repond 413 sans rien transmettre a u1.
-    handle /api/u1/* {
-        request_body {
-            max_size 64KB
-        }
-        reverse_proxy u1-communication:8081
-    }
-
-    handle /api/u2/* {
-        reverse_proxy u2-blog:8082
-    }
-
-    # Tout le reste va vers le frontend Angular
-    handle {
-        reverse_proxy frontend:80
-    }
+    # Resolu a chaque connexion : si la dev est arretee ou en cours de
+    # deploiement, seul ce domaine repond 502, la production n'est pas touchee.
+    reverse_proxy citatio-dev-gateway:80
 }

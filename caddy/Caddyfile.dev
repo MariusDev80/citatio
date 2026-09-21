@@ -1,0 +1,23 @@
+# Gateway de l'environnement dev, derriere la gateway de production.
+#
+# Elle ne publie aucun port et ne gere aucun certificat : la production termine
+# le TLS pour dev.citatio-geo.com, pose l'authentification et relaie ici en HTTP
+# par le reseau citatio-edge (voir le Caddyfile de production). Les regles de
+# service sont celles de la production, importees telles quelles.
+{
+    auto_https off
+    # Aucune API d'administration : personne ne doit pouvoir reconfigurer la dev
+    # depuis le reseau.
+    admin off
+
+    servers {
+        # La seule source de requetes est la gateway de production, sur un reseau
+        # Docker prive. Lui faire confiance rend a {client_ip} l'adresse du
+        # visiteur, que routes.caddy transmet au limiteur de u1.
+        trusted_proxies static private_ranges
+    }
+}
+
+:80 {
+    import routes.caddy
+}
