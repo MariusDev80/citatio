@@ -21,6 +21,14 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
+      # Les types Node doivent suivre le Node reellement utilise, celui du
+      # Dockerfile du frontend et de la CI. Ils monteront avec lui.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      # Majeure du lanceur de tests : elle se fait dans une PR dediee, ou l'on
+      # relit la configuration Vitest et les tests, pas au fil de l'eau.
+      - dependency-name: "vitest"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: maven
     directory: /backend
     target-branch: develop
@@ -29,6 +37,19 @@ updates:
     directories: ["/frontend", "/backend/u1-communication", "/backend/u2-blog"]
     target-branch: develop
     schedule: { interval: weekly }
+    # Les images de base suivent des versions que le projet a choisies :
+    # Java 21 LTS pour les microservices (les POM ciblent 21, la prochaine
+    # montee ira vers la LTS suivante, a la main), et le Node de la CI pour le
+    # frontend, qui construit en 24 et qu'Angular 21 supporte. Une majeure
+    # decidee par Dependabot desalignerait l'un des deux. Les mineures et les
+    # correctifs, eux, sont les bienvenus : nginx 1.31 est arrive ainsi.
+    ignore:
+      - dependency-name: "eclipse-temurin"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "maven"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     target-branch: develop
