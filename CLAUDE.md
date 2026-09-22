@@ -196,7 +196,10 @@ citatio/
 ├── .github/workflows/main.yml    ← tests, build, déploiement dev
 ├── .github/workflows/cleanup-ghcr.yml ← ménage quotidien des images GitHub Packages
 ├── .github/workflows/deploy-prod.yml ← bouton de mise en production (et de retour en arrière)
-├── .github/actions/vps-ssh/      ← connexion SSH au VPS, clé d'hôte vérifiée, commune aux deux
+├── .github/workflows/dev-dependabot.yml ← build et dev des PR Dependabot (workflow_run)
+├── .github/actions/vps-ssh/      ← connexion SSH au VPS, clé d'hôte vérifiée
+├── .github/actions/build-images/ ← construction et publication des trois images
+├── .github/actions/deploy-dev/   ← déploiement dev et ses contrôles
 ├── deploy.sh                     ← exécuté sur le VPS : `deploy.sh prod` ou `deploy.sh dev`
 ├── data/                         ← volumes Docker locaux, ignoré par git
 ├── frontend/                     ← Angular 21, SSR + prerendering
@@ -338,11 +341,24 @@ Caddy (TLS, gateway) → nginx (statique) ou microservices Spring.
 - **CI/CD, intégration et dev** (`.github/workflows/main.yml`) : tests unitaires, e2e et **tests
   backend** (`./mvnw -B test`) sur **tout push sur `develop` et toute PR vers `develop`**. Les images
   se construisant avec `-DskipTests`, sans ce job les tests backend ne tourneraient nulle part.
-  Ensuite, sur un push `develop` **et sur chaque commit d'une PR du dépôt** (Dependabot compris, pas
-  les forks) : build et push des trois images **taguées par SHA** (jamais `latest`), puis
-  **déploiement en dev** et contrôles depuis le VPS (u1 et u2 prêts base comprise, 200, 404,
-  diagnostics coupés, 405). Un nouveau commit sur une PR annule le pipeline du précédent ; les
-  déploiements dev passent en série, le dernier l'emporte.
+  Ensuite, sur un push `develop` **et sur chaque commit d'une PR du dépôt** (ni les forks, ni
+  Dependabot, voir juste en dessous) : build et push des trois images **taguées par SHA** (jamais
+  `latest`), puis **déploiement en dev** et contrôles depuis le VPS (u1 et u2 prêts base comprise,
+  200, 404, diagnostics coupés, 405). Un nouveau commit sur une PR annule le pipeline du précédent ;
+  les déploiements dev passent en série, le dernier l'emporte. Le build et le déploiement dev vivent
+  dans deux actions locales, `.github/actions/build-images` et `.github/actions/deploy-dev`,
+  partagées avec le workflow Dependabot : les deux chemins déploient et vérifient la même chose.
+- **CI/CD, PR Dependabot** (`.github/workflows/dev-dependabot.yml`) : GitHub donne un `GITHUB_TOKEN`
+  en **lecture seule** aux pipelines lancés par Dependabot, quelles que soient les `permissions`
+  demandées, pour qu'une mise à jour hostile ne publie rien. `main.yml` ne peut donc ni construire ni
+  déployer ces PR. Ce second workflow se déclenche **à la fin** du pipeline de tests
+  (`workflow_run`), s'exécute dans le contexte du dépôt et non de la PR, retrouve la PR par sa
+  branche, construit son **commit de fusion**, déploie en dev et commente la PR avec le résultat,
+  qui n'apparaît pas dans ses contrôles. À savoir : GitHub lit toujours ce fichier depuis `develop`,
+  une modification ne s'éprouve donc qu'une fois mergée. Le montage précédent, un PAT dans le coffre
+  de secrets Dependabot, a été **refusé par GHCR** le 21 septembre 2026 alors que ses droits étaient
+  corrects, et chaque PR devait être reprise à la main par un commit vide, ce qui coupe le suivi
+  Dependabot sur la branche.
 - **Nettoyage GHCR** (`.github/workflows/cleanup-ghcr.yml`) : **une fois par jour**, à 3 h 30 UTC,
   et à la demande. Garde les 20 dernières versions de chaque image, plus celle taguée `prod`.
   Il tournait à la fin de chaque déploiement : un build a alors échoué sur `ERROR: unknown blob`,
@@ -373,14 +389,11 @@ Caddy (TLS, gateway) → nginx (statique) ou microservices Spring.
   de la branche, donc quiconque peut pousser une branche agit sur le VPS.
 - **Secrets** : `VPS_IP`, `VPS_USER`, `SSH_PRIVATE_KEY`, `GHCR_PAT`, les `MAIL_*`, et
   `POSTGRES_PASSWORD`, `U1_DB_PASSWORD`, `U2_DB_PASSWORD`, `DEV_AUTH_HASH` (sortie de
-  `caddy hash-password`), côté GitHub. Pour que les PR Dependabot se déploient en dev, les secrets
-  utilisés par `build-and-push` et `deploy-dev` sont **aussi dans le coffre Dependabot**, `GHCR_PAT`
-  avec le droit `write:packages`. **Au 21 septembre 2026, ce jeton est refusé par GHCR**
-  (`denied` dès le `docker login`), donc une PR Dependabot passe les tests mais ne se déploie pas en
-  dev. Contournement employé pour les cinq PR de ce jour : pousser un commit vide sur la branche, ce
-  qui rend la main au jeton standard de GitHub Actions et coupe le suivi Dependabot sur cette
-  branche. Correctif durable à trancher : jeton classic valide, ou schéma `workflow_run` qui
-  supprime le besoin de jeton. Jamais de secret dans le dépôt. Les mots de passe Postgres de `docker-compose.yml` (`password`, `u1_dev_password`...) ne
+  `caddy hash-password`), côté GitHub, dans le **coffre Actions uniquement**. Le coffre Dependabot
+  ne sert plus à rien depuis `dev-dependabot.yml` : `GHCR_PAT` y a été supprimé le 22 septembre 2026,
+  et ce qu'il reste (`SSH_PRIVATE_KEY`, `VPS_IP`, `VPS_USER`, les `MAIL_*`) n'est lu par aucun
+  workflow. N'y remets rien : un secret ajouté là serait exposé au code des PR de dépendances sans
+  rien apporter. Jamais de secret dans le dépôt. Les mots de passe Postgres de `docker-compose.yml` (`password`, `u1_dev_password`...) ne
   servent qu'en local ; le déploiement échoue si l'un des trois secrets manque, pour que la
   production ne démarre jamais avec eux. Ils ne sont lus qu'à l'**initialisation** de la base :
   changer un secret ensuite demande un `ALTER ROLE` sur le VPS, sinon u1 ou u2 ne se connecte plus.
