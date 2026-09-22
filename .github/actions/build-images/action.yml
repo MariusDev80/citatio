@@ -1,0 +1,54 @@
+name: Construire et publier les trois images
+description: >
+  Construit frontend, u1-communication et u2-blog depuis le code déjà extrait,
+  et les publie sur GHCR sous un tag commun. L'authentification au registre est
+  faite par l'appelant, avant cette action.
+
+# Action locale plutôt que ces trois blocs recopiés dans main.yml et dans
+# dev-dependabot.yml : une image ajoutée ou un argument de build modifié se fait
+# à un seul endroit, et les deux chemins ne peuvent pas diverger.
+
+inputs:
+  tag:
+    description: Tag des images, le SHA du commit construit.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Lowercase repo name
+      shell: bash
+      run: echo "REPO_LC=$(echo "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
+
+    # Tag = SHA du commit construit, et jamais `latest` : la dev et la production
+    # tirent chacune un SHA précis (IMAGE_TAG dans docker-compose.yml), une PR ne
+    # peut donc jamais remplacer l'image de production.
+    #
+    # `provenance: false` sur les trois images : sans cela, buildx peut publier
+    # un index et un manifeste d'attestation à côté de l'image, soit plusieurs
+    # versions GHCR par build, que le nettoyage quotidien compterait à tort.
+    - name: Build & Push Front
+      uses: docker/build-push-action@v7
+      with:
+        context: ./frontend
+        push: true
+        provenance: false
+        tags: ghcr.io/${{ env.REPO_LC }}/frontend:${{ inputs.tag }}
+
+    - name: Build & Push u1-communication
+      uses: docker/build-push-action@v7
+      with:
+        context: ./backend
+        file: ./backend/u1-communication/Dockerfile
+        push: true
+        provenance: false
+        tags: ghcr.io/${{ env.REPO_LC }}/u1-communication:${{ inputs.tag }}
+
+    - name: Build & Push u2-blog
+      uses: docker/build-push-action@v7
+      with:
+        context: ./backend
+        file: ./backend/u2-blog/Dockerfile
+        push: true
+        provenance: false
+        tags: ghcr.io/${{ env.REPO_LC }}/u2-blog:${{ inputs.tag }}

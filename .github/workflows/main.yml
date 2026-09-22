@@ -120,13 +120,18 @@ jobs:
   # Ne se déclenche que si les tests passent.
   # Les PR venues d'un fork ne reçoivent aucun secret : elles gardent les tests,
   # sans build ni déploiement.
+  # Les PR de Dependabot non plus : GitHub leur donne un GITHUB_TOKEN en lecture
+  # seule, quelles que soient les `permissions` du job, donc elles ne peuvent pas
+  # publier d'image. Elles sont construites et déployées par dev-dependabot.yml,
+  # qui se déclenche à la fin de ce pipeline avec un jeton normal.
   # ─────────────────────────────────────────────
   build-and-push:
     name: Build & Push Docker images
     needs: [ test, e2e, backend-test ]
     if: >-
       github.event_name == 'push'
-      || github.event.pull_request.head.repo.full_name == github.repository
+      || (github.event.pull_request.head.repo.full_name == github.repository
+          && github.actor != 'dependabot[bot]')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -135,54 +140,18 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Lowercase repo name
-        run: echo "REPO_LC=$(echo "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
-
-      # Sur une PR ouverte par Dependabot, GitHub donne un GITHUB_TOKEN en lecture
-      # seule, quelles que soient les `permissions` du job : il ne peut pas publier
-      # d'image. On passe alors par GHCR_PAT, lu dans le coffre de secrets
-      # Dependabot (qui doit donc le contenir, avec le droit write:packages).
       - name: Log in to GHCR
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
-          username: ${{ github.actor == 'dependabot[bot]' && 'MariusDev80' || github.actor }}
-          password: ${{ github.actor == 'dependabot[bot]' && secrets.GHCR_PAT || secrets.GITHUB_TOKEN }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Tag = SHA du commit construit, et plus `latest` : la dev et la production
-      # tirent chacune un SHA précis (IMAGE_TAG dans docker-compose.yml), une PR ne
-      # peut donc jamais remplacer l'image de production. Sur une PR, github.sha est
-      # le commit de fusion de la PR dans develop : la dev montre ce que develop
-      # deviendrait après le merge.
-      #
-      # `provenance: false` sur les trois images : sans cela, buildx peut publier
-      # un index et un manifeste d'attestation à côté de l'image, soit plusieurs
-      # versions GHCR par build, que le nettoyage (job 6) compterait à tort.
-      - name: Build & Push Front
-        uses: docker/build-push-action@v7
+      - uses: ./.github/actions/build-images
         with:
-          context: ./frontend
-          push: true
-          provenance: false
-          tags: ghcr.io/${{ env.REPO_LC }}/frontend:${{ github.sha }}
-
-      - name: Build & Push u1-communication
-        uses: docker/build-push-action@v7
-        with:
-          context: ./backend
-          file: ./backend/u1-communication/Dockerfile
-          push: true
-          provenance: false
-          tags: ghcr.io/${{ env.REPO_LC }}/u1-communication:${{ github.sha }}
-
-      - name: Build & Push u2-blog
-        uses: docker/build-push-action@v7
-        with:
-          context: ./backend
-          file: ./backend/u2-blog/Dockerfile
-          push: true
-          provenance: false
-          tags: ghcr.io/${{ env.REPO_LC }}/u2-blog:${{ github.sha }}
+          # Sur une PR, github.sha est le commit de fusion de la PR dans develop :
+          # la dev montre ce que develop deviendrait après le merge.
+          tag: ${{ github.sha }}
 
   # ─────────────────────────────────────────────
   # Job 5 : Déploiement de l'environnement dev
@@ -211,109 +180,14 @@ jobs:
           host: ${{ secrets.VPS_IP }}
           user: ${{ secrets.VPS_USER }}
 
-      - name: Deploy to dev
-        env:
-          IMAGE_TAG: ${{ github.sha }}
-          GHCR_PAT: ${{ secrets.GHCR_PAT }}
-          MAIL_HOST: ${{ secrets.MAIL_HOST }}
-          MAIL_PORT: ${{ secrets.MAIL_PORT }}
-          MAIL_SSL: ${{ secrets.MAIL_SSL }}
-          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
-          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-          MAIL_FROM: ${{ secrets.MAIL_FROM }}
-          MAIL_TO: ${{ secrets.MAIL_TO }}
-        run: |
-          set -euo pipefail
-
-          # /opt/citatio-dev est créé une fois, par root, et appartient au compte
-          # de déploiement (qui n'a pas le droit d'écrire dans /opt). S'il manque,
-          # mkdir échoue ici avec un message explicite.
-          ssh citatio-vps 'mkdir -p /opt/citatio-dev/caddy /opt/citatio-dev/backend/docker/postgres'
-          scp docker-compose.yml docker-compose.dev.yml deploy.sh citatio-vps:/opt/citatio-dev/
-          scp caddy/Caddyfile.dev caddy/routes.caddy citatio-vps:/opt/citatio-dev/caddy/
-          scp backend/docker/postgres/init-databases.sh citatio-vps:/opt/citatio-dev/backend/docker/postgres/
-
-          # .env de la dev, réécrit à chaque déploiement.
-          # - Mots de passe Postgres tirés au hasard à chaque fois : la base est
-          #   recréée à chaque déploiement, ils ne servent que le temps de sa vie,
-          #   n'ont pas de secret à gérer, et ne sont jamais ceux de la production.
-          # - SMTP : le même compte que la production, et la même boîte de
-          #   réception. Le nom d'expéditeur signale la dev, pour le tri.
-          # Même précautions que la production : printf, entrée standard de ssh,
-          # fichier né en 600, écriture atomique par mv.
-          {
-            printf 'IMAGE_TAG=%s\n'      "$IMAGE_TAG"
-            printf 'MAIL_HOST=%s\n'      "$MAIL_HOST"
-            printf 'MAIL_PORT=%s\n'      "$MAIL_PORT"
-            printf 'MAIL_SSL=%s\n'       "$MAIL_SSL"
-            printf 'MAIL_USERNAME=%s\n'  "$MAIL_USERNAME"
-            printf 'MAIL_PASSWORD=%s\n'  "$MAIL_PASSWORD"
-            printf 'MAIL_FROM=%s\n'      "$MAIL_FROM"
-            printf 'MAIL_FROM_NAME=%s\n' 'Formulaire Citatio (dev)'
-            printf 'MAIL_TO=%s\n'        "$MAIL_TO"
-            printf 'POSTGRES_PASSWORD=%s\n' "$(openssl rand -hex 32)"
-            printf 'U1_DB_PASSWORD=%s\n'    "$(openssl rand -hex 32)"
-            printf 'U2_DB_PASSWORD=%s\n'    "$(openssl rand -hex 32)"
-          } | ssh citatio-vps \
-                'umask 077 && cat > /opt/citatio-dev/.env.tmp && mv /opt/citatio-dev/.env.tmp /opt/citatio-dev/.env'
-
-          # Le PAT GHCR arrive sur l'entrée standard de deploy.sh, qui le passe
-          # à `docker login --password-stdin`.
-          printf '%s' "$GHCR_PAT" | ssh citatio-vps 'bash /opt/citatio-dev/deploy.sh dev'
-
-      # Contrôles depuis le VPS, dans la gateway dev elle-même : ils ne dépendent ni
-      # du DNS, ni de l'authentification, ni de la configuration de la gateway de
-      # production (appliquée seulement au déploiement de production). Ils
-      # éprouvent donc la pile dev seule, routage Caddy compris.
-      - name: Verify dev
-        run: |
-          ssh citatio-vps 'bash -s' <<'VERIFY'
-          set -euo pipefail
-          # Statut HTTP vu par la gateway dev. wget de busybox (image Caddy alpine)
-          # affiche les en-têtes avec -S, y compris sur une erreur. Il sort en échec
-          # sur un 404 attendu : `|| true`, sinon pipefail arrêterait le script
-          # sans message à la première page d'erreur.
-          status() {
-            { docker exec citatio-dev-gateway wget -S -O /dev/null "http://localhost$1" 2>&1 || true; } \
-              | awk '/^  HTTP\//{code=$2} END{print code}'
-          }
-          check() {
-            got=$(status "$1")
-            if [ "$got" != "$2" ]; then echo "ECHEC $1 : attendu $2, obtenu ${got:-rien}"; exit 1; fi
-            echo "ok $1 -> $got"
-          }
-          ready() {
-            docker exec "$1" wget -qO- "http://localhost:$2/actuator/health/readiness" 2>/dev/null | grep -q '"UP"'
-          }
-
-          # Base neuve et JVM limitées en mémoire : u1 et u2 mettent plus de temps
-          # qu'en production à démarrer. La readiness inclut la base : UP prouve
-          # que les rôles ont été créés et que le schéma s'est appliqué.
-          for _ in $(seq 1 36); do
-            ready citatio-dev-u1 8081 && ready citatio-dev-u2 8082 && break
-            sleep 5
-          done
-          ready citatio-dev-u1 8081 || { echo "ECHEC : u1 pas prêt"; docker logs --tail 80 citatio-dev-u1; exit 1; }
-          ready citatio-dev-u2 8082 || { echo "ECHEC : u2 pas prêt"; docker logs --tail 80 citatio-dev-u2; exit 1; }
-          echo "ok u1 et u2 prêts, base comprise"
-
-          check / 200
-          check /faq 200
-          check /page-inexistante 404
-          check /api/u1/ping-u2 404
-          check /api/u2/ping-u1 404
-          check /api/u1/contact-requests 405
-          VERIFY
-
-      # Vu d'Internet : la dev doit exister et être fermée. Avertissement et non
-      # échec : le bloc dev.citatio-geo.com n'est appliqué qu'au déploiement de
-      # production. Tant qu'il n'a pas eu lieu (première mise en place), la dev
-      # tourne mais n'est pas encore joignable, sans que le déploiement soit en cause.
-      - name: Check dev is reachable and closed
-        run: |
-          got=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 https://dev.citatio-geo.com/ || true)
-          if [ "$got" = 401 ]; then
-            echo "ok https://dev.citatio-geo.com/ -> 401 (authentification demandée)"
-          else
-            echo "::warning::https://dev.citatio-geo.com/ répond ${got:-rien} au lieu de 401 : DNS ou gateway de production pas encore à jour ?"
-          fi
+      - uses: ./.github/actions/deploy-dev
+        with:
+          image-tag: ${{ github.sha }}
+          ghcr-pat: ${{ secrets.GHCR_PAT }}
+          mail-host: ${{ secrets.MAIL_HOST }}
+          mail-port: ${{ secrets.MAIL_PORT }}
+          mail-ssl: ${{ secrets.MAIL_SSL }}
+          mail-username: ${{ secrets.MAIL_USERNAME }}
+          mail-password: ${{ secrets.MAIL_PASSWORD }}
+          mail-from: ${{ secrets.MAIL_FROM }}
+          mail-to: ${{ secrets.MAIL_TO }}

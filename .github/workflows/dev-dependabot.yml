@@ -1,0 +1,127 @@
+name: Dev deployment for Dependabot
+
+# Construit et déploie en dev les PR de Dependabot, que main.yml ne peut pas
+# traiter : GitHub donne un GITHUB_TOKEN en lecture seule aux pipelines lancés
+# par Dependabot, quelles que soient les `permissions` demandées, pour qu'une
+# mise à jour de dépendance hostile ne puisse rien publier.
+#
+# Le contournement précédent était un PAT dans le coffre de secrets Dependabot.
+# Il a été refusé par GHCR le 21 septembre 2026 sans raison visible, et chaque PR
+# a dû être reprise à la main. `workflow_run` est la réponse documentée par
+# GitHub : ce workflow se déclenche à la FIN du pipeline de tests, s'exécute dans
+# le contexte du dépôt et non de la PR, et reçoit donc un jeton normal. Plus
+# aucun secret de longue durée à entretenir pour Dependabot.
+#
+# À savoir, et c'est la contrepartie du procédé :
+#  - GitHub lit toujours ce fichier depuis la branche par défaut, jamais depuis
+#    la PR. Une modification ne s'éprouve donc qu'une fois sur `develop`.
+#  - Le résultat n'apparaît pas dans les contrôles de la PR, mais dans l'onglet
+#    Actions, sous ce nom.
+#  - Le build exécute le code de la PR (un `npm ci` lance les scripts
+#    d'installation des dépendances) dans un contexte qui détient un jeton
+#    d'écriture. Le risque existait déjà avec le PAT, disponible dans le même
+#    job ; il n'augmente pas, et un secret permanent disparaît.
+on:
+  workflow_run:
+    workflows: [ "CI/CD Pipeline" ]
+    types: [ completed ]
+
+permissions: {}
+
+jobs:
+  build-and-deploy:
+    name: Deploy Dependabot PR to dev
+    # Uniquement une PR de Dependabot, ouverte depuis une branche du dépôt, dont
+    # les trois suites de tests viennent de passer. Un pipeline en échec, un push
+    # sur develop ou la PR d'une personne ne passent pas par ici.
+    if: >-
+      github.event.workflow_run.event == 'pull_request'
+      && github.event.workflow_run.conclusion == 'success'
+      && github.event.workflow_run.actor.login == 'dependabot[bot]'
+      && github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      # Le dernier step laisse un commentaire sur la PR : il faut l'écriture.
+      pull-requests: write
+    # Même groupe que main.yml : un seul déploiement dev à la fois, quel que soit
+    # le workflow qui le demande.
+    concurrency:
+      group: deploy-dev
+      cancel-in-progress: false
+
+    steps:
+      # La PR n'est pas donnée par le contexte quand le pipeline a été relancé :
+      # on la retrouve par sa branche, qui est celle du pipeline terminé.
+      - name: Find the pull request
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          set -euo pipefail
+          number=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$BRANCH" \
+                     --state open --json number --jq '.[0].number')
+          if [ -z "$number" ]; then echo "ECHEC : aucune PR ouverte sur $BRANCH"; exit 1; fi
+          echo "PR #$number, branche $BRANCH"
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+
+      # Le commit de fusion de la PR dans develop, comme main.yml le fait pour
+      # les PR de l'équipe : la dev montre ce que develop deviendrait après le
+      # merge, et non la seule tête de la branche.
+      - uses: actions/checkout@v7
+        with:
+          ref: refs/pull/${{ steps.pr.outputs.number }}/merge
+
+      - name: Read the merge commit
+        id: commit
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: ./.github/actions/build-images
+        with:
+          tag: ${{ steps.commit.outputs.sha }}
+
+      - uses: ./.github/actions/vps-ssh
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.VPS_IP }}
+          user: ${{ secrets.VPS_USER }}
+
+      - uses: ./.github/actions/deploy-dev
+        with:
+          image-tag: ${{ steps.commit.outputs.sha }}
+          ghcr-pat: ${{ secrets.GHCR_PAT }}
+          mail-host: ${{ secrets.MAIL_HOST }}
+          mail-port: ${{ secrets.MAIL_PORT }}
+          mail-ssl: ${{ secrets.MAIL_SSL }}
+          mail-username: ${{ secrets.MAIL_USERNAME }}
+          mail-password: ${{ secrets.MAIL_PASSWORD }}
+          mail-from: ${{ secrets.MAIL_FROM }}
+          mail-to: ${{ secrets.MAIL_TO }}
+
+      # Le résultat n'apparaît pas dans les contrôles de la PR : on le dit dans
+      # la PR elle-même, pour que la personne qui la relit sache que la dev
+      # tourne sur ce commit, et depuis quand.
+      - name: Comment on the pull request
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ steps.pr.outputs.number }}
+          SHA: ${{ steps.commit.outputs.sha }}
+          RESULT: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          if [ "$RESULT" = success ]; then
+            body="Déployée en dev sur https://dev.citatio-geo.com (commit de fusion \`${SHA:0:7}\`), contrôles passés."
+          else
+            body="Le déploiement en dev a échoué pour cette PR. Voir le détail : $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          fi
+          gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body "$body"
