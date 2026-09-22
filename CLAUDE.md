@@ -193,7 +193,8 @@ citatio/
 ├── Caddyfile                     ← gateway de production : domaines, TLS, www, porte de la dev
 ├── caddy/routes.caddy            ← en-têtes, diagnostics, routage /api/uX, communs prod et dev
 ├── caddy/Caddyfile.dev           ← gateway dev, derrière celle de production
-├── .github/workflows/main.yml    ← tests, build, déploiement dev, nettoyage GHCR
+├── .github/workflows/main.yml    ← tests, build, déploiement dev
+├── .github/workflows/cleanup-ghcr.yml ← ménage quotidien des images GitHub Packages
 ├── .github/workflows/deploy-prod.yml ← bouton de mise en production (et de retour en arrière)
 ├── .github/actions/vps-ssh/      ← connexion SSH au VPS, clé d'hôte vérifiée, commune aux deux
 ├── deploy.sh                     ← exécuté sur le VPS : `deploy.sh prod` ou `deploy.sh dev`
@@ -341,8 +342,11 @@ Caddy (TLS, gateway) → nginx (statique) ou microservices Spring.
   les forks) : build et push des trois images **taguées par SHA** (jamais `latest`), puis
   **déploiement en dev** et contrôles depuis le VPS (u1 et u2 prêts base comprise, 200, 404,
   diagnostics coupés, 405). Un nouveau commit sur une PR annule le pipeline du précédent ; les
-  déploiements dev passent en série, le dernier l'emporte. Sur push `develop` seulement, le
-  nettoyage GHCR garde les 20 dernières versions de chaque image, plus celle taguée `prod`.
+  déploiements dev passent en série, le dernier l'emporte.
+- **Nettoyage GHCR** (`.github/workflows/cleanup-ghcr.yml`) : **une fois par jour**, à 3 h 30 UTC,
+  et à la demande. Garde les 20 dernières versions de chaque image, plus celle taguée `prod`.
+  Il tournait à la fin de chaque déploiement : un build a alors échoué sur `ERROR: unknown blob`,
+  très probablement parce qu'il réutilisait des couches qu'un nettoyage concurrent supprimait.
 - **CI/CD, production** (`.github/workflows/deploy-prod.yml`) : **uniquement à la main**, onglet
   Actions, « Deploy production », sur `develop`. Rien n'est reconstruit : le bouton **refuse un commit
   qui n'a pas réussi son déploiement dev** sur un push `develop`, tague ses images `prod`, et les
