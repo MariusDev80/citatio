@@ -1,0 +1,152 @@
+name: Déployer l'environnement dev
+description: >
+  Copie la configuration sur le VPS, écrit le .env de la dev, lance
+  `deploy.sh dev`, puis vérifie la pile depuis le VPS et depuis Internet.
+  La connexion ssh doit être préparée avant, par l'action vps-ssh.
+
+# Action locale plutôt que ce bloc recopié dans main.yml et dans
+# dev-dependabot.yml : les deux chemins (PR de l'équipe, PR de Dependabot)
+# déploient et vérifient exactement la même chose, et une correction ne se fait
+# qu'à un endroit.
+
+inputs:
+  image-tag:
+    description: SHA du commit dont les images ont été construites.
+    required: true
+  ghcr-pat:
+    description: Jeton de lecture de GHCR, transmis à deploy.sh pour `docker login`.
+    required: true
+  mail-host:
+    description: Serveur SMTP.
+    required: true
+  mail-port:
+    description: Port SMTP.
+    required: true
+  mail-ssl:
+    description: SSL SMTP.
+    required: true
+  mail-username:
+    description: Compte SMTP.
+    required: true
+  mail-password:
+    description: Mot de passe SMTP.
+    required: true
+  mail-from:
+    description: Adresse d'expédition.
+    required: true
+  mail-to:
+    description: Adresse de réception des demandes.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Deploy to dev
+      env:
+        IMAGE_TAG: ${{ inputs.image-tag }}
+        GHCR_PAT: ${{ inputs.ghcr-pat }}
+        MAIL_HOST: ${{ inputs.mail-host }}
+        MAIL_PORT: ${{ inputs.mail-port }}
+        MAIL_SSL: ${{ inputs.mail-ssl }}
+        MAIL_USERNAME: ${{ inputs.mail-username }}
+        MAIL_PASSWORD: ${{ inputs.mail-password }}
+        MAIL_FROM: ${{ inputs.mail-from }}
+        MAIL_TO: ${{ inputs.mail-to }}
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        # /opt/citatio-dev est créé une fois, par root, et appartient au compte
+        # de déploiement (qui n'a pas le droit d'écrire dans /opt). S'il manque,
+        # mkdir échoue ici avec un message explicite.
+        ssh citatio-vps 'mkdir -p /opt/citatio-dev/caddy /opt/citatio-dev/backend/docker/postgres'
+        scp docker-compose.yml docker-compose.dev.yml deploy.sh citatio-vps:/opt/citatio-dev/
+        scp caddy/Caddyfile.dev caddy/routes.caddy citatio-vps:/opt/citatio-dev/caddy/
+        scp backend/docker/postgres/init-databases.sh citatio-vps:/opt/citatio-dev/backend/docker/postgres/
+
+        # .env de la dev, réécrit à chaque déploiement.
+        # - Mots de passe Postgres tirés au hasard à chaque fois : la base est
+        #   recréée à chaque déploiement, ils ne servent que le temps de sa vie,
+        #   n'ont pas de secret à gérer, et ne sont jamais ceux de la production.
+        # - SMTP : le même compte que la production, et la même boîte de
+        #   réception. Le nom d'expéditeur signale la dev, pour le tri.
+        # Même précautions que la production : printf, entrée standard de ssh,
+        # fichier né en 600, écriture atomique par mv.
+        {
+          printf 'IMAGE_TAG=%s\n'      "$IMAGE_TAG"
+          printf 'MAIL_HOST=%s\n'      "$MAIL_HOST"
+          printf 'MAIL_PORT=%s\n'      "$MAIL_PORT"
+          printf 'MAIL_SSL=%s\n'       "$MAIL_SSL"
+          printf 'MAIL_USERNAME=%s\n'  "$MAIL_USERNAME"
+          printf 'MAIL_PASSWORD=%s\n'  "$MAIL_PASSWORD"
+          printf 'MAIL_FROM=%s\n'      "$MAIL_FROM"
+          printf 'MAIL_FROM_NAME=%s\n' 'Formulaire Citatio (dev)'
+          printf 'MAIL_TO=%s\n'        "$MAIL_TO"
+          printf 'POSTGRES_PASSWORD=%s\n' "$(openssl rand -hex 32)"
+          printf 'U1_DB_PASSWORD=%s\n'    "$(openssl rand -hex 32)"
+          printf 'U2_DB_PASSWORD=%s\n'    "$(openssl rand -hex 32)"
+        } | ssh citatio-vps \
+              'umask 077 && cat > /opt/citatio-dev/.env.tmp && mv /opt/citatio-dev/.env.tmp /opt/citatio-dev/.env'
+
+        # Le PAT GHCR arrive sur l'entrée standard de deploy.sh, qui le passe
+        # à `docker login --password-stdin`.
+        printf '%s' "$GHCR_PAT" | ssh citatio-vps 'bash /opt/citatio-dev/deploy.sh dev'
+
+    # Contrôles depuis le VPS, dans la gateway dev elle-même : ils ne dépendent ni
+    # du DNS, ni de l'authentification, ni de la configuration de la gateway de
+    # production (appliquée seulement au déploiement de production). Ils
+    # éprouvent donc la pile dev seule, routage Caddy compris.
+    - name: Verify dev
+      shell: bash
+      run: |
+        ssh citatio-vps 'bash -s' <<'VERIFY'
+        set -euo pipefail
+        # Statut HTTP vu par la gateway dev. wget de busybox (image Caddy alpine)
+        # affiche les en-têtes avec -S, y compris sur une erreur. Il sort en échec
+        # sur un 404 attendu : `|| true`, sinon pipefail arrêterait le script
+        # sans message à la première page d'erreur.
+        status() {
+          { docker exec citatio-dev-gateway wget -S -O /dev/null "http://localhost$1" 2>&1 || true; } \
+            | awk '/^  HTTP\//{code=$2} END{print code}'
+        }
+        check() {
+          got=$(status "$1")
+          if [ "$got" != "$2" ]; then echo "ECHEC $1 : attendu $2, obtenu ${got:-rien}"; exit 1; fi
+          echo "ok $1 -> $got"
+        }
+        ready() {
+          docker exec "$1" wget -qO- "http://localhost:$2/actuator/health/readiness" 2>/dev/null | grep -q '"UP"'
+        }
+
+        # Base neuve et JVM limitées en mémoire : u1 et u2 mettent plus de temps
+        # qu'en production à démarrer. La readiness inclut la base : UP prouve
+        # que les rôles ont été créés et que le schéma s'est appliqué.
+        for _ in $(seq 1 36); do
+          ready citatio-dev-u1 8081 && ready citatio-dev-u2 8082 && break
+          sleep 5
+        done
+        ready citatio-dev-u1 8081 || { echo "ECHEC : u1 pas prêt"; docker logs --tail 80 citatio-dev-u1; exit 1; }
+        ready citatio-dev-u2 8082 || { echo "ECHEC : u2 pas prêt"; docker logs --tail 80 citatio-dev-u2; exit 1; }
+        echo "ok u1 et u2 prêts, base comprise"
+
+        check / 200
+        check /faq 200
+        check /page-inexistante 404
+        check /api/u1/ping-u2 404
+        check /api/u2/ping-u1 404
+        check /api/u1/contact-requests 405
+        VERIFY
+
+    # Vu d'Internet : la dev doit exister et être fermée. Avertissement et non
+    # échec : le bloc dev.citatio-geo.com n'est appliqué qu'au déploiement de
+    # production. Tant qu'il n'a pas eu lieu (première mise en place), la dev
+    # tourne mais n'est pas encore joignable, sans que le déploiement soit en cause.
+    - name: Check dev is reachable and closed
+      shell: bash
+      run: |
+        got=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 https://dev.citatio-geo.com/ || true)
+        if [ "$got" = 401 ]; then
+          echo "ok https://dev.citatio-geo.com/ -> 401 (authentification demandée)"
+        else
+          echo "::warning::https://dev.citatio-geo.com/ répond ${got:-rien} au lieu de 401 : DNS ou gateway de production pas encore à jour ?"
+        fi
