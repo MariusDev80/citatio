@@ -189,6 +189,11 @@ services:
       # Seul lien entre la production et la dev : la gateway de production y
       # rejoint la gateway dev, et aucun autre conteneur.
       - edge
+      # Lien vers le CRM (depot citatio-crm, crm.citatio-geo.com) : seuls la
+      # gateway de production et citatio-crm-app y sont relies. Reseau distinct de
+      # citatio-edge, pour que la dev, qui fait tourner le code des PR, ne puisse
+      # pas joindre le CRM sans passer par la gateway.
+      - crm
     depends_on:
       - frontend
       - u1-communication
@@ -200,3 +205,7 @@ networks:
   # deploiements n'importe pas.
   edge:
     name: citatio-edge
+  # Meme principe que edge : cree par la production, ou par le deploiement du
+  # CRM s'il passe en premier, avec les etiquettes que Compose poserait ici.
+  crm:
+    name: citatio-crm-edge
