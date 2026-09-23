@@ -63,6 +63,11 @@ services:
       - ./caddy/Caddyfile.dev:/etc/caddy/Caddyfile:ro
       - ./caddy/routes.caddy:/etc/caddy/routes.caddy:ro
     env_file: !reset []
+    # Sans ce !override, la gateway dev heriterait du reseau citatio-crm-edge de
+    # la production et joindrait le CRM directement.
+    networks: !override
+      - default
+      - edge
 
 volumes:
   dev-db:

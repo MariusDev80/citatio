@@ -47,3 +47,32 @@ dev.citatio-geo.com {
     # deploiement, seul ce domaine repond 502, la production n'est pas touchee.
     reverse_proxy citatio-dev-gateway:80
 }
+
+# CRM interne de l'agence (depot citatio-crm), deploye a part dans
+# /opt/citatio-crm. La gateway de production le joint par le reseau
+# citatio-crm-edge ; resolu a chaque connexion : CRM arrete ou en cours de
+# deploiement, seul ce domaine repond 502.
+crm.citatio-geo.com {
+    encode zstd gzip
+
+    # Pas de routes.caddy ici : ses regles (diagnostics /api/uX, routage) sont
+    # celles du site. En-tetes de securite repris, cadre interdit, et noindex :
+    # l'ecran de connexion n'a rien a faire dans les resultats de recherche.
+    header {
+        Strict-Transport-Security "max-age=63072000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        X-Frame-Options "DENY"
+        Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+        X-Robots-Tag "noindex, nofollow"
+        -Server
+    }
+
+    # Pieces jointes limitees a 20 Mo par le CRM (MAX_UPLOAD_MB) : marge pour
+    # l'encodage multipart, refus en 413 au-dela sans rien transmettre.
+    request_body {
+        max_size 25MB
+    }
+
+    reverse_proxy citatio-crm-app:3000
+}

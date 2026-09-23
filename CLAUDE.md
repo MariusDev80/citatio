@@ -169,6 +169,7 @@ La liste complète des sept points est en §7. En oublier un (typiquement le `si
 | Retirer une étape `scp` d'un workflow de déploiement | `docker-compose.yml`, le `Caddyfile` et les routes ne seraient plus déployés : le VPS resterait sur l'ancienne configuration, en silence. |
 | Pousser sur `develop` sans demande explicite, ou lancer « Deploy production » | Un push sur `develop` **redéploie la dev**, qu'une PR en cours de test occupait peut-être. Le bouton **met en production**. |
 | Faire rejoindre `citatio-edge` à un autre conteneur que les deux gateways | Les noms de service (`frontend`, `u1-communication`) s'y résoudraient entre dev et production : la gateway de production pourrait servir la dev. |
+| Faire rejoindre `citatio-crm-edge` à la gateway dev ou à un conteneur du site | Le code d'une PR, ou un service compromis du site, joindrait le CRM et ses données clients sans passer par la gateway. |
 | Remettre un tag `latest` dans le déploiement | La dev et la production tirent un SHA précis. Avec `latest`, une PR pourrait remplacer l'image de production. |
 | Annoncer une vérification qui n'a pas tourné | Voir §2.5. |
 
@@ -387,6 +388,13 @@ Caddy (TLS, gateway) → nginx (statique) ou microservices Spring.
   Les notifications du formulaire partent vers la même boîte que la production, expéditeur
   « Formulaire Citatio (dev) ». À savoir : le workflow et `deploy.sh` exécutés pour une PR sont ceux
   de la branche, donc quiconque peut pousser une branche agit sur le VPS.
+- **CRM interne** (`https://crm.citatio-geo.com`, dépôt `citatio-crm`) : même VPS, projet Compose
+  `citatio-crm` dans `/opt/citatio-crm`, déployé par le workflow manuel de son propre dépôt. Ce
+  dépôt-ci n'en porte que l'entrée : le bloc `crm.citatio-geo.com` du `Caddyfile` (en-têtes, noindex,
+  corps limité à 25 Mo) relaie vers `citatio-crm-app:3000` par le réseau `citatio-crm-edge`, où ne se
+  trouvent que la gateway de production et l'application CRM. La gateway dev en est exclue
+  (`networks: !override` dans `docker-compose.dev.yml`) : le code d'une PR ne joint pas le CRM.
+  CRM arrêté : seul ce domaine répond 502, le site n'est pas touché.
 - **Secrets** : `VPS_IP`, `VPS_USER`, `SSH_PRIVATE_KEY`, `GHCR_PAT`, les `MAIL_*`, et
   `POSTGRES_PASSWORD`, `U1_DB_PASSWORD`, `U2_DB_PASSWORD`, `DEV_AUTH_HASH` (sortie de
   `caddy hash-password`), côté GitHub, dans le **coffre Actions uniquement**. Le coffre Dependabot
