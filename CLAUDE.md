@@ -65,16 +65,16 @@ Ce que le dépôt contient vraiment, pour éviter de raisonner sur un système i
 | Environnement dev (`dev.citatio-geo.com`, même VPS, cloisonné) | **Déployé à chaque commit de PR et push sur `develop`**. La production ne part plus que par le bouton « Deploy production » (§4.3) |
 | Gateway Caddy, TLS, en-têtes de sécurité, routage `/api/uX` | **Opérationnelle** |
 | `u1-communication` (Spring Boot) | **Une fonction réelle** : réception du formulaire de contact (entité `ContactRequest`, envoi SMTP asynchrone). Le reste (`/health`, sondes, `ping-u2`) est inchangé |
-| `u2-blog` (Spring Boot) | **Squelette** : `/health`, sondes Actuator et `ping-u1`, aucune entité métier |
+| `u2-blog` (Spring Boot) | **Articles** : liste paginée avec recherche (titre et chapeau, sans casse ni accents), lecture, publication multipart avec image (en base), rubriques. Schéma sous **Flyway** (`V1__articles.sql`, `ddl-auto=validate`). **Publication non protégée** |
 | Indépendance des deux microservices | **Acquise** : aucun `depends_on` croisé, appels absorbés par `UpstreamClient` (timeouts, disjoncteur, dégradation gracieuse) |
-| Consommation du backend par le frontend | **Un seul appel** : `ContactService` poste sur `/api/u1/contact-requests`. `provideHttpClient(withFetch())` est en place, les 11 routes restent pré-rendues et aucune requête ne part au rendu |
+| Consommation du backend par le frontend | `ContactService` (`/api/u1/contact-requests`) et `BlogService` (`/api/u2/articles`, `/api/u2/article-categories`). Les 11 routes restent pré-rendues et aucune requête ne part au rendu : les routes du blog sont rendues côté client |
 | Formulaire de contact | **Branché sur `u1-communication`** : la demande est enregistrée en base puis notifiée par email. Le `mailto:` a été retiré |
-| Blog | **Pas commencé**, prévu sur `u2-blog` |
+| Blog | **Première étape, fermé au public** : `/blog`, `/blog/nouvel-article`, `/blog/:slug`, rendus côté client, en `noindex`, absents de la navigation, du sitemap et de `llms.txt` |
 
 Conséquence pratique : **une modification du frontend n'a toujours besoin d'aucun backend démarré**,
-les 11 routes étant pré-rendues au build. Seul l'envoi du formulaire de contact appelle une API, et
-seulement sur un clic du visiteur. En dehors de ce point, ne raisonne pas comme si une API était
-branchée : il n'y en a qu'une.
+les 11 routes étant pré-rendues au build. Seuls le formulaire de contact et le blog appellent une
+API ; les e2e du blog simulent u2-blog avec `page.route`. En développement, `ng serve` relaie
+`/api/u1` et `/api/u2` vers `localhost:8081` et `8082` (`proxy.conf.json`).
 
 ---
 
@@ -235,11 +235,15 @@ citatio/
 **CSS pur** (jamais de SCSS) · **Vitest** (unitaire) · **Playwright** (e2e) · TypeScript strict.
 
 **Rendu** : les 11 routes sont **pré-rendues** (`app.routes.server.ts`, `RenderMode.Prerender`),
-la 404 seule est rendue côté client. Le build produit du HTML statique servi par nginx. C'est un
+la 404 et le blog sont rendus côté client. Ce fichier n'a d'effet que par `withRoutes(serverRoutes)`
+dans `app.config.server.ts` et `"outputMode": "static"` dans `angular.json` : avec l'ancienne option
+`"prerender": true`, le build pré-rendait toute route sans paramètre et ignorait les `renderMode`. Le build produit du HTML statique servi par nginx. C'est un
 **argument commercial affiché sur `/ce-site`** : le contenu doit être dans le HTML source, jamais
 injecté par JavaScript. Un test e2e verrouille cette propriété. Toute page future qui dépendra d'une
-API (le blog en premier) devra **choisir explicitement** son mode de rendu, prerender au build ou
-rendu serveur, et ce choix se justifie dans le code.
+API devra **choisir explicitement** son mode de rendu, et ce choix se justifie dans le code. Le blog
+a pris le rendu client, faute de mieux : le build ne joint pas l'API, et la production n'a pas de
+serveur Node. nginx sert `/blog` et `/blog/*` en 200 avec `index.csr.html` (une adresse d'article
+inconnue répond donc 200), d'où le `noindex` (`BLOG_ROBOTS`) tant que ce choix n'est pas revu.
 
 **Règles non négociables :**
 
@@ -304,8 +308,9 @@ JPA · PostgreSQL 15 · Lombok · Maven multi-modules · JUnit 5 + Mockito (H2 e
 - **Interdits** : injection par champ, logique métier dans un contrôleur (elle va en `@Service`),
   exposition d'entités JPA (toujours mapper vers un record), `System.out.println` (SLF4J `@Slf4j`),
   types bruts.
-- **Dette connue** : `spring.jpa.hibernate.ddl-auto=update` sur les deux modules. Dès qu'une entité
-  réelle apparaît, passer à **Flyway** avant la première mise en production de schéma.
+- **Schéma** : `u2-blog` est sous **Flyway** (`db/migration`, SQL commun à Postgres et H2, rejoué
+  par les tests) avec `ddl-auto=validate`. **Dette connue** : `u1-communication` reste en
+  `ddl-auto=update`, sa table `contact_request` est à reprendre dans une migration.
 - Les origines CORS sont **fermées** (`citatio.cors.allowed-origins`, la production par défaut).
   En dev avec `ng serve` : `CORS_ALLOWED_ORIGINS=http://localhost:4200`.
 
@@ -632,7 +637,7 @@ npm run check:contrast          # balayage de contraste en thème sombre, après
 npm run build:og                # régénère public/og-citatio.png depuis tools/og-image.html
 
 # Backend, depuis backend/
-./mvnw -B test                  # les 40 tests des trois modules (ce que lance la CI)
+./mvnw -B test                  # les 74 tests des trois modules (ce que lance la CI)
 ./mvnw clean package            # les trois modules
 ./mvnw -pl u2-blog -am package  # un module et ses dépendances
 
@@ -657,7 +662,7 @@ npx lighthouse http://localhost:4173 --preset=desktop --view
   des prix, absence de fausse preuve sociale, polices auto-hébergées, contenu présent dans le HTML
   pré-rendu, bascule de thème. S'ils tombent, la bonne réaction est presque toujours de corriger le
   code, pas le test.
-- Côté backend, 40 tests tournent sur H2 en mémoire, **sans aucune base externe**, et la CI les
+- Côté backend, 74 tests tournent sur H2 en mémoire, **sans aucune base externe**, et la CI les
   lance sur tout push et toute PR (job `backend-test`). Trois familles sont des garde-fous et non des
   tests fonctionnels : `UpstreamClientTest` (aucune exception ne remonte d'un voisin coupé, le motif
   ne fuit pas, le circuit s'ouvre), `ApiExceptionHandlerTest` (une URL inconnue rend 404 et non
@@ -753,11 +758,14 @@ Non priorisés ici : la priorisation appartient au propriétaire.
 
 - Renseigner les secrets SMTP (`MAIL_*`) côté GitHub Actions : sans eux, une demande de contact est
   bien enregistrée en base mais aucune notification ne part (statut `FAILED`).
-- Passer à **Flyway** : `ContactRequest` est la première entité réelle, sa table est aujourd'hui
-  créée par `ddl-auto: update`. La migration doit être posée avant qu'une deuxième entité arrive.
+- Passer `u1-communication` à **Flyway**, comme `u2-blog` : la table `contact_request` existe déjà
+  en production, la première migration doit en tenir compte (`baseline-on-migrate`).
 - Rejouer les notifications en échec (`mail_status = FAILED`), aujourd'hui repérables seulement en
   lisant la table ou les logs.
-- Premières entités métier de `u2-blog` et pages blog côté Angular.
+- Ouvrir le blog : protéger la publication, trancher le mode de rendu (rendu serveur ou pré-rendu
+  alimenté par l'API), puis lever `BLOG_ROBOTS` et appliquer la liste de §7 (navigation, sitemap,
+  `llms.txt`). Les deux garde-fous e2e « tant qu'il est fermé » sont à mettre à jour ce jour-là.
+  Ensuite : modification et suppression logique d'un article.
 - Figer les tarifs de `pricing.config.ts` (aujourd'hui provisoires, marqués comme tels) une fois
   validés par le propriétaire.
 - Migrer progressivement les commentaires anglais du frontend vers le français.

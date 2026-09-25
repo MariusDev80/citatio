@@ -78,9 +78,8 @@ export function toContactFailure(error: HttpErrorResponse): ContactFailure {
  * déclenche. Une URL absolue devrait par ailleurs être connue à la compilation,
  * alors que le domaine appartient à l'infrastructure.
  *
- * <p>En développement avec `ng serve`, l'origine diffère (localhost:4200) :
- * lancer u1-communication avec `CORS_ALLOWED_ORIGINS=http://localhost:4200`,
- * ou passer par un proxy de développement.
+ * <p>En développement, `ng serve` relaie `/api/u1` et `/api/u2` vers les
+ * microservices locaux (`proxy.conf.json`) : même origine, pas de CORS à ouvrir.
  */
 @Injectable({ providedIn: 'root' })
 export class ContactService {

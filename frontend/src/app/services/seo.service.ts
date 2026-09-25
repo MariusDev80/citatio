@@ -10,7 +10,15 @@ export interface SeoData {
   title: string;
   description: string;
   ogImage?: string;
+  /**
+   * Consigne aux moteurs, `index, follow` par défaut (la valeur de index.html).
+   * Sert aux pages qui existent sans devoir être trouvées, comme le blog tant
+   * qu'il n'est pas ouvert au public.
+   */
+  robots?: string;
 }
+
+const DEFAULT_ROBOTS = 'index, follow';
 
 /**
  * Service SSR-compatible qui met à jour les meta tags à chaque navigation.
@@ -43,6 +51,18 @@ export class SeoService {
       .subscribe(({ seo, path }) => this.updateMeta(seo, path));
   }
 
+  /**
+   * Remplace les meta de la page courante, après la navigation.
+   *
+   * Pour les pages dont le titre vient de l'API (un article) : les `data.seo`
+   * de la route, posés à la fin de la navigation, ne connaissent pas encore
+   * l'article. La page les remplace une fois l'article chargé.
+   */
+  updatePage(seo: SeoData): void {
+    const path = this.router.url.split(/[?#]/)[0].replace(/^\//, '');
+    this.updateMeta(seo, path);
+  }
+
   private updateMeta(seo: SeoData | undefined, path: string): void {
     const pageTitle = seo?.title ?? COMPANY.name;
     const description = seo?.description ?? COMPANY.description;
@@ -52,6 +72,7 @@ export class SeoService {
     this.title.setTitle(pageTitle);
 
     this.meta.updateTag({ name: 'description', content: description });
+    this.meta.updateTag({ name: 'robots', content: seo?.robots ?? DEFAULT_ROBOTS });
     this.meta.updateTag({ property: 'og:title', content: pageTitle });
     this.meta.updateTag({ property: 'og:description', content: description });
     this.meta.updateTag({ property: 'og:url', content: canonicalUrl });

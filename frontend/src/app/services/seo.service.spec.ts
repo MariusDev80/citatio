@@ -20,6 +20,11 @@ const testRoutes = [
     component: StubComponent,
     data: { seo: { title: 'À propos, Test', description: 'Description à propos test' } },
   },
+  {
+    path: 'blog/:slug',
+    component: StubComponent,
+    data: { seo: { title: 'Blog', description: 'Blog', robots: 'noindex, nofollow' } },
+  },
 ];
 
 describe('SeoService', () => {
@@ -61,5 +66,26 @@ describe('SeoService', () => {
       .toBe('À propos, Test');
     expect(document.querySelector('meta[property="og:description"]')?.getAttribute('content'))
       .toBe('Description à propos test');
+  });
+
+  it('pose la consigne robots de la route, puis revient à la valeur par défaut', async () => {
+    const harness = await RouterTestingHarness.create('/blog/un-article');
+    const robots = () => document.querySelector('meta[name="robots"]')?.getAttribute('content');
+    expect(robots()).toBe('noindex, nofollow');
+
+    // Sans ce retour, une navigation depuis le blog laisserait tout le site en
+    // noindex jusqu'au prochain rechargement.
+    await harness.navigateByUrl('/qui-sommes-nous');
+    expect(robots()).toBe('index, follow');
+  });
+
+  it('remplace les meta de la page courante une fois ses données chargées', async () => {
+    await RouterTestingHarness.create('/blog/un-article?source=liste');
+    service.updatePage({ title: 'Un article | Citatio', description: 'Son chapeau' });
+
+    expect(document.title).toBe('Un article | Citatio');
+    // La canonique ignore la query string.
+    const canonical = document.querySelector('link[rel="canonical"]');
+    expect(canonical?.getAttribute('href')).toBe('https://citatio-geo.com/blog/un-article');
   });
 });

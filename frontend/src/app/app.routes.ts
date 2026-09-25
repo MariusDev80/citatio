@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { SeoData } from './services/seo.service';
+import { BLOG_ROBOTS } from './pages/blog/blog-format';
 
 export const routes: Routes = [
   {
@@ -122,6 +123,49 @@ export const routes: Routes = [
       } satisfies SeoData,
     },
     loadComponent: () => import('./pages/legal/legal.component').then(m => m.LegalComponent),
+  },
+  // Blog : rendu côté client et hors index pour l'instant (voir BLOG_ROBOTS
+  // et app.routes.server.ts). Absent de la navigation, du sitemap et de
+  // llms.txt tant qu'il n'est pas ouvert au public.
+  {
+    path: 'blog',
+    data: {
+      seo: {
+        title: 'Blog, notes d\'atelier | Citatio',
+        description:
+          'Ce que nous apprenons en construisant des sites vitrines : ce qu\'ils coûtent, comment ils se trouvent sur Google, comment ils restent en ligne.',
+        robots: BLOG_ROBOTS,
+      } satisfies SeoData,
+    },
+    loadComponent: () =>
+      import('./pages/blog/blog-list/blog-list.component').then(m => m.BlogListComponent),
+  },
+  {
+    // Déclarée avant `blog/:slug`, qu'elle masquerait sinon. Le serveur ne
+    // donne jamais cette adresse à un article (ArticleSlugs.RESERVED).
+    path: 'blog/nouvel-article',
+    data: {
+      seo: {
+        title: 'Rédiger un article | Citatio',
+        description: 'Formulaire de publication du blog Citatio.',
+        robots: BLOG_ROBOTS,
+      } satisfies SeoData,
+    },
+    loadComponent: () =>
+      import('./pages/blog/article-form/article-form.component').then(m => m.ArticleFormComponent),
+  },
+  {
+    path: 'blog/:slug',
+    data: {
+      // Provisoire : la page les remplace une fois l'article chargé.
+      seo: {
+        title: 'Article | Citatio',
+        description: 'Un article du blog Citatio.',
+        robots: BLOG_ROBOTS,
+      } satisfies SeoData,
+    },
+    loadComponent: () =>
+      import('./pages/blog/article/article.component').then(m => m.ArticleComponent),
   },
   {
     path: '**',
