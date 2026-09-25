@@ -41,9 +41,14 @@ const json = (route: Route, body: unknown, status = 200) =>
 /** API simulée. `articles` sert la liste ; les autres cas se surchargent test par test. */
 async function mockApi(page: Page, articles: unknown[] = [ARTICLE]) {
   await page.route('**/api/u2/article-categories', (route) => json(route, CATEGORIES));
-  await page.route('**/api/u2/articles?*', (route) =>
-    json(route, { items: articles, page: 0, size: 12, totalItems: articles.length, totalPages: 1 }),
-  );
+  // Filtre grossier sur le titre, suffisant pour vérifier que la page
+  // transmet `q` et affiche ce que l'API renvoie. La vraie recherche
+  // (accents, chapeau, jokers) est testée côté Java, dans ArticleApiTest.
+  await page.route('**/api/u2/articles?*', (route) => {
+    const q = new URL(route.request().url()).searchParams.get('q')?.toLowerCase() ?? '';
+    const items = (articles as { title: string }[]).filter((a) => a.title.toLowerCase().includes(q));
+    return json(route, { items, page: 0, size: 12, totalItems: items.length, totalPages: items.length ? 1 : 0 });
+  });
   await page.route(`**/api/u2/articles/${ARTICLE.slug}`, (route) => json(route, ARTICLE));
   await page.route(`**/api/u2/articles/${ARTICLE.slug}/image`, (route) =>
     route.fulfill({ status: 200, contentType: 'image/png', body: PIXEL }),
@@ -84,6 +89,44 @@ test.describe('Blog, la liste', () => {
     await page.route('**/api/u2/articles?*', (route) => route.fulfill({ status: 502 }));
     await page.goto('/blog');
     await expect(page.getByRole('alert')).toContainText(/n.ont pas pu être chargés/i);
+  });
+});
+
+test.describe('Blog, la recherche', () => {
+  test('interroge l’API, s’inscrit dans l’URL et annonce le nombre de résultats', async ({ page }) => {
+    await mockApi(page);
+    await page.goto('/blog');
+    await expect(page.getByRole('link', { name: ARTICLE.title })).toBeVisible();
+
+    const request = page.waitForRequest((req) => req.url().includes('q=co%C3%BBte'));
+    await page.getByRole('searchbox', { name: /rechercher un article/i }).fill('coûte');
+    await request;
+
+    await expect(page).toHaveURL(/\/blog\?q=co%C3%BBte$/);
+    await expect(page.getByText('Un article pour « coûte ».')).toBeVisible();
+    await expect(page.getByRole('link', { name: ARTICLE.title })).toBeVisible();
+  });
+
+  test('aucun résultat : le dit, et « Effacer » ramène tout le blog', async ({ page }) => {
+    await mockApi(page);
+    await page.goto('/blog?q=introuvable');
+
+    // Un lien partagé remplit le champ avec sa recherche.
+    await expect(page.getByRole('searchbox')).toHaveValue('introuvable');
+    await expect(page.getByText(/aucun article ne correspond à « introuvable »/i)).toBeVisible();
+
+    await page.getByRole('button', { name: /effacer la recherche/i }).click();
+    await expect(page).toHaveURL('/blog');
+    await expect(page.getByRole('searchbox')).toHaveValue('');
+    await expect(page.getByRole('link', { name: ARTICLE.title })).toBeVisible();
+  });
+
+  test('un article sans image reçoit une couverture typographique, pas une image cassée', async ({ page }) => {
+    await mockApi(page, [{ ...ARTICLE, imageUrl: null, imageAlt: null }]);
+    await page.goto('/blog');
+    await expect(page.getByRole('link', { name: ARTICLE.title })).toBeVisible();
+    await expect(page.locator('main img, app-blog-list img')).toHaveCount(0);
+    await expect(page.locator('[aria-hidden="true"]', { hasText: 'Site vitrine' })).toBeVisible();
   });
 });
 

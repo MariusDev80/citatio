@@ -108,9 +108,17 @@ export class BlogService {
   private static readonly ARTICLES = '/api/u2/articles';
   private static readonly CATEGORIES = '/api/u2/article-categories';
 
-  /** @param page numéro de page à partir de zéro */
-  list(page: number, size = 12): Observable<ArticlePage> {
-    const params = new HttpParams().set('page', page).set('size', size);
+  /**
+   * @param page numéro de page à partir de zéro
+   * @param query recherche dans le titre et le chapeau, sans tenir compte des
+   *              majuscules ni des accents (côté serveur). Vide : tout le blog.
+   */
+  list(page: number, query = '', size = 12): Observable<ArticlePage> {
+    let params = new HttpParams().set('page', page).set('size', size);
+    const q = query.trim();
+    if (q) {
+      params = params.set('q', q);
+    }
     return this.http.get<ArticlePage>(BlogService.ARTICLES, { params });
   }
 

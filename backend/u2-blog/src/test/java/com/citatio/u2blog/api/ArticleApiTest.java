@@ -233,4 +233,63 @@ class ArticleApiTest {
                     .andExpect(jsonPath("$[2].label").value("Visibilité IA"));
         }
     }
+
+    @Nested
+    class Recherche {
+
+        private ResultActions search(String q) throws Exception {
+            return mockMvc.perform(get("/api/u2/articles").param("q", q));
+        }
+
+        @Test
+        @DisplayName("Sans accents ni majuscules, trouve un titre accentue")
+        void ignoresCaseAndAccents() throws Exception {
+            // Mot absent du chapeau commun aux brouillons de test.
+            publish(draft("Le référencement local expliqué", null));
+            publish(draft("Un autre sujet", null));
+
+            search("REFERENCEMENT")
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.totalItems").value(1))
+                    .andExpect(jsonPath("$.items[0].slug").value("le-referencement-local-explique"));
+        }
+
+        @Test
+        @DisplayName("Cherche aussi dans le chapeau")
+        void searchesTheExcerpt() throws Exception {
+            publish(draft("Titre sans rapport", null));
+
+            // Le chapeau des brouillons de test : "Ce que coute un site vitrine, poste par poste."
+            search("poste par poste")
+                    .andExpect(jsonPath("$.totalItems").value(1));
+        }
+
+        @Test
+        @DisplayName("Un % tape par le lecteur ne renvoie pas toute la table")
+        void percentIsLiteral() throws Exception {
+            publish(draft("Un article ordinaire", null));
+
+            search("%").andExpect(jsonPath("$.totalItems").value(0));
+        }
+
+        @Test
+        @DisplayName("Aucun resultat : page vide, pas d'erreur")
+        void noMatchIsAnEmptyPage() throws Exception {
+            publish(draft("Un article ordinaire", null));
+
+            search("introuvable")
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.items.length()").value(0))
+                    .andExpect(jsonPath("$.totalPages").value(0));
+        }
+
+        @Test
+        @DisplayName("Recherche vide : tous les articles")
+        void blankQueryListsEverything() throws Exception {
+            publish(draft("Premier", null));
+            publish(draft("Deuxieme", null));
+
+            search("  ").andExpect(jsonPath("$.totalItems").value(2));
+        }
+    }
 }

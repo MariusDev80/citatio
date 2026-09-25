@@ -32,14 +32,16 @@ public class ArticleService {
     private final Clock clock;
 
     @Transactional(readOnly = true)
-    public ArticlePage list(int page, int size) {
+    public ArticlePage list(int page, int size, String query) {
         // Bornes ramenees plutot que refusees : une page negative ou une taille
         // de 10 000 viennent d'une URL bricolee, pas d'un usage a signaler.
         int safePage = Math.max(0, page);
         int safeSize = Math.clamp(size, 1, MAX_PAGE_SIZE);
+        PageRequest pageRequest = PageRequest.of(safePage, safeSize);
 
-        Page<Article> result = articles.findAllByOrderByPublishedAtDescIdDesc(
-                PageRequest.of(safePage, safeSize));
+        Page<Article> result = ArticleSearch.likePattern(query)
+                .map(pattern -> articles.search(pattern, pageRequest))
+                .orElseGet(() -> articles.findAllByOrderByPublishedAtDescIdDesc(pageRequest));
         return new ArticlePage(
                 result.map(ArticleViews::summary).getContent(),
                 result.getNumber(),

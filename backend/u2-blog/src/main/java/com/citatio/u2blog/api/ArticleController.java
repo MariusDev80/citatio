@@ -54,10 +54,16 @@ public class ArticleController {
 
     private final ArticleService articleService;
 
+    /**
+     * @param q recherche facultative dans le titre et le chapeau, sans tenir
+     *          compte des majuscules ni des accents. Vide ou absente : tous les
+     *          articles.
+     */
     @GetMapping("/articles")
     public ArticlePage list(@RequestParam(defaultValue = "0") int page,
-                            @RequestParam(defaultValue = "12") int size) {
-        return articleService.list(page, size);
+                            @RequestParam(defaultValue = "12") int size,
+                            @RequestParam(required = false) String q) {
+        return articleService.list(page, size, q);
     }
 
     @GetMapping("/articles/{slug}")

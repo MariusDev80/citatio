@@ -46,6 +46,14 @@ describe('BlogService', () => {
     req.flush({ items: [], page: 2, size: 12, totalItems: 0, totalPages: 0 });
   });
 
+  it('transmet la recherche, et l’omet quand elle est vide', () => {
+    service.list(0, '  coût ').subscribe();
+    httpMock.expectOne('/api/u2/articles?page=0&size=12&q=co%C3%BBt').flush({});
+
+    service.list(0, '   ').subscribe();
+    httpMock.expectOne('/api/u2/articles?page=0&size=12').flush({});
+  });
+
   it('encode le slug, qui vient de la barre d’adresse', () => {
     service.get('../article-categories').subscribe();
 

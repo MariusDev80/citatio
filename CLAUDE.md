@@ -65,7 +65,7 @@ Ce que le dépôt contient vraiment, pour éviter de raisonner sur un système i
 | Environnement dev (`dev.citatio-geo.com`, même VPS, cloisonné) | **Déployé à chaque commit de PR et push sur `develop`**. La production ne part plus que par le bouton « Deploy production » (§4.3) |
 | Gateway Caddy, TLS, en-têtes de sécurité, routage `/api/uX` | **Opérationnelle** |
 | `u1-communication` (Spring Boot) | **Une fonction réelle** : réception du formulaire de contact (entité `ContactRequest`, envoi SMTP asynchrone). Le reste (`/health`, sondes, `ping-u2`) est inchangé |
-| `u2-blog` (Spring Boot) | **Articles** : liste paginée, lecture, publication multipart avec image (en base), rubriques. Schéma sous **Flyway** (`V1__articles.sql`, `ddl-auto=validate`). **Publication non protégée** |
+| `u2-blog` (Spring Boot) | **Articles** : liste paginée avec recherche (titre et chapeau, sans casse ni accents), lecture, publication multipart avec image (en base), rubriques. Schéma sous **Flyway** (`V1__articles.sql`, `ddl-auto=validate`). **Publication non protégée** |
 | Indépendance des deux microservices | **Acquise** : aucun `depends_on` croisé, appels absorbés par `UpstreamClient` (timeouts, disjoncteur, dégradation gracieuse) |
 | Consommation du backend par le frontend | `ContactService` (`/api/u1/contact-requests`) et `BlogService` (`/api/u2/articles`, `/api/u2/article-categories`). Les 11 routes restent pré-rendues et aucune requête ne part au rendu : les routes du blog sont rendues côté client |
 | Formulaire de contact | **Branché sur `u1-communication`** : la demande est enregistrée en base puis notifiée par email. Le `mailto:` a été retiré |
@@ -637,7 +637,7 @@ npm run check:contrast          # balayage de contraste en thème sombre, après
 npm run build:og                # régénère public/og-citatio.png depuis tools/og-image.html
 
 # Backend, depuis backend/
-./mvnw -B test                  # les 64 tests des trois modules (ce que lance la CI)
+./mvnw -B test                  # les 74 tests des trois modules (ce que lance la CI)
 ./mvnw clean package            # les trois modules
 ./mvnw -pl u2-blog -am package  # un module et ses dépendances
 
@@ -662,7 +662,7 @@ npx lighthouse http://localhost:4173 --preset=desktop --view
   des prix, absence de fausse preuve sociale, polices auto-hébergées, contenu présent dans le HTML
   pré-rendu, bascule de thème. S'ils tombent, la bonne réaction est presque toujours de corriger le
   code, pas le test.
-- Côté backend, 64 tests tournent sur H2 en mémoire, **sans aucune base externe**, et la CI les
+- Côté backend, 74 tests tournent sur H2 en mémoire, **sans aucune base externe**, et la CI les
   lance sur tout push et toute PR (job `backend-test`). Trois familles sont des garde-fous et non des
   tests fonctionnels : `UpstreamClientTest` (aucune exception ne remonte d'un voisin coupé, le motif
   ne fuit pas, le circuit s'ouvre), `ApiExceptionHandlerTest` (une URL inconnue rend 404 et non
