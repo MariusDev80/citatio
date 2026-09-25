@@ -1,0 +1,112 @@
+@switch (state()) {
+  @case ('loading') {
+    <section class="ct-section pt-36 pb-8 md:pt-44">
+      <p class="ct-prose" role="status">Chargement de l’article…</p>
+    </section>
+  }
+
+  @case ('notFound') {
+    <section class="ct-section flex min-h-[70vh] flex-col justify-center py-32">
+      <p class="ct-eyebrow">Blog</p>
+      <h1 class="ct-display-lg mt-6 max-w-[16ch]">Cet article n’existe pas.</h1>
+      <p class="ct-lede ct-column mt-8">
+        Le lien est peut-être erroné, ou l’article a changé d’adresse.
+      </p>
+      <div class="mt-10">
+        <a routerLink="/blog" class="ct-btn">Voir tous les articles</a>
+      </div>
+    </section>
+  }
+
+  @case ('error') {
+    <section class="ct-section flex min-h-[70vh] flex-col justify-center py-32" role="alert">
+      <p class="ct-eyebrow">Blog</p>
+      <h1 class="ct-display-lg mt-6 max-w-[16ch]">L’article n’a pas pu être chargé.</h1>
+      <p class="ct-lede ct-column mt-8">
+        Notre serveur n’a pas répondu. Rechargez la page dans un instant.
+      </p>
+      <div class="mt-10">
+        <a routerLink="/blog" class="ct-link">
+          <span aria-hidden="true">←</span>
+          Retour au blog
+        </a>
+      </div>
+    </section>
+  }
+
+  @case ('ready') {
+    @if (article(); as article) {
+      <article class="pt-36 pb-8 md:pt-44">
+        <header class="ct-section">
+          <nav aria-label="Fil d’Ariane">
+            <p class="ct-eyebrow">
+              <a routerLink="/blog" class="ct-navlink">Blog</a>
+              @for (category of article.categories; track category.code) {
+                <span aria-hidden="true"> · </span>{{ category.label }}
+              }
+            </p>
+          </nav>
+          <h1 class="ct-display-lg mt-6 max-w-[22ch]">{{ article.title }}</h1>
+          <div class="ct-lede ct-column mt-8">
+            <p>{{ article.excerpt }}</p>
+          </div>
+          <p class="mt-8 text-sm text-ink-faint">
+            Par <span class="text-ink">{{ article.author }}</span>, le
+            <time [attr.datetime]="article.publishedAt">{{ publishedLabel() }}</time>
+          </p>
+        </header>
+
+        @if (article.imageUrl) {
+          <div class="ct-section mt-14">
+            <img
+              [src]="article.imageUrl"
+              [alt]="article.imageAlt ?? ''"
+              decoding="async"
+              fetchpriority="high"
+              class="aspect-[3/2] w-full rounded-sm bg-surface object-cover md:aspect-[2/1]" />
+          </div>
+        }
+
+        <div class="ct-section mt-14">
+          <div class="ct-column ct-prose border-t border-rule-strong pt-10 text-[1.0625rem]">
+            @for (block of blocks(); track $index) {
+              @switch (block.kind) {
+                @case ('heading') {
+                  @if (block.level === 2) {
+                    <h2 class="ct-display-md mt-14 mb-6 text-ink">{{ block.text }}</h2>
+                  } @else {
+                    <h3 class="ct-title mt-10 mb-4">{{ block.text }}</h3>
+                  }
+                }
+                @case ('list') {
+                  <ul class="my-6 list-disc space-y-2 pl-6 marker:text-ink-faint">
+                    @for (item of block.items; track $index) {
+                      <li>{{ item }}</li>
+                    }
+                  </ul>
+                }
+                @case ('paragraph') {
+                  <p class="my-5">
+                    @for (line of block.lines; track $index) {
+                      {{ line }}@if (!$last) {<br />}
+                    }
+                  </p>
+                }
+              }
+            }
+          </div>
+        </div>
+
+        <footer class="ct-section mt-16">
+          <div class="ct-column flex flex-col gap-6 border-t border-rule pt-8 sm:flex-row sm:items-center sm:justify-between">
+            <a routerLink="/blog" class="ct-link">
+              <span aria-hidden="true">←</span>
+              Tous les articles
+            </a>
+            <a routerLink="/contact" class="ct-btn">Parlons de votre projet</a>
+          </div>
+        </footer>
+      </article>
+    }
+  }
+}

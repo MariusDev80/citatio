@@ -27,6 +27,27 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
+		<!-- Sans ce starter, aucun validateur n'est present : les contraintes
+		     jakarta.validation des DTO seraient ignorees et @Valid ne rejetterait
+		     rien. Meme raison que dans u1-communication. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+		<!-- Schema versionne des la premiere table du module. CLAUDE.md §4.2 note
+		     ddl-auto=update comme une dette a solder avant la deuxieme entite du
+		     projet : les articles en sont une, u2 part donc directement sur
+		     Flyway plutot que d'ajouter une table de plus a rattraper. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-flyway</artifactId>
+		</dependency>
+		<!-- Depuis Flyway 10, chaque base a son module ; sans lui, Flyway refuse
+		     Postgres au demarrage ("Unsupported Database"). -->
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
+		</dependency>
 		<!-- Sondes de sante liveness / readiness. Caddy ne routant que /api/uX/*,
 		     /actuator/** reste joignable depuis le reseau Docker seulement. -->
 		<dependency>

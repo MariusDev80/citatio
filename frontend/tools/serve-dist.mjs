@@ -11,7 +11,9 @@ import { join, extname, normalize } from 'node:path';
  * nothing. It also made the canonical test flaky, since it only passed once
  * Angular had hydrated and rewritten the tag.
  *
- * Resolution order, the same three rules as the nginx config:
+ * Resolution order, the same rules as the nginx config:
+ *   0. /blog and /blog/*: the client-side template, index.csr.html, under 200
+ *      (`location ^~ /blog/`), the blog being rendered in the browser
  *   1. the file itself            (`try_files $uri`)
  *   2. the directory's index.html (`try_files $uri/index.html`)
  *   3. otherwise 404 carrying the SPA body, so Angular renders its not-found
@@ -51,6 +53,14 @@ createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
   const path = normalize(decodeURIComponent(url.pathname)).replace(/^(\.\.[/\\])+/, '');
   const target = join(ROOT, path);
+
+  // Regle du blog de nginx.conf : gabarit client, en 200, quelle que soit l'adresse.
+  if (url.pathname === '/blog' || url.pathname.startsWith('/blog/')) {
+    const shell = await readIfFile(join(ROOT, 'index.csr.html'));
+    res.writeHead(shell ? 200 : 404, { 'Content-Type': TYPES['.html'] });
+    res.end(shell ?? 'Not found');
+    return;
+  }
 
   const body = (await readIfFile(target)) ?? (await readIfFile(join(target, 'index.html')));
   if (body) {

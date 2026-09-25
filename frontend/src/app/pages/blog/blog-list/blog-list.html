@@ -1,0 +1,108 @@
+<article class="pt-36 pb-8 md:pt-44">
+  <header class="ct-section">
+    <p class="ct-eyebrow">Blog</p>
+    <div class="mt-6 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+      <h1 class="ct-display-lg max-w-[16ch]">Notes d’atelier.</h1>
+      <!-- Lien de rédaction visible de tous : la publication n'est pas encore
+           protégée (décision de la première étape du blog). À retirer ou à
+           conditionner avant toute ouverture au public. -->
+      <a routerLink="/blog/nouvel-article" class="ct-btn ct-btn--ghost shrink-0">Rédiger un article</a>
+    </div>
+    <div class="ct-lede ct-column mt-8">
+      <p>
+        Ce que nous apprenons en construisant des sites vitrines : ce qu’ils coûtent, comment ils
+        se trouvent sur Google, comment ils restent en ligne.
+      </p>
+    </div>
+  </header>
+
+  <div class="ct-section mt-16">
+    @switch (state()) {
+      @case ('loading') {
+        <p class="ct-prose border-t border-rule-strong pt-8" role="status">Chargement des articles…</p>
+      }
+
+      @case ('error') {
+        <div class="border-t border-rule-strong pt-8" role="alert">
+          <p class="ct-title">Les articles n’ont pas pu être chargés.</p>
+          <p class="ct-prose mt-3">
+            Notre serveur n’a pas répondu. Rechargez la page dans un instant.
+          </p>
+        </div>
+      }
+
+      @case ('ready') {
+        @if (articles().length === 0) {
+          <div class="border-t border-rule-strong pt-8">
+            <p class="ct-title">Aucun article publié pour l’instant.</p>
+          </div>
+        } @else {
+          <ol class="border-t border-rule-strong">
+            @for (article of articles(); track article.slug) {
+              <li class="border-b border-rule">
+                <!-- Le lien couvre toute la ligne par son pseudo-élément
+                     (after:absolute), le titre reste le seul texte du lien
+                     annoncé par un lecteur d'écran. -->
+                <div class="relative grid gap-6 py-10 md:grid-cols-12 md:gap-10">
+                  <div class="md:col-span-8">
+                    <p class="ct-eyebrow">
+                      <time [attr.datetime]="article.publishedAt">{{ article.publishedLabel }}</time>
+                      @for (category of article.categories; track category.code) {
+                        <span aria-hidden="true"> · </span>{{ category.label }}
+                      }
+                    </p>
+                    <h2 class="ct-display-md mt-4">
+                      <a
+                        [routerLink]="['/blog', article.slug]"
+                        class="ct-focus-ring rounded-sm transition-colors after:absolute after:inset-0 hover:text-accent">
+                        {{ article.title }}
+                      </a>
+                    </h2>
+                    <p class="ct-prose ct-column mt-4">{{ article.excerpt }}</p>
+                    <p class="mt-4 text-sm text-ink-faint">Par {{ article.author }}</p>
+                  </div>
+
+                  @if (article.imageUrl) {
+                    <div class="md:col-span-4">
+                      <!-- Pas de NgOptimizedImage : l'image vient de l'API, ses
+                           dimensions ne sont pas connues au build. Le cadre fixe
+                           le ratio, donc aucun décalage de mise en page. -->
+                      <img
+                        [src]="article.imageUrl"
+                        [alt]="article.imageAlt ?? ''"
+                        loading="lazy"
+                        decoding="async"
+                        class="aspect-[3/2] w-full rounded-sm bg-surface object-cover" />
+                    </div>
+                  }
+                </div>
+              </li>
+            }
+          </ol>
+
+          @if (totalPages() > 1) {
+            <nav class="mt-10 flex items-center justify-between gap-6 text-sm" aria-label="Pages du blog">
+              @if (hasNewer()) {
+                <a routerLink="/blog" [queryParams]="pageParams(pageNumber() - 1)" class="ct-link">
+                  <span aria-hidden="true">←</span>
+                  Articles plus récents
+                </a>
+              } @else {
+                <span></span>
+              }
+              <p class="text-ink-faint">Page {{ pageNumber() }} sur {{ totalPages() }}</p>
+              @if (hasOlder()) {
+                <a routerLink="/blog" [queryParams]="pageParams(pageNumber() + 1)" class="ct-link">
+                  Articles plus anciens
+                  <span aria-hidden="true">→</span>
+                </a>
+              } @else {
+                <span></span>
+              }
+            </nav>
+          }
+        }
+      }
+    }
+  </div>
+</article>

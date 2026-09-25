@@ -63,7 +63,16 @@ handle /api/u1/* {
     }
 }
 
+# Meme raison qu'au dessus, avec une autre borne : la publication d'un article
+# porte une image. Spring refuse au dela de 2 Mo de fichier et 3 Mo de requete
+# (spring.servlet.multipart.*), mais sans cette limite la gateway acceptait le
+# televersement complet avant que u2 ne le rejette. 3 Mo, la meme valeur que
+# max-request-size, pour que Caddy coupe au plus tot sans refuser un envoi que
+# le service aurait accepte. Au dela, Caddy repond 413 sans rien transmettre.
 handle /api/u2/* {
+    request_body {
+        max_size 3MB
+    }
     reverse_proxy u2-blog:8082
 }
 

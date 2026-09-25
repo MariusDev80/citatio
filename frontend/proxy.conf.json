@@ -1,0 +1,10 @@
+{
+  "/api/u1": {
+    "target": "http://localhost:8081",
+    "secure": false
+  },
+  "/api/u2": {
+    "target": "http://localhost:8082",
+    "secure": false
+  }
+}
